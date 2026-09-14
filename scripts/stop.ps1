@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $ProjectRoot = Split-Path -Parent $PSScriptRoot
-foreach ($Name in @('web','worker','api','source')) {
+foreach ($Name in @('web','worker','ai-worker','api','source')) {
     $pidFile = Join-Path $ProjectRoot "logs/$Name.pid"
     if (!(Test-Path -LiteralPath $pidFile)) { continue }
     $saved = Get-Content -Raw $pidFile | ConvertFrom-Json

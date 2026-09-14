@@ -134,7 +134,7 @@ def test_search_and_hidden_content_boundaries(client):
     api, conn = client
     visible = fixture_account(conn)
     hidden = fixture_account(conn, "hidden")
-    response = api.get("/api/accounts", params={"q": "人工智能"})
+    response = api.get("/api/accounts", params={"q": "测试人工智能信息源", "limit": 100})
     assert response.status_code == 200
     ids = [a["id"] for a in response.json()["items"]]
     assert visible in ids and hidden not in ids
@@ -208,6 +208,8 @@ def test_admin_ranking_validation(client):
 
 
 def test_ai_profile_is_structured_and_preserves_manual_review(client, monkeypatch):
+    scores = ai.Profile.model_json_schema()['properties']['quality_scores']['additionalProperties']
+    assert scores['minimum'] == 0 and scores['maximum'] == 5
     _, conn = client
     account = fixture_account(conn)
     for i in range(3):

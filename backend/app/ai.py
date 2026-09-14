@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Literal
+from typing import Annotated, Literal
 
 import httpx
 from psycopg.types.json import Jsonb
@@ -29,7 +29,9 @@ class Profile(BaseModel):
     weaknesses: list[str]
     recommendation_reason: str
     not_recommended_for: list[str]
-    quality_scores: dict[str, float]
+    quality_scores: dict[str, Annotated[float, Field(ge=0, le=5)]] = Field(
+        description="各维度采用五分制，所有分值必须介于 0 和 5 之间，不使用十分制或百分制"
+    )
 
     @model_validator(mode="after")
     def valid_scores(self):
