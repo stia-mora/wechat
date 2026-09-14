@@ -272,6 +272,7 @@ export function SourcePipeline({
               </p>
             )}
             {state.job.error && <p className="text-red-700">{state.job.error}</p>}
+            {Array.isArray(state.job.result?.skipped_bodies) && state.job.result.skipped_bodies.length > 0 && <p>本批跳过 {state.job.result.skipped_bodies.length} 篇异常正文，已记录原因并延后 24 小时重试，其他文章继续采集。</p>}
             {['blocked', 'failed'].includes(state.job.status) && (
               <button disabled={busy} className="button secondary small mt-2" onClick={retry}>
                 处理后继续此任务

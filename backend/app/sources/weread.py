@@ -184,8 +184,22 @@ class WeReadAdapter:
         soup = BeautifulSoup(html, "html.parser")
         body = soup.select_one("#js_content") or soup.select_one(".rich_media_content")
         if body is None or not body.get_text(strip=True):
-            if "验证" in html or "captcha" in html.lower():
-                raise SourceError("verification", "正文页面要求验证，请人工打开原文处理后检测账号", "verification")
+            for hidden in soup.select("script,style,noscript,template"):
+                hidden.decompose()
+            visible = soup.get_text(" ", strip=True)
+            if any(
+                message in visible
+                for message in (
+                    "环境异常",
+                    "完成验证后",
+                    "请完成安全验证",
+                    "请输入验证码",
+                    "拖动滑块",
+                )
+            ):
+                raise SourceError(
+                    "verification", "正文页面要求验证，请人工打开原文处理后检测账号", "verification"
+                )
             raise SourceError("invalid_content", "正文页面没有可读内容", "content")
         timestamp = re.search(r'(?:var\s+)?ct\s*=\s*["\'](\d{10})["\']', html)
         author = soup.select_one("#js_name")

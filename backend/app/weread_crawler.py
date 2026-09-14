@@ -20,6 +20,7 @@ def collect(payload):
     adapter = None
     progress = dict(payload.get("_progress") or {})
     capability = "history"
+    skipped_bodies = []
 
     def checkpoint(stage, **values):
         pool.heartbeat(lease)
@@ -101,12 +102,31 @@ def collect(payload):
             missing = conn.execute(
                 """SELECT a.*,o.external_id FROM articles a JOIN article_origins o ON o.article_id=a.id
                 WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s
+                AND (a.body_retry_after IS NULL OR a.body_retry_after<=now())
                 ORDER BY a.publish_time DESC NULLS LAST,a.id DESC LIMIT %s""",
                 (target, body_since(), payload.get("parse_limit", 20)),
             ).fetchall()
         for article in missing:
             checkpoint("补全文章正文", article_id=article["id"])
-            body = adapter.content(article["external_id"])
+            try:
+                body = adapter.content(article["external_id"])
+            except SourceError as exc:
+                with db() as conn:
+                    conn.execute(
+                        """UPDATE articles SET body_error=%s,body_failures=body_failures+1,
+                        body_retry_after=CASE WHEN %s='content' THEN now()+interval '24 hours' ELSE NULL END WHERE id=%s""",
+                        (str(exc), exc.category, article["id"]),
+                    )
+                if exc.category != "content":
+                    raise
+                skipped_bodies.append({"article_id": article["id"], "error": str(exc)})
+                checkpoint("跳过单篇异常，继续补采", skipped_bodies=skipped_bodies)
+                continue
+            with db() as conn:
+                conn.execute(
+                    "UPDATE articles SET body_error=NULL,body_retry_after=NULL WHERE id=%s",
+                    (article["id"],),
+                )
             if body.get("publish_time"):
                 with db() as conn:
                     conn.execute(
@@ -166,6 +186,7 @@ def collect(payload):
             imported=counts["total"],
             readable_articles=counts["readable"],
             missing_bodies=remaining,
+            skipped_bodies=skipped_bodies,
             body_since=body_since().isoformat(),
             history_complete=(exhausted or reached_known) if capability == "history" else False,
         )

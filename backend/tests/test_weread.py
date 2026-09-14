@@ -70,6 +70,21 @@ def test_adapter_identity_and_group_pagination():
     adapter.close()
 
 
+@pytest.mark.parametrize(
+    "html,category",
+    [
+        ('<script>var captcha="验证"</script><p>微信扫一扫使用小程序</p>', "content"),
+        ("<p>环境异常，请完成验证后继续</p>", "verification"),
+    ],
+)
+def test_verification_requires_visible_challenge(html, category):
+    adapter = WeReadAdapter(transport=httpx.MockTransport(lambda r: httpx.Response(200, text=html)))
+    with pytest.raises(SourceError) as error:
+        adapter.content("test")
+    assert error.value.category == category
+    adapter.close()
+
+
 @pytest.mark.parametrize("code,category", [(-2012, "auth"), (-2041, "ambiguous"), (-2010, "auth")])
 def test_adapter_business_errors(code, category):
     adapter = WeReadAdapter(
@@ -263,7 +278,7 @@ def test_cover_is_explicit_degradation_not_history_success(client, monkeypatch):
             }
 
         def content(self, rid):
-            pytest.fail('Unknown publication date must not fetch a body')
+            pytest.fail("Unknown publication date must not fetch a body")
 
         def credentials(self):
             return {"cookies": {}}

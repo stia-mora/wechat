@@ -44,7 +44,8 @@ def test_body_cutoff_shanghai_boundary(monkeypatch):
     assert eligible(datetime.fromisoformat("2026-05-31T16:00:00+00:00"))
 
 
-def test_corrected_old_body_date_is_not_refetched(client, monkeypatch):
+@pytest.mark.parametrize("unreadable", [False, True])
+def test_corrected_old_body_date_is_not_refetched(client, monkeypatch, unreadable):
     from types import SimpleNamespace
 
     from test_weread import job, source_account, target
@@ -60,6 +61,10 @@ def test_corrected_old_body_date_is_not_refetched(client, monkeypatch):
 
     def content(rid):
         calls.append(rid)
+        if unreadable and rid.endswith("_old"):
+            from app.sources.weread import SourceError
+
+            raise SourceError("invalid_content", "正文缺失", "content")
         return {
             "content": "<p>正文</p>",
             "publish_time": 1700000000 if rid.endswith("_old") else 1780272000,
@@ -97,7 +102,9 @@ def test_corrected_old_body_date_is_not_refetched(client, monkeypatch):
         "SELECT title,publish_time,content_text FROM articles WHERE account_id=%s", (aid,)
     ).fetchall()
     old = next(r for r in rows if r["title"] == "old")
-    assert old["publish_time"].timestamp() == 1700000000 and not old["content_text"]
+    assert not old["content_text"]
+    if not unreadable:
+        assert old["publish_time"].timestamp() == 1700000000
     assert next(r for r in rows if r["title"] == "new")["content_text"] == "正文"
 
 

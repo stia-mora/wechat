@@ -164,3 +164,6 @@ CREATE INDEX IF NOT EXISTS jobs_source_lease ON jobs(source_account_id) WHERE st
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS execution_token text;
 ALTER TABLE source_accounts ADD COLUMN IF NOT EXISTS maintenance_until timestamptz;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_publish_time timestamptz;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_error text;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_failures integer NOT NULL DEFAULT 0;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_retry_after timestamptz;
