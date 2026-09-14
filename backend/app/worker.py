@@ -64,7 +64,12 @@ def run(once=False, mode="all"):
 
                 result = analyze(job["kind"], job["payload"])
             else:
-                result = getattr(source, job["kind"])(job["payload"])
+                payload = dict(job["payload"])
+                if job["kind"] == "sync":
+                    payload.update(
+                        _job_id=job["id"], _progress=job["result"] or payload.get("_progress")
+                    )
+                result = getattr(source, job["kind"])(payload)
             with db() as conn:
                 conn.execute(
                     "UPDATE jobs SET status='done',result=%s,finished_at=now() WHERE id=%s",
@@ -82,7 +87,7 @@ def run(once=False, mode="all"):
             if not job["kind"].endswith("_ai"):
                 with db() as conn:
                     conn.execute(
-                        "UPDATE jobs SET status='blocked',error=%s,finished_at=now() WHERE status='queued' AND kind IN ('discover','sync','parse')",
+                        "UPDATE jobs SET status='blocked',error=%s,finished_at=now() WHERE status='queued' AND kind IN ('discover','sync','parse') AND coalesce((payload->>'cache_only')::boolean,false)=false",
                         (str(exc)[:1000],),
                     )
         except Exception as exc:

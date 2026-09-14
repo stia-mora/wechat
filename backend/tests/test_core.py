@@ -5,7 +5,7 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from app import admin, ai, auth, crawler, main
+from app import admin, ai, auth, crawler, main, pipeline
 from app.content import article_key, clean_content
 from app.db import db
 from app.repository import enqueue, index_account, index_article
@@ -27,7 +27,7 @@ def client(monkeypatch):
                     with conn.transaction():
                         yield conn
 
-                for module in (main, auth, admin, crawler, ai):
+                for module in (main, auth, admin, crawler, ai, pipeline):
                     monkeypatch.setattr(module, "db", test_db)
                 monkeypatch.setenv("ADMIN_TOKEN", "test-only-admin-token-long-enough")
                 auth.attempts.clear()
@@ -216,34 +216,173 @@ def test_ai_profile_is_structured_and_preserves_manual_review(client, monkeypatc
         ai.analyze("account_ai", {"target_id": account})
 
 
-def test_sync_continues_past_already_readable_articles(client, monkeypatch):
+def test_pipeline_resumes_bodies_without_refetching_history(client, monkeypatch):
     _, conn = client
     account = fixture_account(conn)
+    job_id = enqueue(conn, "sync", {"target_id": account})
     marker = secrets.token_hex(8)
-    items = [
-        {
-            "title": f"article {i}",
-            "link": f"https://mp.weixin.qq.com/s?__biz={marker}&mid={i}&idx=1",
-            "create_time": 1700000000,
-        }
-        for i in range(5)
-    ]
-    for item in items[:3]:
-        conn.execute(
-            "INSERT INTO articles(account_id,source_key,title,source_url,status) VALUES (%s,%s,%s,%s,'ready')",
-            (account, article_key(item["link"]), item["title"], item["link"]),
-        )
+    cached, calls = [], []
+    fail = True
+
+    def bridge(method, path, **kw):
+        nonlocal fail
+        calls.append(path)
+        if path == "/history":
+            cached.extend(
+                {
+                    "id": i,
+                    "title": f"article {i}",
+                    "publish_time": 1700000000,
+                    "link": f"https://mp.weixin.qq.com/s?__biz={marker}&mid={i}&idx=1",
+                }
+                for i in range(1, 4)
+            )
+            return {"next_begin": 10, "has_more": True}
+        if path == "/articles":
+            return {
+                "items": [dict(i) for i in cached if i["id"] > kw["params"]["after"]],
+                "next_after": 3,
+            }
+        item = next(i for i in cached if i["id"] == int(path.split("/")[2]))
+        if item["id"] == 2 and fail:
+            fail = False
+            raise crawler.SourceBlocked("ret=200013")
+        item.update(content="<p>真实链路的隔离测试正文</p>")
+        return dict(item)
+
     source = crawler.SourceClient()
-    monkeypatch.setattr(source, "request", lambda *a, **kw: {"articles": items, "total": 5})
-    source.sync({"target_id": account, "parse_limit": 3})
-    queued = conn.execute(
-        "SELECT count(*) AS n FROM jobs WHERE kind='parse' AND (payload->>'target_id')::bigint IN(SELECT id FROM articles WHERE account_id=%s)",
-        (account,),
-    ).fetchone()["n"]
-    assert queued == 2
+    monkeypatch.setattr(source, "bridge", bridge)
+    monkeypatch.setattr(source, "request", lambda *a, **kw: {"success": True})
+    payload = {"target_id": account, "pages": 1, "parse_limit": 3, "_job_id": job_id}
+    with pytest.raises(crawler.SourceBlocked):
+        source.sync(payload)
+    assert (
+        conn.execute(
+            "SELECT count(*) n FROM articles WHERE account_id=%s AND status='ready'", (account,)
+        ).fetchone()["n"]
+        == 1
+    )
+    progress = conn.execute("SELECT result FROM jobs WHERE id=%s", (job_id,)).fetchone()["result"]
+    assert progress["pages_done"] == 1
+    result = source.sync({**payload, "_progress": progress})
+    assert result["readable_articles"] == 3 and result["export_available"]
+    assert calls.count("/history") == 1 and calls.count("/articles/3/body") == 1
     assert (
         marker
         in conn.execute(
             "SELECT source_url FROM official_accounts WHERE id=%s", (account,)
         ).fetchone()["source_url"]
     )
+
+
+def test_cache_import_updates_old_body_keeps_hidden_and_needs_no_login(client, monkeypatch):
+    _, conn = client
+    account = fixture_account(conn)
+    marker = secrets.token_hex(8)
+    items = [
+        {
+            "id": i,
+            "title": f"cached {i}",
+            "publish_time": 1700000000,
+            "link": f"https://mp.weixin.qq.com/s?__biz={marker}&mid={i}&idx=1",
+        }
+        for i in range(1, 104)
+    ]
+    source = crawler.SourceClient()
+
+    def bridge(method, path, **kw):
+        assert method == "GET" and path == "/articles"
+        batch = [dict(i) for i in items if i["id"] > kw["params"]["after"]][:100]
+        return {"items": batch, "next_after": batch[-1]["id"] if batch else 103}
+
+    monkeypatch.setattr(source, "bridge", bridge)
+    monkeypatch.setattr(
+        source, "request", lambda *a, **kw: pytest.fail("cache import contacted WeChat")
+    )
+    source.sync({"target_id": account, "cache_only": True})
+    conn.execute(
+        "UPDATE articles SET status='hidden' WHERE account_id=%s AND title='cached 1'", (account,)
+    )
+    items[0]["content"] = "<p>补全的正文</p>"
+    items[0].update(author="补全作者", publish_time=1800000000, digest="补全摘要")
+    source.sync({"target_id": account, "cache_only": True})
+    rows = conn.execute("SELECT * FROM articles WHERE account_id=%s", (account,)).fetchall()
+    assert len(rows) == 103
+    hidden = next(r for r in rows if r["title"] == "cached 1")
+    assert hidden["status"] == "hidden" and hidden["content_text"] == "补全的正文"
+    assert hidden["author"] == "补全作者" and hidden["publish_time"].timestamp() == 1800000000
+    assert hidden["summary"] == "补全摘要"
+
+
+def test_admin_export_requires_auth_and_proxies_file(client, monkeypatch):
+    api, conn = client
+    account = fixture_account(conn)
+    url = f"/api/admin/accounts/{account}/export/zip"
+    assert api.get(url).status_code == 403
+    monkeypatch.setattr(
+        admin.httpx,
+        "get",
+        lambda *a, **kw: httpx.Response(
+            200,
+            content=b"PK-test-export",
+            headers={"Content-Type": "application/zip"},
+            request=httpx.Request("GET", "http://source/export"),
+        ),
+    )
+    headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
+    response = api.get(url, headers=headers)
+    assert (
+        response.content == b"PK-test-export"
+        and "attachment" in response.headers["content-disposition"]
+    )
+    assert api.get(url.replace("/zip", "/exe"), headers=headers).status_code == 422
+
+
+def test_source_message_errors_are_preserved():
+    source = crawler.SourceClient()
+    source.client = httpx.Client(
+        transport=httpx.MockTransport(
+            lambda request: httpx.Response(
+                200, json={"success": False, "message": "微信API错误: ret=200013"}
+            )
+        ),
+        base_url="http://source",
+    )
+    with pytest.raises(crawler.SourceBlocked, match="200013"):
+        source.request("POST", "/api/admin/history/fetch", remote=False)
+
+
+def test_manual_links_queue_parse_and_save_real_metadata(client, monkeypatch):
+    api, conn = client
+    account = fixture_account(conn)
+    headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
+    url = f"https://mp.weixin.qq.com/s?__biz={secrets.token_hex(8)}&mid=1&idx=1"
+    endpoint = f"/api/admin/accounts/{account}/links"
+    assert (
+        api.post(endpoint, headers=headers, json={"urls": ["http://127.0.0.1/"]}).status_code == 422
+    )
+    result = api.post(endpoint, headers=headers, json={"urls": [url, url]}).json()
+    assert len(result["ids"]) == 1
+    job = conn.execute("SELECT payload FROM jobs WHERE id=%s", (result["ids"][0],)).fetchone()
+    calls = []
+
+    def bridge(method, path, **kw):
+        calls.append(path)
+        if path == "/articles":
+            return {"id": 99, "content": ""}
+        return {
+            "title": "解析到的标题",
+            "author": "作者",
+            "publish_time": 1700000000,
+            "content": "<p>解析正文</p>",
+        }
+
+    source = crawler.SourceClient()
+    monkeypatch.setattr(source, "bridge", bridge)
+    source.parse(job["payload"])
+    article = conn.execute(
+        "SELECT * FROM articles WHERE id=%s", (job["payload"]["target_id"],)
+    ).fetchone()
+    assert article["status"] == "ready" and article["title"] == "解析到的标题"
+    assert article["author"] == "作者" and article["publish_time"].timestamp() == 1700000000
+    assert calls == ["/articles", "/articles/99/body"]

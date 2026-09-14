@@ -53,7 +53,7 @@ function Start-OwnedService($Name, $Executable, $Arguments, $Directory, $Port) {
 if (Test-Path -LiteralPath 'ref/wechat-download-api/app.py') {
     $env:SITE_URL = 'http://localhost:5500'
     $env:SKIP_BACKGROUND_TASKS = 'true'
-    Start-OwnedService 'source' $PythonExe '-X utf8 -m uvicorn app:app --host 127.0.0.1 --port 5500' (Join-Path $ProjectRoot 'ref/wechat-download-api') 5500
+    Start-OwnedService 'source' $PythonExe '-X utf8 -m uvicorn service:app --app-dir ../../source_bridge --host 127.0.0.1 --port 5500' (Join-Path $ProjectRoot 'ref/wechat-download-api') 5500
 }
 Start-OwnedService 'api' $PythonExe '-X utf8 -m uvicorn app.main:app --host 127.0.0.1 --port 8500' (Join-Path $ProjectRoot 'backend') 8500
 Start-OwnedService 'worker' $PythonExe '-X utf8 -m app.worker' (Join-Path $ProjectRoot 'backend') 0

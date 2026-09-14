@@ -5,12 +5,12 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import httpx
 
-from .content import article_key, clean_content
+from .content import clean_content
 from .db import db
 from .repository import enqueue, index_account, index_article
 
 
-class SourceBlocked(Exception):
+class SourceBlocked(RuntimeError):
     pass
 
 
@@ -21,20 +21,21 @@ class SourceClient:
             base_url=os.environ["SOURCE_API_URL"].rstrip("/"), timeout=150, trust_env=False
         )
 
-    def request(self, method, path, **kwargs):
+    def request(self, method, path, remote=True, **kwargs):
         delay = max(13, float(os.getenv("CRAWL_INTERVAL_SECONDS", "13"))) - (
             time.monotonic() - self.last_request
         )
-        if delay > 0:
+        if remote and delay > 0:
             time.sleep(delay)
-        self.last_request = time.monotonic()
+        if remote:
+            self.last_request = time.monotonic()
         response = self.client.request(method, path, **kwargs)
         if response.status_code in (401, 403, 429):
             raise SourceBlocked(f"采集服务要求认证或限流，HTTP {response.status_code}")
         response.raise_for_status()
         result = response.json()
         if not result.get("success"):
-            message = result.get("error") or "数据源返回失败"
+            message = result.get("error") or result.get("message") or "数据源返回失败"
             if any(
                 word in message.lower()
                 for word in (
@@ -51,7 +52,7 @@ class SourceClient:
             ):
                 raise SourceBlocked(message)
             raise RuntimeError(message)
-        return result.get("data") or {}
+        return result.get("data") if "data" in result else result
 
     def discover(self, payload):
         data = self.request("GET", "/api/public/searchbiz", params={"query": payload["query"]})
@@ -90,66 +91,19 @@ class SourceClient:
                 found.append(row)
         return {"count": len(found), "accounts": found, "query": payload["query"]}
 
+    def bridge(self, method, path, remote=False, **kwargs):
+        return self.request(
+            method,
+            "/api/bridge" + path,
+            remote=remote,
+            headers={"Authorization": "Bearer " + os.environ["ADMIN_TOKEN"]},
+            **kwargs,
+        )
+
     def sync(self, payload):
-        with db() as conn:
-            account = conn.execute(
-                "SELECT * FROM official_accounts WHERE id=%s", (payload["target_id"],)
-            ).fetchone()
-        if not account:
-            raise ValueError("公众号不存在")
-        seen = []
-        parse_enqueued = 0
-        for page in range(payload.get("pages", 1)):
-            data = self.request(
-                "GET",
-                "/api/public/articles",
-                params={"fakeid": account["source_id"], "begin": page * 10, "count": 10},
-            )
-            items = data.get("articles", [])
-            with db() as conn:
-                for item in items:
-                    url = item.get("link", "")
-                    if not url:
-                        continue
-                    published = item.get("create_time") or item.get("update_time")
-                    row = conn.execute(
-                        """INSERT INTO articles(account_id,source_key,title,author,source_url,cover_url,summary,publish_time)
-                      VALUES (%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT(source_key) DO UPDATE SET title=EXCLUDED.title,cover_url=EXCLUDED.cover_url,updated_at=now() RETURNING id,status""",
-                        (
-                            account["id"],
-                            article_key(url),
-                            item["title"],
-                            item.get("author") or "",
-                            url,
-                            item.get("cover") or "",
-                            item.get("digest") or "",
-                            datetime.fromtimestamp(published, UTC) if published else None,
-                        ),
-                    ).fetchone()
-                    index_article(conn, row["id"])
-                    if (
-                        row["status"] not in ("ready", "hidden")
-                        and parse_enqueued < payload.get("parse_limit", 3)
-                        and enqueue(conn, "parse", {"target_id": row["id"]})
-                    ):
-                        parse_enqueued += 1
-                    biz = parse_qs(urlparse(url).query).get("__biz")
-                    if biz:
-                        profile_url = "https://mp.weixin.qq.com/mp/profile_ext?" + urlencode(
-                            {"action": "home", "__biz": biz[0]}
-                        )
-                        conn.execute(
-                            "UPDATE official_accounts SET source_url=%s WHERE id=%s",
-                            (profile_url, account["id"]),
-                        )
-                    seen.append(row["id"])
-                conn.execute(
-                    "UPDATE official_accounts SET last_crawled_at=now(),last_article_at=(SELECT max(publish_time) FROM articles WHERE account_id=%s) WHERE id=%s",
-                    (account["id"], account["id"]),
-                )
-            if not items or (page + 1) * 10 >= data.get("total", 0):
-                break
-        return {"account_id": account["id"], "articles": len(set(seen))}
+        from .pipeline import run
+
+        return run(self, payload)
 
     def parse(self, payload):
         with db() as conn:
@@ -158,16 +112,64 @@ class SourceClient:
             ).fetchone()
         if not article:
             raise ValueError("文章不存在")
-        data = self.request("POST", "/api/article", json={"url": article["source_url"]})
+        with db() as conn:
+            account = conn.execute(
+                "SELECT * FROM official_accounts WHERE id=%s", (article["account_id"],)
+            ).fetchone()
+        cached = self.bridge(
+            "POST",
+            "/articles",
+            json={
+                "fakeid": account["source_id"],
+                "nickname": account["name"],
+                "title": article["title"],
+                "link": article["source_url"],
+                "publish_time": int(article["publish_time"].timestamp())
+                if article["publish_time"]
+                else 0,
+                "author": article["author"],
+                "cover": article["cover_url"],
+                "digest": article["summary"],
+            },
+        )
+        data = (
+            cached
+            if cached.get("content")
+            else self.bridge("POST", f"/articles/{cached['id']}/body", remote=True)
+        )
         html, text = clean_content(data.get("content", ""))
         if not text.strip():
             raise ValueError("未返回可读正文")
         with db() as conn:
             conn.execute(
-                "UPDATE articles SET content_html=%s,content_text=%s,word_count=%s,status=CASE WHEN status='hidden' THEN 'hidden' ELSE 'ready' END,crawl_time=now(),updated_at=now() WHERE id=%s",
-                (html, text, len(text), article["id"]),
+                "UPDATE articles SET title=%s,author=%s,publish_time=%s,content_html=%s,content_text=%s,word_count=%s,status=CASE WHEN status='hidden' THEN 'hidden' ELSE 'ready' END,crawl_time=now(),updated_at=now() WHERE id=%s",
+                (
+                    data.get("title") or article["title"],
+                    data.get("author") or article["author"],
+                    datetime.fromtimestamp(data["publish_time"], UTC)
+                    if data.get("publish_time")
+                    else article["publish_time"],
+                    html,
+                    text,
+                    len(text),
+                    article["id"],
+                ),
             )
             index_article(conn, article["id"])
+            biz = parse_qs(urlparse(article["source_url"]).query).get("__biz")
+            conn.execute(
+                "UPDATE official_accounts SET last_article_at=(SELECT max(publish_time) FROM articles WHERE account_id=%s) WHERE id=%s",
+                (article["account_id"], article["account_id"]),
+            )
+            if biz:
+                conn.execute(
+                    "UPDATE official_accounts SET source_url=%s WHERE id=%s",
+                    (
+                        "https://mp.weixin.qq.com/mp/profile_ext?"
+                        + urlencode({"action": "home", "__biz": biz[0]}),
+                        article["account_id"],
+                    ),
+                )
             enqueue(conn, "article_ai", {"target_id": article["id"]})
             count = conn.execute(
                 "SELECT count(*) AS n FROM articles WHERE account_id=%s AND status='ready'",

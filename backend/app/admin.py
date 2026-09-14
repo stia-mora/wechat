@@ -1,11 +1,14 @@
 import os
+from urllib.parse import parse_qs, quote, urlparse
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, Field
 
 from .auth import require_admin
+from .content import article_key
 from .db import db
 from .repository import ACCOUNT_SELECT, enqueue, index_account, set_tags
 
@@ -114,6 +117,7 @@ class Task(BaseModel):
     target_id: int | None = None
     pages: int = Field(default=1, ge=1, le=30)
     parse_limit: int = Field(default=3, ge=0, le=100)
+    cache_only: bool = False
 
 
 @router.post("/jobs")
@@ -125,9 +129,21 @@ def create_job(data: Task):
     payload = (
         {"query": data.query.strip(), "category_id": data.category_id}
         if data.kind == "discover"
-        else {"target_id": data.target_id, "pages": data.pages, "parse_limit": data.parse_limit}
+        else {
+            "target_id": data.target_id,
+            "pages": data.pages,
+            "parse_limit": data.parse_limit,
+            "cache_only": data.cache_only,
+        }
     )
     with db() as conn:
+        if (
+            data.kind in ("sync", "account_ai")
+            and not conn.execute(
+                "SELECT 1 FROM official_accounts WHERE id=%s", (data.target_id,)
+            ).fetchone()
+        ):
+            raise HTTPException(404, "公众号不存在")
         job_id = enqueue(conn, data.kind, payload)
     return {"id": job_id, "message": "任务已排队" if job_id else "相同任务已在队列中"}
 
@@ -149,8 +165,112 @@ def retry(job_id: int):
         ).fetchone()
         if not job:
             raise HTTPException(409, "只能重试失败或阻塞的任务")
-        new_id = enqueue(conn, job["kind"], job["payload"], job["dedupe_key"])
+        payload = dict(job["payload"])
+        if job["kind"] == "sync":
+            payload["_progress"] = job["result"] or payload.get("_progress")
+        new_id = enqueue(conn, job["kind"], payload, job["dedupe_key"])
     return {"id": new_id}
+
+
+@router.get("/accounts/{account_id}/source")
+def source_state(account_id: int):
+    from .crawler import SourceClient
+
+    with db() as conn:
+        account = conn.execute(
+            "SELECT source_id FROM official_accounts WHERE id=%s", (account_id,)
+        ).fetchone()
+        job = conn.execute(
+            """SELECT * FROM jobs WHERE
+            (kind='sync' AND (payload->>'target_id')::bigint=%s) OR
+            (kind='parse' AND (payload->>'target_id')::bigint IN (SELECT id FROM articles WHERE account_id=%s))
+            ORDER BY id DESC LIMIT 1""",
+            (account_id, account_id),
+        ).fetchone()
+    if not account:
+        raise HTTPException(404, "公众号不存在")
+    source = SourceClient()
+    try:
+        cached = source.bridge(
+            "GET", "/articles", params={"fakeid": account["source_id"], "limit": 1}
+        )
+    except (httpx.HTTPError, RuntimeError, ValueError) as exc:
+        raise HTTPException(502, "读取参考服务失败：" + str(exc)[:300])
+    finally:
+        source.client.close()
+    return {"articles": cached["articles"], "bodies": cached["bodies"], "job": job}
+
+
+class ArticleLinks(BaseModel):
+    urls: list[str] = Field(min_length=1, max_length=20)
+
+
+@router.post("/accounts/{account_id}/links")
+def add_article_links(account_id: int, data: ArticleLinks):
+    try:
+        links = {article_key(url.strip()): url.strip() for url in data.urls}
+    except ValueError as exc:
+        raise HTTPException(422, str(exc))
+    with db() as conn:
+        account = conn.execute(
+            "SELECT source_url FROM official_accounts WHERE id=%s", (account_id,)
+        ).fetchone()
+        if not account:
+            raise HTTPException(404, "公众号不存在")
+        known_biz = parse_qs(urlparse(account["source_url"]).query).get("__biz")
+        jobs = []
+        for key, url in links.items():
+            link_biz = parse_qs(urlparse(url).query).get("__biz")
+            if known_biz and link_biz and known_biz != link_biz:
+                raise HTTPException(422, "文章链接的公众号标识与当前账号不一致")
+            row = conn.execute(
+                """INSERT INTO articles(account_id,source_key,title,source_url)
+                VALUES (%s,%s,'待解析文章',%s) ON CONFLICT(source_key) DO NOTHING RETURNING id""",
+                (account_id, key, url),
+            ).fetchone()
+            if not row:
+                row = conn.execute(
+                    "SELECT id,account_id FROM articles WHERE source_key=%s", (key,)
+                ).fetchone()
+                if row["account_id"] != account_id:
+                    raise HTTPException(409, "文章已归属于其他公众号，请检查链接")
+            job = enqueue(conn, "parse", {"target_id": row["id"]})
+            if job:
+                jobs.append(job)
+    return {"ids": jobs, "message": f"已排队 {len(jobs)} 篇，正文保存后可导出；进度见采集任务页"}
+
+
+@router.get("/accounts/{account_id}/export/{format}")
+def export_account(account_id: int, format: str):
+    if format not in ("zip", "html", "xlsx", "json", "docx", "pdf", "epub"):
+        raise HTTPException(422, "不支持的导出格式")
+    with db() as conn:
+        account = conn.execute(
+            "SELECT source_id FROM official_accounts WHERE id=%s", (account_id,)
+        ).fetchone()
+    if not account:
+        raise HTTPException(404, "公众号不存在")
+    try:
+        response = httpx.get(
+            os.environ["SOURCE_API_URL"].rstrip("/")
+            + f"/api/export/account/{quote(account['source_id'], safe='')}.{format}",
+            timeout=180,
+            trust_env=False,
+        )
+        if response.status_code == 404:
+            raise HTTPException(404, "参考库中还没有可导出的正文，请先完成采集或导入缓存")
+        response.raise_for_status()
+    except httpx.HTTPError:
+        raise HTTPException(502, "参考服务导出失败，请检查服务状态或减少文章量后重试")
+    return Response(
+        response.content,
+        media_type=response.headers.get("content-type", "application/octet-stream"),
+        headers={
+            "Content-Disposition": f'attachment; filename="account-{account_id}.{format}"',
+            "Cache-Control": "no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
 
 
 class CategoryEdit(BaseModel):
