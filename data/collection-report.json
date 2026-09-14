@@ -1,0 +1,5119 @@
+{
+  "generated_at": "2026-09-14T04:02:29.915504+00:00",
+  "source": "local wechat-download-api, actual WeChat searchbiz responses",
+  "unique_accounts": 235,
+  "approved_accounts": 50,
+  "accounts": [
+    {
+      "id": 6,
+      "name": "机器之心",
+      "source_id": "MzA3MzI4MjgzMw==",
+      "wechat_id": "almosthuman2014",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:54.006874+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 7,
+      "name": "新智元",
+      "source_id": "MzI3MTA0MTk1MA==",
+      "wechat_id": "AI_era",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:54.006874+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 8,
+      "name": "量子位",
+      "source_id": "MzIzNjc1NzUzMw==",
+      "wechat_id": "QbitAI",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:54.006874+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 9,
+      "name": "机器之心PRO会员",
+      "source_id": "MzkwODI4NjY2Mw==",
+      "wechat_id": "almosthuman2014pro",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:27.733119+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 10,
+      "name": "机器之心SOTA模型",
+      "source_id": "MzkyMzcwMDIyMQ==",
+      "wechat_id": "sotaai",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:27.733119+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 14,
+      "name": "量子位智库",
+      "source_id": "MzUzNDUyNzYzNg==",
+      "wechat_id": "AI123All",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:41.159603+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 15,
+      "name": "科技量子位",
+      "source_id": "Mzg4NzUzMDYwOA==",
+      "wechat_id": "spaceX-lyh",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:41.159603+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 19,
+      "name": "新智元生物",
+      "source_id": "MzY0MDEwMTUzNg==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:54.006874+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 20,
+      "name": "AI新智元",
+      "source_id": "Mzg4Njk2OTI3OQ==",
+      "wechat_id": "openchat_888",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:48:54.006874+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 21,
+      "name": "极客公园",
+      "source_id": "MTMwNDMwODQ0MQ==",
+      "wechat_id": "geekpark",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:07.084724+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 22,
+      "name": "Founder Park",
+      "source_id": "MzY5ODQwMTkxNA==",
+      "wechat_id": "Founder-Park",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:07.084724+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 23,
+      "name": "极客公园不是公园",
+      "source_id": "Mzg4MDg2NTAzNQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:07.084724+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 24,
+      "name": "极客公园前沿社",
+      "source_id": "MzI5ODY0NTAxNA==",
+      "wechat_id": "GeekParkFrontier",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:07.084724+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 25,
+      "name": "爱飞客极客公园",
+      "source_id": "Mzg5Mjg5ODcxNA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:07.084724+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 26,
+      "name": "InfoQ",
+      "source_id": "MjM5MDE0Mjc4MA==",
+      "wechat_id": "infoqchina",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:20.557442+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 27,
+      "name": "InfoQ Pro",
+      "source_id": "MzAwODI4MjEwNQ==",
+      "wechat_id": "infoqpro",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:20.557442+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 28,
+      "name": "InfoQ 架构头条",
+      "source_id": "MzIzNjUxMzk2NQ==",
+      "wechat_id": "ArchFront",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:20.557442+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 29,
+      "name": "AI前线",
+      "source_id": "MzU1NDA4NjU2MA==",
+      "wechat_id": "ai-front",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:20.557442+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 30,
+      "name": "极客邦科技Geekbang",
+      "source_id": "MzAxNDU2MTU5MA==",
+      "wechat_id": "geekbang01",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:20.557442+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 31,
+      "name": "雷峰网",
+      "source_id": "MTM2ODM0ODYyMQ==",
+      "wechat_id": "leiphone-sz",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:33.037466+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 32,
+      "name": "AI科技评论",
+      "source_id": "MzA5ODEzMjIyMA==",
+      "wechat_id": "aitechtalk",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:33.037466+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 33,
+      "name": "澳村雷峰网",
+      "source_id": "Mzg3NjIxMTQ1Mg==",
+      "wechat_id": "auleifeng",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:33.037466+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 34,
+      "name": "新智驾",
+      "source_id": "MzAxNjk5NjIzNw==",
+      "wechat_id": "AI-Drive",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:33.037466+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 35,
+      "name": "新时代雷锋网",
+      "source_id": "MzkwMzE2MDg5NQ==",
+      "wechat_id": "xsdlfw",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:33.037466+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 36,
+      "name": "爱范儿",
+      "source_id": "MjgzMTAwODI0MA==",
+      "wechat_id": "ifanr",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:46.765540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 37,
+      "name": "APPSO",
+      "source_id": "MjM5MjAyNDUyMA==",
+      "wechat_id": "appsolution",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:46.765540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 38,
+      "name": "爱范儿+",
+      "source_id": "Mzg4MDgzMDQzMA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:46.765540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 39,
+      "name": "制糖工厂CANDYSIGN",
+      "source_id": "MzkzNzI5ODM2OQ==",
+      "wechat_id": "CandySign",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:46.765540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 40,
+      "name": "玩物志",
+      "source_id": "MjM5NjAwMjEwMA==",
+      "wechat_id": "coolbuy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:46.765540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 41,
+      "name": "36氪",
+      "source_id": "MzI2NDk5NzA0Mw==",
+      "wechat_id": "wow36kr",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:12.469751+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 42,
+      "name": "硬氪",
+      "source_id": "MzkwMTI4MjU0Mw==",
+      "wechat_id": "south_36kr",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:58.711296+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 43,
+      "name": "36氪Pro",
+      "source_id": "MzUxOTA3MzMzOQ==",
+      "wechat_id": "krkrpro",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:58.711296+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 44,
+      "name": "智能涌现",
+      "source_id": "MzkwMDQ2NDU2Nw==",
+      "wechat_id": "AIEmergence",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:58.711296+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 45,
+      "name": "暗涌Waves",
+      "source_id": "Mzk0MDMyNDUxOQ==",
+      "wechat_id": "waves36kr",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:49:58.711296+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 46,
+      "name": "虎嗅APP",
+      "source_id": "MTQzMjE1NjQwMQ==",
+      "wechat_id": "huxiu_com",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:12.469751+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 48,
+      "name": "虎嗅服务",
+      "source_id": "Mzg3NTkzOTczMQ==",
+      "wechat_id": "huxiu-service",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:12.469751+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 49,
+      "name": "那个NG",
+      "source_id": "MzU5NjM0MzE4Mw==",
+      "wechat_id": "huxiu4youth",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:12.469751+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 50,
+      "name": "钛媒体",
+      "source_id": "MjM5ODIzNTc2MA==",
+      "wechat_id": "taimeiti",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:24.823995+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 51,
+      "name": "钛媒体AGI",
+      "source_id": "MzA3NzMxNTI1MQ==",
+      "wechat_id": "TMTPOSTAGI",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:24.823995+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 52,
+      "name": "钛媒体创投家",
+      "source_id": "Mzk0NTMxODg3Mg==",
+      "wechat_id": "tzmengtaiqi",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:24.823995+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 53,
+      "name": "钛媒体出海参考",
+      "source_id": "MzkzNjQ0NzQ2MQ==",
+      "wechat_id": "chuhai_cankao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:24.823995+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 54,
+      "name": "消研所trendmakers",
+      "source_id": "MjM5MTMzMTU1Ng==",
+      "wechat_id": "trendmakers",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:24.823995+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 55,
+      "name": "差评X.PIN",
+      "source_id": "MzA5NDc1NzQ4MA==",
+      "wechat_id": "chaping321",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:38.437904+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 56,
+      "name": "差评黑科技",
+      "source_id": "MzkxMjYxNjYxNg==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:38.437904+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 57,
+      "name": "差评",
+      "source_id": "MzA4MTIxODc2OA==",
+      "wechat_id": "gh_d468ead75dbf",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:38.437904+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 58,
+      "name": "差评硬件部",
+      "source_id": "MzkzMDk0MDE0NQ==",
+      "wechat_id": "XPIN_yingjianbu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:38.437904+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 59,
+      "name": "差评汽车部",
+      "source_id": "MzkzNDcxOTc5OA==",
+      "wechat_id": "xpin_automobile",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:38.437904+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 60,
+      "name": "果壳",
+      "source_id": "MTg1MjI3MzY2MQ==",
+      "wechat_id": "Guokr42",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:50.429939+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 61,
+      "name": "果壳鹊桥",
+      "source_id": "MzkwNDc0MjUzNA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:50.429939+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 62,
+      "name": "果壳帮果壳",
+      "source_id": "Mzg2MTY1Mjc0NQ==",
+      "wechat_id": "Guokers_help_Guokers",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:50.429939+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 63,
+      "name": "果壳大联盟UCAS",
+      "source_id": "MzkwMjY1MjM5OA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:50.429939+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 64,
+      "name": "果壳户外",
+      "source_id": "MzkxOTc0MjkzMg==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:50:50.429939+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 65,
+      "name": "科学大院",
+      "source_id": "MzI3MzE3OTI0Mw==",
+      "wechat_id": "kexuedayuan",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:04.239422+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 66,
+      "name": "数学大院",
+      "source_id": "MzkyMTU4NzkwMA==",
+      "wechat_id": "GrandMaths",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:04.239422+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 67,
+      "name": "科学大院外卖",
+      "source_id": "MzU4Mzc2MjA0OA==",
+      "wechat_id": "close_3583762048",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:04.239422+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 68,
+      "name": "CNS科学大院",
+      "source_id": "MzkyMjc5Mzc3NQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:04.239422+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 69,
+      "name": "科农大院",
+      "source_id": "MzAxOTY5MDU3NA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:04.239422+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 70,
+      "name": "DeepTech深科技",
+      "source_id": "MzA3NTIyODUzNA==",
+      "wechat_id": "deeptechchina",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:17.631036+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 71,
+      "name": "杭州云深科技",
+      "source_id": "MzI3MjAxOTgzMQ==",
+      "wechat_id": "yunshencloud",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:17.631036+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 72,
+      "name": "腾讯科技",
+      "source_id": "Mjc1NjM3MjY2MA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:17.631036+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 73,
+      "name": "深碳科技",
+      "source_id": "MzkxMzM5OTg4Mw==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:17.631036+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 74,
+      "name": "DeepIntData",
+      "source_id": "Mzk0ODcxODAzNg==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:17.631036+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 75,
+      "name": "科技日报",
+      "source_id": "MzI3NDI5MjI4OQ==",
+      "wechat_id": "kjrbwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:29.982645+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 76,
+      "name": "科创板日报",
+      "source_id": "Mzg4MTEyNzc4Mg==",
+      "wechat_id": "chinastarmarket",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:29.982645+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 77,
+      "name": "头部科技",
+      "source_id": "MzI5ODQxMzUzNg==",
+      "wechat_id": "Toubukeji",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:29.982645+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 78,
+      "name": "知乎日报",
+      "source_id": "MjM5MDM4MDExNQ==",
+      "wechat_id": "zhihuribao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:29.982645+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 79,
+      "name": "Global Innovation",
+      "source_id": "MzI4Nzg5NTI0NA==",
+      "wechat_id": "GlobalInnovation",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "科技",
+      "last_crawled_at": "2026-09-14 03:51:29.982645+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 80,
+      "name": "第一财经",
+      "source_id": "MjM5MTM3NTMwNA==",
+      "wechat_id": "cbn-yicai",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:43.510430+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 81,
+      "name": "第一财经服务号",
+      "source_id": "MzA5NDEyNjMxMw==",
+      "wechat_id": "yicaifuwu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:43.510430+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 82,
+      "name": "第一财经YiMagazine",
+      "source_id": "MjM5NDAzMjk2MA==",
+      "wechat_id": "CBNweekly2008",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:43.510430+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 83,
+      "name": "第一财经资讯",
+      "source_id": "MTU1OTI4NDM4MQ==",
+      "wechat_id": "yicainews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:43.510430+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 84,
+      "name": "第一财经广播",
+      "source_id": "Mzk2NDExMzI3MA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:43.510430+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 85,
+      "name": "财新",
+      "source_id": "MjY2NzgwMjU0MA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:56.278243+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 86,
+      "name": "财新我闻",
+      "source_id": "MzU2OTQ0NDQ4NQ==",
+      "wechat_id": "wenews001",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:56.278243+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 87,
+      "name": "财新视频",
+      "source_id": "MzA3ODk2NDEyOQ==",
+      "wechat_id": "caixin_video",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:56.278243+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 88,
+      "name": "财新mini+",
+      "source_id": "MzA5OTMxNTgzMQ==",
+      "wechat_id": "caixinmini",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:56.278243+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 89,
+      "name": "金融我闻",
+      "source_id": "MzA5MTI3NzYyNA==",
+      "wechat_id": "caixinfinance",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:51:56.278243+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 96,
+      "name": "经济观察报",
+      "source_id": "MjM5OTExMjYwMA==",
+      "wechat_id": "eeo-com-cn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:06.502028+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 97,
+      "name": "经济观察报观察家",
+      "source_id": "MzA5NzIwNTkzMw==",
+      "wechat_id": "eeoobserver",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:09.801957+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 98,
+      "name": "经观书评",
+      "source_id": "MzkyMTY1NjUzMw==",
+      "wechat_id": "jingguanshuping",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:09.801957+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 99,
+      "name": "中国商报",
+      "source_id": "Mzg2NDA4NjczNw==",
+      "wechat_id": "zgsbcn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:09.801957+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 100,
+      "name": "中国发展改革",
+      "source_id": "MzAwMDA4Njc4MA==",
+      "wechat_id": "zhongguofazhangaige",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:09.801957+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 101,
+      "name": "证券时报",
+      "source_id": "MjM5NDEzMTAwMA==",
+      "wechat_id": "wwwstcncom",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:35.122698+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 102,
+      "name": "券商中国",
+      "source_id": "MzA3NjM5MjIwOQ==",
+      "wechat_id": "quanshangcn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:53.038522+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 103,
+      "name": "上海证券报",
+      "source_id": "MjM5MDIwNDEyMg==",
+      "wechat_id": "shzqbwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:47.781540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 104,
+      "name": "金融时报",
+      "source_id": "MzI5MjE1ODM5Mw==",
+      "wechat_id": "FINANCIALNEWS2011",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:35.122698+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 105,
+      "name": "证券时报基金观察室",
+      "source_id": "MzAxMzU4NTk3NA==",
+      "wechat_id": "Fundgcs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:21.565280+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 106,
+      "name": "中国证券报",
+      "source_id": "MjM5MzMwNjM0MA==",
+      "wechat_id": "xhszzb",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:53.038522+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 109,
+      "name": "中国基金报",
+      "source_id": "MzA5MDEzNjQwMA==",
+      "wechat_id": "chinafundnews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:53.038522+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 112,
+      "name": "中国证券网",
+      "source_id": "MzIzNjI1OTIxMw==",
+      "wechat_id": "www_cnstock_com",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:40.588142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 113,
+      "name": "上交所发布",
+      "source_id": "MjM5NzAzMDI0Mg==",
+      "wechat_id": "chinasse",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:47.781540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 114,
+      "name": "上海证券",
+      "source_id": "MzkyOTI0MTk0Ng==",
+      "wechat_id": "SHANGHAI-SECURITIES",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:47.781540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 115,
+      "name": "上海证券基金评价",
+      "source_id": "MzA3NzU1MTg2Mg==",
+      "wechat_id": "shzqjjpj",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:52:47.781540+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 116,
+      "name": "每日经济新闻",
+      "source_id": "Mzg3NTA5MjkyNQ==",
+      "wechat_id": "nbdnews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:01.373112+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 117,
+      "name": "每经头条",
+      "source_id": "MzIwNDY3NDMyMw==",
+      "wechat_id": "nbdtoutiao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:01.373112+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 118,
+      "name": "21世纪经济报道",
+      "source_id": "MjI3Njc0NTk4MQ==",
+      "wechat_id": "jjbd21",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:06.502028+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 120,
+      "name": "ETF风向标",
+      "source_id": "MzU3MjgyNTAzNQ==",
+      "wechat_id": "njcjnews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:01.373112+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 121,
+      "name": "华尔街见闻",
+      "source_id": "MjM5NzAwMzU0MA==",
+      "wechat_id": "wallstreetcn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:13.632657+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 122,
+      "name": "华尔街见闻Max",
+      "source_id": "MzcwMzEwNjY1NA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:13.632657+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 123,
+      "name": "华尔街见闻Pro",
+      "source_id": "MzI4NjM3MTMyMQ==",
+      "wechat_id": "wscn_service",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:13.632657+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 124,
+      "name": "WallStreet见闻",
+      "source_id": "MzIxNTc1MzU5Mw==",
+      "wechat_id": "close_3215753593",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:13.632657+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 125,
+      "name": "华尔街见闻APP助手",
+      "source_id": "MzU2MTY2OTkzNw==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:13.632657+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 126,
+      "name": "财联社",
+      "source_id": "Mzg5MzEyNzEwNQ==",
+      "wechat_id": "cailianpress",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:27.041859+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 127,
+      "name": "财联社早知道",
+      "source_id": "Mzg2NzE4MjUwNw==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:27.041859+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 128,
+      "name": "界面新闻",
+      "source_id": "MjM5NTE0ODc2Nw==",
+      "wechat_id": "wowjiemian",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:27.041859+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 129,
+      "name": "财联社AI daily",
+      "source_id": "Mzg4MjYyMzUyNw==",
+      "wechat_id": "clsaidaily",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:27.041859+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 130,
+      "name": "财联社App服务号",
+      "source_id": "MzI1NDY3OTE5Ng==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:27.041859+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 132,
+      "name": "中国基金报投资者教育基地",
+      "source_id": "MzI4MTk5MDk2NQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:40.588142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 133,
+      "name": "中国证券投资基金业协会",
+      "source_id": "MzA5OTIwODIyMw==",
+      "wechat_id": "CHINAAMAC",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:40.588142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 135,
+      "name": "中国社会报",
+      "source_id": "MzAwMTM1NjgyOA==",
+      "wechat_id": "zhongguoshehuibao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:40.588142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 139,
+      "name": "中金财富",
+      "source_id": "MjM5NjU0NDQ4NA==",
+      "wechat_id": "cicc_wm",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:53.038522+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 140,
+      "name": "中国券商网",
+      "source_id": "MjM5MDY0MDUyOQ==",
+      "wechat_id": "zgzqhlw",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:53:53.038522+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 142,
+      "name": "21金融圈",
+      "source_id": "MzkzMTI4OTU0Mg==",
+      "wechat_id": "jrquan21",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:06.502028+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 143,
+      "name": "21世纪商业评论",
+      "source_id": "MzA3MTY0ODMxMw==",
+      "wechat_id": "weixin21cbr",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:32.363840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 145,
+      "name": "一见Auto",
+      "source_id": "Mzg5NzYwOTM3Mw==",
+      "wechat_id": "FCChinese",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:06.502028+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 146,
+      "name": "经济日报",
+      "source_id": "MjM5NjEyMzYxMg==",
+      "wechat_id": "jjrbwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:18.802305+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 147,
+      "name": "经济日报理论",
+      "source_id": "MzIwNDc0MzQ1Nw==",
+      "wechat_id": "jjrblilun",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:18.802305+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 148,
+      "name": "中国经济时报",
+      "source_id": "MzA4OTQ2MTAxMA==",
+      "wechat_id": "cetnews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:18.802305+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 149,
+      "name": "经济日报出版社",
+      "source_id": "MzA5Nzc5NjIyNA==",
+      "wechat_id": "edpbook_com_cn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:18.802305+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 150,
+      "name": "经济杂志",
+      "source_id": "MjM5NzA4ODY2MA==",
+      "wechat_id": "jingjiwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:18.802305+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 152,
+      "name": "哈佛商业评论",
+      "source_id": "MjM5NzY4MzQyMQ==",
+      "wechat_id": "hbrchinese",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:32.363840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 153,
+      "name": "Wbusiness商业评论",
+      "source_id": "MzIwMjgyMTU4MA==",
+      "wechat_id": "wbusiness6",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:32.363840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 154,
+      "name": "商业评论零售现场",
+      "source_id": "MjM5ODI3NDM4MA==",
+      "wechat_id": "shangyepinglun",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:32.363840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 155,
+      "name": "AI商业评论",
+      "source_id": "MzU5NjM1MDUwMw==",
+      "wechat_id": "aibizweek",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:32.363840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 156,
+      "name": "正和岛",
+      "source_id": "MjM5ODAxODQ0MA==",
+      "wechat_id": "zhenghedao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:44.914747+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 157,
+      "name": "正和岛品牌官",
+      "source_id": "MzI1NjE2OTIwMQ==",
+      "wechat_id": "zhenghedaopinpaiguan",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:44.914747+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 158,
+      "name": "四川正和岛",
+      "source_id": "MzIzNzA2NDQyMQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:44.914747+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 159,
+      "name": "正和岛招聘",
+      "source_id": "MzAwODEwMTE1Ng==",
+      "wechat_id": "zhisland_zhaopin",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:44.914747+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 160,
+      "name": "正和岛温暖部落",
+      "source_id": "MzAxNDE2ODI3NA==",
+      "wechat_id": "wennuan_trible",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "财经",
+      "last_crawled_at": "2026-09-14 03:54:44.914747+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 161,
+      "name": "清华大学",
+      "source_id": "MzA4OTIyMzgxMw==",
+      "wechat_id": "THU1911-BJ",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:54:58.492737+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 162,
+      "name": "清华大学第一附属医院服务号",
+      "source_id": "MzUzODcyNjE3NQ==",
+      "wechat_id": "bjhxyyfwh",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:54:58.492737+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 163,
+      "name": "清华大学体育部场馆中心",
+      "source_id": "MzkyMDYyNTg1Mg==",
+      "wechat_id": "tsinghuasportsvenue",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:54:58.492737+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 164,
+      "name": "清华大学新清华学堂",
+      "source_id": "MzU1MDM0NDE3NQ==",
+      "wechat_id": "xinqinghuaxuetang",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:54:58.492737+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 165,
+      "name": "北京大学",
+      "source_id": "MzA3OTE0MjQzMw==",
+      "wechat_id": "iPKU1898",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:10.465198+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 167,
+      "name": "北京大学人民医院服务号",
+      "source_id": "MzI4NTQzNzI5MQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:10.465198+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 168,
+      "name": "北京大学第一医院服务号",
+      "source_id": "MjM5NTI2MzcxMQ==",
+      "wechat_id": "bdyy_1915",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:10.465198+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 169,
+      "name": "北京大学信息门户",
+      "source_id": "MjM5ODI2NjM3OQ==",
+      "wechat_id": "bdxxfw",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:10.465198+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 170,
+      "name": "北京大学餐饮中心服务平台",
+      "source_id": "MzUzNzg0NzAwMA==",
+      "wechat_id": "BJDXCYZX",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:10.465198+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 171,
+      "name": "浙江大学",
+      "source_id": "MjM5NDgxNTQwNQ==",
+      "wechat_id": "zdnews99",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:24.041403+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 172,
+      "name": "浙江大学研究生招生",
+      "source_id": "MzI5MjQ1OTc0Mg==",
+      "wechat_id": "zjuyjszs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:24.041403+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 173,
+      "name": "浙江大学本科招生",
+      "source_id": "MzI2NzIxNDE4Ng==",
+      "wechat_id": "zjuzsc",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:24.041403+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 174,
+      "name": "浙江大学继续教育学院",
+      "source_id": "MzAxNTY1NTYyNQ==",
+      "wechat_id": "scezju99",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:24.041403+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 175,
+      "name": "浙江大学学生基层工作服务协会",
+      "source_id": "Mzg2NTY5NDI0NQ==",
+      "wechat_id": "zjdxxsjcgzfwxh",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:24.041403+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 176,
+      "name": "复旦大学",
+      "source_id": "MjM5OTUwMzIwMQ==",
+      "wechat_id": "fudanunivs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:37.163052+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 177,
+      "name": "复旦信息办",
+      "source_id": "MzA5NzIzNTMyMw==",
+      "wechat_id": "fduxxb",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:37.163052+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 178,
+      "name": "复旦大学附属儿科医院",
+      "source_id": "MjM5MTE0OTkxOQ==",
+      "wechat_id": "ekzc399",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:37.163052+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 179,
+      "name": "复旦招生",
+      "source_id": "MjM5MzQwNzYyMA==",
+      "wechat_id": "fudanzs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:37.163052+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 180,
+      "name": "复旦大学财务与国资处",
+      "source_id": "MzI2OTQ3OTg1MA==",
+      "wechat_id": "fudanczc",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:37.163052+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 181,
+      "name": "上海交通大学",
+      "source_id": "MjM5MDIyMDQyMA==",
+      "wechat_id": "love_SJTU",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:50.106910+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 182,
+      "name": "上海交通大学医学院",
+      "source_id": "MzA5NTEzODAyMA==",
+      "wechat_id": "shsmu2013",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:50.106910+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 183,
+      "name": "上交大",
+      "source_id": "MzA3OTIxMDg5OA==",
+      "wechat_id": "apply_SJTU",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:50.106910+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 184,
+      "name": "上海交通大学溥渊未来技术学院",
+      "source_id": "MzkwNjI4MDMzMQ==",
+      "wechat_id": "sjtu-gift",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:50.106910+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 185,
+      "name": "上海交大船舶海洋与建筑工程学院",
+      "source_id": "MzI3MTc4ODgwMg==",
+      "wechat_id": "sjtu_cjxy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:55:50.106910+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 186,
+      "name": "南京大学",
+      "source_id": "MzAxODAzMjQ1NQ==",
+      "wechat_id": "NJUINFO",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:03.647079+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 187,
+      "name": "南大招生小蓝鲸",
+      "source_id": "MzA3NzQ2ODEwNQ==",
+      "wechat_id": "ndzsxlj",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:03.647079+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 188,
+      "name": "南京大学信息门户",
+      "source_id": "MzU3OTU2MzY2NQ==",
+      "wechat_id": "iNJU1902",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:03.647079+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 189,
+      "name": "南京大学新生学院",
+      "source_id": "MzkwNDE4ODYyMg==",
+      "wechat_id": "NJUNEWCOLLEGE",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:03.647079+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 190,
+      "name": "南大研招",
+      "source_id": "MzA4NTU0MDI2NA==",
+      "wechat_id": "njuyzb",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:03.647079+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 191,
+      "name": "武汉大学",
+      "source_id": "MzA5MjM3MzUxMA==",
+      "wechat_id": "luojia1893",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:16.149849+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 192,
+      "name": "武汉大学学生宿舍服务",
+      "source_id": "MzI0MzE5Njk4Mg==",
+      "wechat_id": "whussfw",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:16.149849+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 193,
+      "name": "武大招办",
+      "source_id": "MzA4MjY2MjgzOQ==",
+      "wechat_id": "wudazhaoban",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:16.149849+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 194,
+      "name": "武汉大学人民医院",
+      "source_id": "MjM5NjI2MjYyMQ==",
+      "wechat_id": "rmhwhu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:16.149849+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 195,
+      "name": "武汉大学口腔医院",
+      "source_id": "MjM5ODA0MzkyMA==",
+      "wechat_id": "dentalhospital_whu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:16.149849+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 196,
+      "name": "中山大学",
+      "source_id": "MzA3MDc5NjAyOA==",
+      "wechat_id": "isysu1924",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:29.791325+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 197,
+      "name": "中山大学研究生教育",
+      "source_id": "MzA4MTI2NjMyMQ==",
+      "wechat_id": "sysu_yjsy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:29.791325+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 198,
+      "name": "中山大学附属第五医院",
+      "source_id": "MzAwMjAwNTI5Ng==",
+      "wechat_id": "zsdxfsdwyy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:29.791325+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 199,
+      "name": "中山大学总务部",
+      "source_id": "MzA3Nzg3NTYwNw==",
+      "wechat_id": "zdzwhqk",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:29.791325+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 200,
+      "name": "中山大学附属第三医院",
+      "source_id": "MzAxODkzNzA4OA==",
+      "wechat_id": "zsdxfsdsyy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:29.791325+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 201,
+      "name": "中国科学技术大学",
+      "source_id": "MjM5NTY5ODYyMQ==",
+      "wechat_id": "ustcnews",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:42.376840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 202,
+      "name": "中国科大本科招生",
+      "source_id": "MzA4NzA0OTYyNA==",
+      "wechat_id": "ustczsb",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:42.376840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 203,
+      "name": "中国科学技术大学财务处",
+      "source_id": "MzA5ODU0NDM1Mw==",
+      "wechat_id": "USTC-CWC",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:42.376840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 204,
+      "name": "科大就业",
+      "source_id": "MjM5MDQxNTA5Mg==",
+      "wechat_id": "jobustc",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:42.376840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 205,
+      "name": "中国科大网络信息服务",
+      "source_id": "MzA3Njc5NzYyNQ==",
+      "wechat_id": "weixinustc",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:42.376840+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 206,
+      "name": "南开大学",
+      "source_id": "MjM5NzgwNDg0MQ==",
+      "wechat_id": "nankaiuni",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:55.490931+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 207,
+      "name": "南开大学本科招生",
+      "source_id": "MzA4MjEwMzEzMA==",
+      "wechat_id": "nku_admission",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:55.490931+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 208,
+      "name": "南开大学研究生教育",
+      "source_id": "MzkyMTQ3MTQ4NQ==",
+      "wechat_id": "nkdxyjsjy",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:55.490931+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 209,
+      "name": "南开大学接待服务中心",
+      "source_id": "MzIzMjE5MTgwMA==",
+      "wechat_id": "nkdxjdfwzx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:55.490931+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 210,
+      "name": "南开大学生",
+      "source_id": "MjM5NTU4MzA0Mg==",
+      "wechat_id": "nkudxs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:56:55.490931+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 217,
+      "name": "中国人民大学",
+      "source_id": "MzA3ODU4MzU3OA==",
+      "wechat_id": "ruc_1937",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:07.746469+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 218,
+      "name": "人大阳光招生",
+      "source_id": "MzA4MzQ1MTkyMQ==",
+      "wechat_id": "rdygzs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:07.746469+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 219,
+      "name": "中国人民公安大学",
+      "source_id": "MzI1NTA3NTgwMw==",
+      "wechat_id": "ppsucwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:07.746469+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 220,
+      "name": "人大数智",
+      "source_id": "MzA4NzUwNTAyNA==",
+      "wechat_id": "vrucer",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:07.746469+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 221,
+      "name": "中国人民大学图书馆",
+      "source_id": "MzAxNjQ1MjcyNQ==",
+      "wechat_id": "rmdxtsg",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:07.746469+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 222,
+      "name": "北京师范大学",
+      "source_id": "MjM5MTg4NjM2MQ==",
+      "wechat_id": "bnuweixin",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:21.166503+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 223,
+      "name": "北师大心理学部心理健康服务中心",
+      "source_id": "MzI4MzU5OTE2OA==",
+      "wechat_id": "bnu_mhs",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:21.166503+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 224,
+      "name": "北京师范大学图书馆",
+      "source_id": "MjM5MDE1OTU0MA==",
+      "wechat_id": "bnulibrary",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:21.166503+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 225,
+      "name": "北京师范大学昌平附属学校",
+      "source_id": "Mzg3NDkxNjU1NA==",
+      "wechat_id": "bsdcpfx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:21.166503+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 226,
+      "name": "北京师范大学学历继续教育",
+      "source_id": "MjM5NzI2Njk3NQ==",
+      "wechat_id": "bnusne",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:21.166503+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 227,
+      "name": "中国教育报",
+      "source_id": "MjM5OTU5MzcyMg==",
+      "wechat_id": "Zhongguojiaoyubao",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:47.177889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 228,
+      "name": "中国教师报",
+      "source_id": "MzA5NDE2MDY3NA==",
+      "wechat_id": "zgjsbqmt",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:47.177889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 229,
+      "name": "中国教育报好老师",
+      "source_id": "MzU5ODMxNzE4NA==",
+      "wechat_id": "edumedia100",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:33.955215+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 230,
+      "name": "中国教育新闻网",
+      "source_id": "MzAxNjI3NzU5Mg==",
+      "wechat_id": "jiaoyuxinwenwang",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:33.955215+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 231,
+      "name": "中国教育报家长会",
+      "source_id": "MzAxNDA3NTcwMA==",
+      "wechat_id": "zgjybjzh",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:33.955215+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 232,
+      "name": "EOL教育在线",
+      "source_id": "MjM5MjMzMTg0MQ==",
+      "wechat_id": "eoleoleol",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:47.177889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 234,
+      "name": "中国大学生在线",
+      "source_id": "MzA4MDMxNzgyNw==",
+      "wechat_id": "dxsmoegovcn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:47.177889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 235,
+      "name": "中华医学教育在线",
+      "source_id": "MzUyMjE5MjAxMw==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:57:47.177889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 237,
+      "name": "新东方",
+      "source_id": "MjM5NzQzOTgyMA==",
+      "wechat_id": "xdf2013",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:58:00.592952+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 238,
+      "name": "成都新东方微服务",
+      "source_id": "Mzk0NzIzNjAxMg==",
+      "wechat_id": "XDFCDWFW",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:58:00.592952+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 239,
+      "name": "南昌新东方微服务",
+      "source_id": "MzI5NDI3Njg4Ng==",
+      "wechat_id": "xdfncxx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:58:00.592952+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 240,
+      "name": "南昌新东方",
+      "source_id": "MzA4OTAwODI1Mg==",
+      "wechat_id": "ncxdf0791",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:58:00.592952+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 241,
+      "name": "新东方家校平台",
+      "source_id": "MzI0NjE5NDI0MQ==",
+      "wechat_id": "xdfylbzx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "教育",
+      "last_crawled_at": "2026-09-14 03:58:00.592952+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 242,
+      "name": "三联生活周刊",
+      "source_id": "MTc5MTU3NTYyMQ==",
+      "wechat_id": "lifeweek",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:13.035049+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 243,
+      "name": "三联少年新知",
+      "source_id": "MzI1NzI3NjEwOQ==",
+      "wechat_id": "lifeweek-education",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:13.035049+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 244,
+      "name": "三联生活传媒发行部",
+      "source_id": "MzU2MDcwOTk5MQ==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:13.035049+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 245,
+      "name": "南方人物周刊",
+      "source_id": "MTY0MzI5NDcwMQ==",
+      "wechat_id": "Peopleweekly",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:13.035049+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 246,
+      "name": "三联生活市集",
+      "source_id": "MzkwMTEyNzY2NA==",
+      "wechat_id": "Lifeweek-Shop",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:13.035049+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 247,
+      "name": "一条",
+      "source_id": "MjM5MDI5OTkyOA==",
+      "wechat_id": "yitiaotv",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:26.720429+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 248,
+      "name": "一条家居生活",
+      "source_id": "Mzk0NzI4Mjk0Nw==",
+      "wechat_id": "yit-design",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:26.720429+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 249,
+      "name": "我的一条",
+      "source_id": "MzA5MDc1Mzc4Ng==",
+      "wechat_id": "yitcom",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:26.720429+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 250,
+      "name": "一条艺术",
+      "source_id": "Mzk0MTI4MDg1MQ==",
+      "wechat_id": "yitiaoart",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:26.720429+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 251,
+      "name": "一条生活馆",
+      "source_id": "MzUxNzM2NDY2NA==",
+      "wechat_id": "yitiaoshop",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:26.720429+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 252,
+      "name": "读者",
+      "source_id": "MjM5NDA2NjY4MA==",
+      "wechat_id": "duzheweixin",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:39.614142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 253,
+      "name": "读者原创版",
+      "source_id": "MjM5NTk3ODY1NA==",
+      "wechat_id": "duzheycb",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:39.614142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 254,
+      "name": "读者校园版",
+      "source_id": "MzA4NjM2NDAxNg==",
+      "wechat_id": "duzhexyban",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:39.614142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 255,
+      "name": "青年文摘",
+      "source_id": "MzA5ODEzMTIxOA==",
+      "wechat_id": "qnwzwx",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:39.614142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 256,
+      "name": "读者出版集团有限公司",
+      "source_id": "MzI2OTE1MDg3Nw==",
+      "wechat_id": "duzhejt",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:39.614142+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 257,
+      "name": "十点读书",
+      "source_id": "MjM5MDMyMzg2MA==",
+      "wechat_id": "duhaoshu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:51.713055+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 258,
+      "name": "十点人物志",
+      "source_id": "MzU0NzUxMzQzNQ==",
+      "wechat_id": "sdrenwu",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:51.713055+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 259,
+      "name": "十点课堂",
+      "source_id": "MzIxNTI3MDYyNg==",
+      "wechat_id": "sdlearn",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:51.713055+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 260,
+      "name": "十点读书会",
+      "source_id": "MzAwNDIyMTE3Ng==",
+      "wechat_id": "sdclass",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:51.713055+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 261,
+      "name": "小十点",
+      "source_id": "MzU1NDQxODYwMQ==",
+      "wechat_id": "sdikid",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:58:51.713055+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 262,
+      "name": "看理想",
+      "source_id": "MzA3MDM3NjE5NQ==",
+      "wechat_id": "ikanlixiang",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:04.769632+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 263,
+      "name": "理想国imaginist",
+      "source_id": "MjM5NzIwMTIyMQ==",
+      "wechat_id": "lixiangguo2013",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:04.769632+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 264,
+      "name": "看理想APP",
+      "source_id": "MzUxMjk3NTA5Ng==",
+      "wechat_id": "vistopia_app",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:04.769632+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 265,
+      "name": "naive理想国",
+      "source_id": "Mzg3NjczODA5NA==",
+      "wechat_id": "naivecafe2020",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:04.769632+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 266,
+      "name": "看理想生活",
+      "source_id": "MzU5NTI4OTA1OQ==",
+      "wechat_id": "ivistopia",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:04.769632+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 267,
+      "name": "单读",
+      "source_id": "MzA3MzYzNjMyMA==",
+      "wechat_id": "dandureading",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:18.400889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 268,
+      "name": "单向历",
+      "source_id": "MzAwOTM5NzUzMw==",
+      "wechat_id": "owscalendar",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:18.400889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 269,
+      "name": "单单读资治通鉴",
+      "source_id": "MzU4NjgzMzMxMg==",
+      "wechat_id": "cjhjdsg",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:18.400889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 270,
+      "name": "简丶單讀",
+      "source_id": "MzI1NTcwOTcwNw==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:18.400889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 271,
+      "name": "单读美宿",
+      "source_id": "MzU1NzYzMzc0Ng==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:18.400889+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 272,
+      "name": "新世相",
+      "source_id": "MzI2OTA3MTA5Mg==",
+      "wechat_id": "thefair2",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "approved",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:30.931752+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 273,
+      "name": "新世相Brand",
+      "source_id": "Mzk0MjY2NjQ5Mw==",
+      "wechat_id": "xinshixiangad",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:30.931752+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 274,
+      "name": "新世相服务号",
+      "source_id": "MzU5MTAzNDE2MA==",
+      "wechat_id": "",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:30.931752+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    },
+    {
+      "id": 275,
+      "name": "新世相客栈",
+      "source_id": "MjM5OTA5MjAyOA==",
+      "wechat_id": "xinshixiangkezhan",
+      "source_url": "",
+      "source_provider": "wechat-download-api",
+      "status": "pending",
+      "category": "生活",
+      "last_crawled_at": "2026-09-14 03:59:30.931752+00:00",
+      "article_count": 0,
+      "readable_count": 0
+    }
+  ],
+  "jobs": [
+    {
+      "id": 3,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "机器之心",
+        "accounts": [
+          {
+            "id": 6,
+            "name": "机器之心",
+            "source_id": "MzA3MzI4MjgzMw=="
+          },
+          {
+            "id": 7,
+            "name": "新智元",
+            "source_id": "MzI3MTA0MTk1MA=="
+          },
+          {
+            "id": 8,
+            "name": "量子位",
+            "source_id": "MzIzNjc1NzUzMw=="
+          },
+          {
+            "id": 9,
+            "name": "机器之心PRO会员",
+            "source_id": "MzkwODI4NjY2Mw=="
+          },
+          {
+            "id": 10,
+            "name": "机器之心SOTA模型",
+            "source_id": "MzkyMzcwMDIyMQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:48:26.576946+00:00",
+      "finished_at": "2026-09-14 03:48:27.768913+00:00"
+    },
+    {
+      "id": 4,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "量子位",
+        "accounts": [
+          {
+            "id": 8,
+            "name": "量子位",
+            "source_id": "MzIzNjc1NzUzMw=="
+          },
+          {
+            "id": 7,
+            "name": "新智元",
+            "source_id": "MzI3MTA0MTk1MA=="
+          },
+          {
+            "id": 6,
+            "name": "机器之心",
+            "source_id": "MzA3MzI4MjgzMw=="
+          },
+          {
+            "id": 14,
+            "name": "量子位智库",
+            "source_id": "MzUzNDUyNzYzNg=="
+          },
+          {
+            "id": 15,
+            "name": "科技量子位",
+            "source_id": "Mzg4NzUzMDYwOA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:48:27.813918+00:00",
+      "finished_at": "2026-09-14 03:48:41.200749+00:00"
+    },
+    {
+      "id": 5,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "新智元",
+        "accounts": [
+          {
+            "id": 7,
+            "name": "新智元",
+            "source_id": "MzI3MTA0MTk1MA=="
+          },
+          {
+            "id": 8,
+            "name": "量子位",
+            "source_id": "MzIzNjc1NzUzMw=="
+          },
+          {
+            "id": 6,
+            "name": "机器之心",
+            "source_id": "MzA3MzI4MjgzMw=="
+          },
+          {
+            "id": 19,
+            "name": "新智元生物",
+            "source_id": "MzY0MDEwMTUzNg=="
+          },
+          {
+            "id": 20,
+            "name": "AI新智元",
+            "source_id": "Mzg4Njk2OTI3OQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:48:41.240174+00:00",
+      "finished_at": "2026-09-14 03:48:54.038459+00:00"
+    },
+    {
+      "id": 6,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "极客公园",
+        "accounts": [
+          {
+            "id": 21,
+            "name": "极客公园",
+            "source_id": "MTMwNDMwODQ0MQ=="
+          },
+          {
+            "id": 22,
+            "name": "Founder Park",
+            "source_id": "MzY5ODQwMTkxNA=="
+          },
+          {
+            "id": 23,
+            "name": "极客公园不是公园",
+            "source_id": "Mzg4MDg2NTAzNQ=="
+          },
+          {
+            "id": 24,
+            "name": "极客公园前沿社",
+            "source_id": "MzI5ODY0NTAxNA=="
+          },
+          {
+            "id": 25,
+            "name": "爱飞客极客公园",
+            "source_id": "Mzg5Mjg5ODcxNA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:48:54.076034+00:00",
+      "finished_at": "2026-09-14 03:49:07.117211+00:00"
+    },
+    {
+      "id": 7,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "InfoQ",
+        "accounts": [
+          {
+            "id": 26,
+            "name": "InfoQ",
+            "source_id": "MjM5MDE0Mjc4MA=="
+          },
+          {
+            "id": 27,
+            "name": "InfoQ Pro",
+            "source_id": "MzAwODI4MjEwNQ=="
+          },
+          {
+            "id": 28,
+            "name": "InfoQ 架构头条",
+            "source_id": "MzIzNjUxMzk2NQ=="
+          },
+          {
+            "id": 29,
+            "name": "AI前线",
+            "source_id": "MzU1NDA4NjU2MA=="
+          },
+          {
+            "id": 30,
+            "name": "极客邦科技Geekbang",
+            "source_id": "MzAxNDU2MTU5MA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:49:07.157054+00:00",
+      "finished_at": "2026-09-14 03:49:20.594746+00:00"
+    },
+    {
+      "id": 8,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "雷峰网",
+        "accounts": [
+          {
+            "id": 31,
+            "name": "雷峰网",
+            "source_id": "MTM2ODM0ODYyMQ=="
+          },
+          {
+            "id": 32,
+            "name": "AI科技评论",
+            "source_id": "MzA5ODEzMjIyMA=="
+          },
+          {
+            "id": 33,
+            "name": "澳村雷峰网",
+            "source_id": "Mzg3NjIxMTQ1Mg=="
+          },
+          {
+            "id": 34,
+            "name": "新智驾",
+            "source_id": "MzAxNjk5NjIzNw=="
+          },
+          {
+            "id": 35,
+            "name": "新时代雷锋网",
+            "source_id": "MzkwMzE2MDg5NQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:49:20.634162+00:00",
+      "finished_at": "2026-09-14 03:49:33.060953+00:00"
+    },
+    {
+      "id": 9,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "爱范儿",
+        "accounts": [
+          {
+            "id": 36,
+            "name": "爱范儿",
+            "source_id": "MjgzMTAwODI0MA=="
+          },
+          {
+            "id": 37,
+            "name": "APPSO",
+            "source_id": "MjM5MjAyNDUyMA=="
+          },
+          {
+            "id": 38,
+            "name": "爱范儿+",
+            "source_id": "Mzg4MDgzMDQzMA=="
+          },
+          {
+            "id": 39,
+            "name": "制糖工厂CANDYSIGN",
+            "source_id": "MzkzNzI5ODM2OQ=="
+          },
+          {
+            "id": 40,
+            "name": "玩物志",
+            "source_id": "MjM5NjAwMjEwMA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:49:33.090931+00:00",
+      "finished_at": "2026-09-14 03:49:46.791200+00:00"
+    },
+    {
+      "id": 10,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "36氪",
+        "accounts": [
+          {
+            "id": 41,
+            "name": "36氪",
+            "source_id": "MzI2NDk5NzA0Mw=="
+          },
+          {
+            "id": 42,
+            "name": "硬氪",
+            "source_id": "MzkwMTI4MjU0Mw=="
+          },
+          {
+            "id": 43,
+            "name": "36氪Pro",
+            "source_id": "MzUxOTA3MzMzOQ=="
+          },
+          {
+            "id": 44,
+            "name": "智能涌现",
+            "source_id": "MzkwMDQ2NDU2Nw=="
+          },
+          {
+            "id": 45,
+            "name": "暗涌Waves",
+            "source_id": "Mzk0MDMyNDUxOQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:49:46.822940+00:00",
+      "finished_at": "2026-09-14 03:49:58.735560+00:00"
+    },
+    {
+      "id": 11,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 4,
+        "query": "虎嗅APP",
+        "accounts": [
+          {
+            "id": 46,
+            "name": "虎嗅APP",
+            "source_id": "MTQzMjE1NjQwMQ=="
+          },
+          {
+            "id": 41,
+            "name": "36氪",
+            "source_id": "MzI2NDk5NzA0Mw=="
+          },
+          {
+            "id": 48,
+            "name": "虎嗅服务",
+            "source_id": "Mzg3NTkzOTczMQ=="
+          },
+          {
+            "id": 49,
+            "name": "那个NG",
+            "source_id": "MzU5NjM0MzE4Mw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:49:58.771498+00:00",
+      "finished_at": "2026-09-14 03:50:12.495073+00:00"
+    },
+    {
+      "id": 12,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "钛媒体",
+        "accounts": [
+          {
+            "id": 50,
+            "name": "钛媒体",
+            "source_id": "MjM5ODIzNTc2MA=="
+          },
+          {
+            "id": 51,
+            "name": "钛媒体AGI",
+            "source_id": "MzA3NzMxNTI1MQ=="
+          },
+          {
+            "id": 52,
+            "name": "钛媒体创投家",
+            "source_id": "Mzk0NTMxODg3Mg=="
+          },
+          {
+            "id": 53,
+            "name": "钛媒体出海参考",
+            "source_id": "MzkzNjQ0NzQ2MQ=="
+          },
+          {
+            "id": 54,
+            "name": "消研所trendmakers",
+            "source_id": "MjM5MTMzMTU1Ng=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:50:12.527651+00:00",
+      "finished_at": "2026-09-14 03:50:24.850072+00:00"
+    },
+    {
+      "id": 13,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "差评",
+        "accounts": [
+          {
+            "id": 55,
+            "name": "差评X.PIN",
+            "source_id": "MzA5NDc1NzQ4MA=="
+          },
+          {
+            "id": 56,
+            "name": "差评黑科技",
+            "source_id": "MzkxMjYxNjYxNg=="
+          },
+          {
+            "id": 57,
+            "name": "差评",
+            "source_id": "MzA4MTIxODc2OA=="
+          },
+          {
+            "id": 58,
+            "name": "差评硬件部",
+            "source_id": "MzkzMDk0MDE0NQ=="
+          },
+          {
+            "id": 59,
+            "name": "差评汽车部",
+            "source_id": "MzkzNDcxOTc5OA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:50:24.885066+00:00",
+      "finished_at": "2026-09-14 03:50:38.465649+00:00"
+    },
+    {
+      "id": 14,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "果壳",
+        "accounts": [
+          {
+            "id": 60,
+            "name": "果壳",
+            "source_id": "MTg1MjI3MzY2MQ=="
+          },
+          {
+            "id": 61,
+            "name": "果壳鹊桥",
+            "source_id": "MzkwNDc0MjUzNA=="
+          },
+          {
+            "id": 62,
+            "name": "果壳帮果壳",
+            "source_id": "Mzg2MTY1Mjc0NQ=="
+          },
+          {
+            "id": 63,
+            "name": "果壳大联盟UCAS",
+            "source_id": "MzkwMjY1MjM5OA=="
+          },
+          {
+            "id": 64,
+            "name": "果壳户外",
+            "source_id": "MzkxOTc0MjkzMg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:50:38.501862+00:00",
+      "finished_at": "2026-09-14 03:50:50.456801+00:00"
+    },
+    {
+      "id": 15,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "科学大院",
+        "accounts": [
+          {
+            "id": 65,
+            "name": "科学大院",
+            "source_id": "MzI3MzE3OTI0Mw=="
+          },
+          {
+            "id": 66,
+            "name": "数学大院",
+            "source_id": "MzkyMTU4NzkwMA=="
+          },
+          {
+            "id": 67,
+            "name": "科学大院外卖",
+            "source_id": "MzU4Mzc2MjA0OA=="
+          },
+          {
+            "id": 68,
+            "name": "CNS科学大院",
+            "source_id": "MzkyMjc5Mzc3NQ=="
+          },
+          {
+            "id": 69,
+            "name": "科农大院",
+            "source_id": "MzAxOTY5MDU3NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:50:50.493630+00:00",
+      "finished_at": "2026-09-14 03:51:04.269722+00:00"
+    },
+    {
+      "id": 16,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "DeepTech深科技",
+        "accounts": [
+          {
+            "id": 70,
+            "name": "DeepTech深科技",
+            "source_id": "MzA3NTIyODUzNA=="
+          },
+          {
+            "id": 71,
+            "name": "杭州云深科技",
+            "source_id": "MzI3MjAxOTgzMQ=="
+          },
+          {
+            "id": 72,
+            "name": "腾讯科技",
+            "source_id": "Mjc1NjM3MjY2MA=="
+          },
+          {
+            "id": 73,
+            "name": "深碳科技",
+            "source_id": "MzkxMzM5OTg4Mw=="
+          },
+          {
+            "id": 74,
+            "name": "DeepIntData",
+            "source_id": "Mzk0ODcxODAzNg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:51:04.306353+00:00",
+      "finished_at": "2026-09-14 03:51:17.657437+00:00"
+    },
+    {
+      "id": 17,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "科技日报",
+        "accounts": [
+          {
+            "id": 75,
+            "name": "科技日报",
+            "source_id": "MzI3NDI5MjI4OQ=="
+          },
+          {
+            "id": 76,
+            "name": "科创板日报",
+            "source_id": "Mzg4MTEyNzc4Mg=="
+          },
+          {
+            "id": 77,
+            "name": "头部科技",
+            "source_id": "MzI5ODQxMzUzNg=="
+          },
+          {
+            "id": 78,
+            "name": "知乎日报",
+            "source_id": "MjM5MDM4MDExNQ=="
+          },
+          {
+            "id": 79,
+            "name": "Global Innovation",
+            "source_id": "MzI4Nzg5NTI0NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:51:17.691515+00:00",
+      "finished_at": "2026-09-14 03:51:30.015506+00:00"
+    },
+    {
+      "id": 18,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "第一财经",
+        "accounts": [
+          {
+            "id": 80,
+            "name": "第一财经",
+            "source_id": "MjM5MTM3NTMwNA=="
+          },
+          {
+            "id": 81,
+            "name": "第一财经服务号",
+            "source_id": "MzA5NDEyNjMxMw=="
+          },
+          {
+            "id": 82,
+            "name": "第一财经YiMagazine",
+            "source_id": "MjM5NDAzMjk2MA=="
+          },
+          {
+            "id": 83,
+            "name": "第一财经资讯",
+            "source_id": "MTU1OTI4NDM4MQ=="
+          },
+          {
+            "id": 84,
+            "name": "第一财经广播",
+            "source_id": "Mzk2NDExMzI3MA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:51:30.053944+00:00",
+      "finished_at": "2026-09-14 03:51:43.539410+00:00"
+    },
+    {
+      "id": 19,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "财新",
+        "accounts": [
+          {
+            "id": 85,
+            "name": "财新",
+            "source_id": "MjY2NzgwMjU0MA=="
+          },
+          {
+            "id": 86,
+            "name": "财新我闻",
+            "source_id": "MzU2OTQ0NDQ4NQ=="
+          },
+          {
+            "id": 87,
+            "name": "财新视频",
+            "source_id": "MzA3ODk2NDEyOQ=="
+          },
+          {
+            "id": 88,
+            "name": "财新mini+",
+            "source_id": "MzA5OTMxNTgzMQ=="
+          },
+          {
+            "id": 89,
+            "name": "金融我闻",
+            "source_id": "MzA5MTI3NzYyNA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:51:43.574150+00:00",
+      "finished_at": "2026-09-14 03:51:56.304327+00:00"
+    },
+    {
+      "id": 20,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "经济观察报",
+        "accounts": [
+          {
+            "id": 96,
+            "name": "经济观察报",
+            "source_id": "MjM5OTExMjYwMA=="
+          },
+          {
+            "id": 97,
+            "name": "经济观察报观察家",
+            "source_id": "MzA5NzIwNTkzMw=="
+          },
+          {
+            "id": 98,
+            "name": "经观书评",
+            "source_id": "MzkyMTY1NjUzMw=="
+          },
+          {
+            "id": 99,
+            "name": "中国商报",
+            "source_id": "Mzg2NDA4NjczNw=="
+          },
+          {
+            "id": 100,
+            "name": "中国发展改革",
+            "source_id": "MzAwMDA4Njc4MA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:51:56.338941+00:00",
+      "finished_at": "2026-09-14 03:52:09.827204+00:00"
+    },
+    {
+      "id": 25,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "证券时报",
+        "accounts": [
+          {
+            "id": 101,
+            "name": "证券时报",
+            "source_id": "MjM5NDEzMTAwMA=="
+          },
+          {
+            "id": 102,
+            "name": "券商中国",
+            "source_id": "MzA3NjM5MjIwOQ=="
+          },
+          {
+            "id": 103,
+            "name": "上海证券报",
+            "source_id": "MjM5MDIwNDEyMg=="
+          },
+          {
+            "id": 104,
+            "name": "金融时报",
+            "source_id": "MzI5MjE1ODM5Mw=="
+          },
+          {
+            "id": 105,
+            "name": "证券时报基金观察室",
+            "source_id": "MzAxMzU4NTk3NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:52:09.856726+00:00",
+      "finished_at": "2026-09-14 03:52:21.592917+00:00"
+    },
+    {
+      "id": 26,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国证券报",
+        "accounts": [
+          {
+            "id": 106,
+            "name": "中国证券报",
+            "source_id": "MjM5MzMwNjM0MA=="
+          },
+          {
+            "id": 101,
+            "name": "证券时报",
+            "source_id": "MjM5NDEzMTAwMA=="
+          },
+          {
+            "id": 104,
+            "name": "金融时报",
+            "source_id": "MzI5MjE1ODM5Mw=="
+          },
+          {
+            "id": 109,
+            "name": "中国基金报",
+            "source_id": "MzA5MDEzNjQwMA=="
+          },
+          {
+            "id": 103,
+            "name": "上海证券报",
+            "source_id": "MjM5MDIwNDEyMg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:52:21.629595+00:00",
+      "finished_at": "2026-09-14 03:52:35.146476+00:00"
+    },
+    {
+      "id": 27,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "上海证券报",
+        "accounts": [
+          {
+            "id": 103,
+            "name": "上海证券报",
+            "source_id": "MjM5MDIwNDEyMg=="
+          },
+          {
+            "id": 112,
+            "name": "中国证券网",
+            "source_id": "MzIzNjI1OTIxMw=="
+          },
+          {
+            "id": 113,
+            "name": "上交所发布",
+            "source_id": "MjM5NzAzMDI0Mg=="
+          },
+          {
+            "id": 114,
+            "name": "上海证券",
+            "source_id": "MzkyOTI0MTk0Ng=="
+          },
+          {
+            "id": 115,
+            "name": "上海证券基金评价",
+            "source_id": "MzA3NzU1MTg2Mg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:52:35.177350+00:00",
+      "finished_at": "2026-09-14 03:52:47.805613+00:00"
+    },
+    {
+      "id": 28,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "每日经济新闻",
+        "accounts": [
+          {
+            "id": 116,
+            "name": "每日经济新闻",
+            "source_id": "Mzg3NTA5MjkyNQ=="
+          },
+          {
+            "id": 117,
+            "name": "每经头条",
+            "source_id": "MzIwNDY3NDMyMw=="
+          },
+          {
+            "id": 118,
+            "name": "21世纪经济报道",
+            "source_id": "MjI3Njc0NTk4MQ=="
+          },
+          {
+            "id": 96,
+            "name": "经济观察报",
+            "source_id": "MjM5OTExMjYwMA=="
+          },
+          {
+            "id": 120,
+            "name": "ETF风向标",
+            "source_id": "MzU3MjgyNTAzNQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:52:47.835680+00:00",
+      "finished_at": "2026-09-14 03:53:01.406082+00:00"
+    },
+    {
+      "id": 29,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "华尔街见闻",
+        "accounts": [
+          {
+            "id": 121,
+            "name": "华尔街见闻",
+            "source_id": "MjM5NzAwMzU0MA=="
+          },
+          {
+            "id": 122,
+            "name": "华尔街见闻Max",
+            "source_id": "MzcwMzEwNjY1NA=="
+          },
+          {
+            "id": 123,
+            "name": "华尔街见闻Pro",
+            "source_id": "MzI4NjM3MTMyMQ=="
+          },
+          {
+            "id": 124,
+            "name": "WallStreet见闻",
+            "source_id": "MzIxNTc1MzU5Mw=="
+          },
+          {
+            "id": 125,
+            "name": "华尔街见闻APP助手",
+            "source_id": "MzU2MTY2OTkzNw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:53:01.449106+00:00",
+      "finished_at": "2026-09-14 03:53:13.659476+00:00"
+    },
+    {
+      "id": 30,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "财联社",
+        "accounts": [
+          {
+            "id": 126,
+            "name": "财联社",
+            "source_id": "Mzg5MzEyNzEwNQ=="
+          },
+          {
+            "id": 127,
+            "name": "财联社早知道",
+            "source_id": "Mzg2NzE4MjUwNw=="
+          },
+          {
+            "id": 128,
+            "name": "界面新闻",
+            "source_id": "MjM5NTE0ODc2Nw=="
+          },
+          {
+            "id": 129,
+            "name": "财联社AI daily",
+            "source_id": "Mzg4MjYyMzUyNw=="
+          },
+          {
+            "id": 130,
+            "name": "财联社App服务号",
+            "source_id": "MzI1NDY3OTE5Ng=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:53:13.693620+00:00",
+      "finished_at": "2026-09-14 03:53:27.068445+00:00"
+    },
+    {
+      "id": 31,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国基金报",
+        "accounts": [
+          {
+            "id": 109,
+            "name": "中国基金报",
+            "source_id": "MzA5MDEzNjQwMA=="
+          },
+          {
+            "id": 132,
+            "name": "中国基金报投资者教育基地",
+            "source_id": "MzI4MTk5MDk2NQ=="
+          },
+          {
+            "id": 133,
+            "name": "中国证券投资基金业协会",
+            "source_id": "MzA5OTIwODIyMw=="
+          },
+          {
+            "id": 112,
+            "name": "中国证券网",
+            "source_id": "MzIzNjI1OTIxMw=="
+          },
+          {
+            "id": 135,
+            "name": "中国社会报",
+            "source_id": "MzAwMTM1NjgyOA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:53:27.103886+00:00",
+      "finished_at": "2026-09-14 03:53:40.618716+00:00"
+    },
+    {
+      "id": 32,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "券商中国",
+        "accounts": [
+          {
+            "id": 102,
+            "name": "券商中国",
+            "source_id": "MzA3NjM5MjIwOQ=="
+          },
+          {
+            "id": 106,
+            "name": "中国证券报",
+            "source_id": "MjM5MzMwNjM0MA=="
+          },
+          {
+            "id": 109,
+            "name": "中国基金报",
+            "source_id": "MzA5MDEzNjQwMA=="
+          },
+          {
+            "id": 139,
+            "name": "中金财富",
+            "source_id": "MjM5NjU0NDQ4NA=="
+          },
+          {
+            "id": 140,
+            "name": "中国券商网",
+            "source_id": "MjM5MDY0MDUyOQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:53:40.656961+00:00",
+      "finished_at": "2026-09-14 03:53:53.068706+00:00"
+    },
+    {
+      "id": 33,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "21世纪经济报道",
+        "accounts": [
+          {
+            "id": 118,
+            "name": "21世纪经济报道",
+            "source_id": "MjI3Njc0NTk4MQ=="
+          },
+          {
+            "id": 142,
+            "name": "21金融圈",
+            "source_id": "MzkzMTI4OTU0Mg=="
+          },
+          {
+            "id": 143,
+            "name": "21世纪商业评论",
+            "source_id": "MzA3MTY0ODMxMw=="
+          },
+          {
+            "id": 96,
+            "name": "经济观察报",
+            "source_id": "MjM5OTExMjYwMA=="
+          },
+          {
+            "id": 145,
+            "name": "一见Auto",
+            "source_id": "Mzg5NzYwOTM3Mw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:53:53.104583+00:00",
+      "finished_at": "2026-09-14 03:54:06.532168+00:00"
+    },
+    {
+      "id": 34,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "经济日报",
+        "accounts": [
+          {
+            "id": 146,
+            "name": "经济日报",
+            "source_id": "MjM5NjEyMzYxMg=="
+          },
+          {
+            "id": 147,
+            "name": "经济日报理论",
+            "source_id": "MzIwNDc0MzQ1Nw=="
+          },
+          {
+            "id": 148,
+            "name": "中国经济时报",
+            "source_id": "MzA4OTQ2MTAxMA=="
+          },
+          {
+            "id": 149,
+            "name": "经济日报出版社",
+            "source_id": "MzA5Nzc5NjIyNA=="
+          },
+          {
+            "id": 150,
+            "name": "经济杂志",
+            "source_id": "MjM5NzA4ODY2MA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:54:06.568818+00:00",
+      "finished_at": "2026-09-14 03:54:18.832079+00:00"
+    },
+    {
+      "id": 35,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "商业评论",
+        "accounts": [
+          {
+            "id": 143,
+            "name": "21世纪商业评论",
+            "source_id": "MzA3MTY0ODMxMw=="
+          },
+          {
+            "id": 152,
+            "name": "哈佛商业评论",
+            "source_id": "MjM5NzY4MzQyMQ=="
+          },
+          {
+            "id": 153,
+            "name": "Wbusiness商业评论",
+            "source_id": "MzIwMjgyMTU4MA=="
+          },
+          {
+            "id": 154,
+            "name": "商业评论零售现场",
+            "source_id": "MjM5ODI3NDM4MA=="
+          },
+          {
+            "id": 155,
+            "name": "AI商业评论",
+            "source_id": "MzU5NjM1MDUwMw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:54:18.866838+00:00",
+      "finished_at": "2026-09-14 03:54:32.388598+00:00"
+    },
+    {
+      "id": 36,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "正和岛",
+        "accounts": [
+          {
+            "id": 156,
+            "name": "正和岛",
+            "source_id": "MjM5ODAxODQ0MA=="
+          },
+          {
+            "id": 157,
+            "name": "正和岛品牌官",
+            "source_id": "MzI1NjE2OTIwMQ=="
+          },
+          {
+            "id": 158,
+            "name": "四川正和岛",
+            "source_id": "MzIzNzA2NDQyMQ=="
+          },
+          {
+            "id": 159,
+            "name": "正和岛招聘",
+            "source_id": "MzAwODEwMTE1Ng=="
+          },
+          {
+            "id": 160,
+            "name": "正和岛温暖部落",
+            "source_id": "MzAxNDE2ODI3NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:54:32.418867+00:00",
+      "finished_at": "2026-09-14 03:54:44.943132+00:00"
+    },
+    {
+      "id": 37,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "清华大学",
+        "accounts": [
+          {
+            "id": 161,
+            "name": "清华大学",
+            "source_id": "MzA4OTIyMzgxMw=="
+          },
+          {
+            "id": 162,
+            "name": "清华大学第一附属医院服务号",
+            "source_id": "MzUzODcyNjE3NQ=="
+          },
+          {
+            "id": 163,
+            "name": "清华大学体育部场馆中心",
+            "source_id": "MzkyMDYyNTg1Mg=="
+          },
+          {
+            "id": 164,
+            "name": "清华大学新清华学堂",
+            "source_id": "MzU1MDM0NDE3NQ=="
+          },
+          {
+            "id": 165,
+            "name": "北京大学",
+            "source_id": "MzA3OTE0MjQzMw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:54:44.982474+00:00",
+      "finished_at": "2026-09-14 03:54:58.520900+00:00"
+    },
+    {
+      "id": 38,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "北京大学",
+        "accounts": [
+          {
+            "id": 165,
+            "name": "北京大学",
+            "source_id": "MzA3OTE0MjQzMw=="
+          },
+          {
+            "id": 167,
+            "name": "北京大学人民医院服务号",
+            "source_id": "MzI4NTQzNzI5MQ=="
+          },
+          {
+            "id": 168,
+            "name": "北京大学第一医院服务号",
+            "source_id": "MjM5NTI2MzcxMQ=="
+          },
+          {
+            "id": 169,
+            "name": "北京大学信息门户",
+            "source_id": "MjM5ODI2NjM3OQ=="
+          },
+          {
+            "id": 170,
+            "name": "北京大学餐饮中心服务平台",
+            "source_id": "MzUzNzg0NzAwMA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:54:58.557616+00:00",
+      "finished_at": "2026-09-14 03:55:10.494275+00:00"
+    },
+    {
+      "id": 39,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "浙江大学",
+        "accounts": [
+          {
+            "id": 171,
+            "name": "浙江大学",
+            "source_id": "MjM5NDgxNTQwNQ=="
+          },
+          {
+            "id": 172,
+            "name": "浙江大学研究生招生",
+            "source_id": "MzI5MjQ1OTc0Mg=="
+          },
+          {
+            "id": 173,
+            "name": "浙江大学本科招生",
+            "source_id": "MzI2NzIxNDE4Ng=="
+          },
+          {
+            "id": 174,
+            "name": "浙江大学继续教育学院",
+            "source_id": "MzAxNTY1NTYyNQ=="
+          },
+          {
+            "id": 175,
+            "name": "浙江大学学生基层工作服务协会",
+            "source_id": "Mzg2NTY5NDI0NQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:55:10.530818+00:00",
+      "finished_at": "2026-09-14 03:55:24.078315+00:00"
+    },
+    {
+      "id": 40,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "复旦大学",
+        "accounts": [
+          {
+            "id": 176,
+            "name": "复旦大学",
+            "source_id": "MjM5OTUwMzIwMQ=="
+          },
+          {
+            "id": 177,
+            "name": "复旦信息办",
+            "source_id": "MzA5NzIzNTMyMw=="
+          },
+          {
+            "id": 178,
+            "name": "复旦大学附属儿科医院",
+            "source_id": "MjM5MTE0OTkxOQ=="
+          },
+          {
+            "id": 179,
+            "name": "复旦招生",
+            "source_id": "MjM5MzQwNzYyMA=="
+          },
+          {
+            "id": 180,
+            "name": "复旦大学财务与国资处",
+            "source_id": "MzI2OTQ3OTg1MA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:55:24.118297+00:00",
+      "finished_at": "2026-09-14 03:55:37.195663+00:00"
+    },
+    {
+      "id": 41,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "上海交通大学",
+        "accounts": [
+          {
+            "id": 181,
+            "name": "上海交通大学",
+            "source_id": "MjM5MDIyMDQyMA=="
+          },
+          {
+            "id": 182,
+            "name": "上海交通大学医学院",
+            "source_id": "MzA5NTEzODAyMA=="
+          },
+          {
+            "id": 183,
+            "name": "上交大",
+            "source_id": "MzA3OTIxMDg5OA=="
+          },
+          {
+            "id": 184,
+            "name": "上海交通大学溥渊未来技术学院",
+            "source_id": "MzkwNjI4MDMzMQ=="
+          },
+          {
+            "id": 185,
+            "name": "上海交大船舶海洋与建筑工程学院",
+            "source_id": "MzI3MTc4ODgwMg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:55:37.236179+00:00",
+      "finished_at": "2026-09-14 03:55:50.137530+00:00"
+    },
+    {
+      "id": 42,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "南京大学",
+        "accounts": [
+          {
+            "id": 186,
+            "name": "南京大学",
+            "source_id": "MzAxODAzMjQ1NQ=="
+          },
+          {
+            "id": 187,
+            "name": "南大招生小蓝鲸",
+            "source_id": "MzA3NzQ2ODEwNQ=="
+          },
+          {
+            "id": 188,
+            "name": "南京大学信息门户",
+            "source_id": "MzU3OTU2MzY2NQ=="
+          },
+          {
+            "id": 189,
+            "name": "南京大学新生学院",
+            "source_id": "MzkwNDE4ODYyMg=="
+          },
+          {
+            "id": 190,
+            "name": "南大研招",
+            "source_id": "MzA4NTU0MDI2NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:55:50.196494+00:00",
+      "finished_at": "2026-09-14 03:56:03.674436+00:00"
+    },
+    {
+      "id": 43,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "武汉大学",
+        "accounts": [
+          {
+            "id": 191,
+            "name": "武汉大学",
+            "source_id": "MzA5MjM3MzUxMA=="
+          },
+          {
+            "id": 192,
+            "name": "武汉大学学生宿舍服务",
+            "source_id": "MzI0MzE5Njk4Mg=="
+          },
+          {
+            "id": 193,
+            "name": "武大招办",
+            "source_id": "MzA4MjY2MjgzOQ=="
+          },
+          {
+            "id": 194,
+            "name": "武汉大学人民医院",
+            "source_id": "MjM5NjI2MjYyMQ=="
+          },
+          {
+            "id": 195,
+            "name": "武汉大学口腔医院",
+            "source_id": "MjM5ODA0MzkyMA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:56:03.711992+00:00",
+      "finished_at": "2026-09-14 03:56:16.174586+00:00"
+    },
+    {
+      "id": 44,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中山大学",
+        "accounts": [
+          {
+            "id": 196,
+            "name": "中山大学",
+            "source_id": "MzA3MDc5NjAyOA=="
+          },
+          {
+            "id": 197,
+            "name": "中山大学研究生教育",
+            "source_id": "MzA4MTI2NjMyMQ=="
+          },
+          {
+            "id": 198,
+            "name": "中山大学附属第五医院",
+            "source_id": "MzAwMjAwNTI5Ng=="
+          },
+          {
+            "id": 199,
+            "name": "中山大学总务部",
+            "source_id": "MzA3Nzg3NTYwNw=="
+          },
+          {
+            "id": 200,
+            "name": "中山大学附属第三医院",
+            "source_id": "MzAxODkzNzA4OA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:56:16.209730+00:00",
+      "finished_at": "2026-09-14 03:56:29.815908+00:00"
+    },
+    {
+      "id": 45,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国科学技术大学",
+        "accounts": [
+          {
+            "id": 201,
+            "name": "中国科学技术大学",
+            "source_id": "MjM5NTY5ODYyMQ=="
+          },
+          {
+            "id": 202,
+            "name": "中国科大本科招生",
+            "source_id": "MzA4NzA0OTYyNA=="
+          },
+          {
+            "id": 203,
+            "name": "中国科学技术大学财务处",
+            "source_id": "MzA5ODU0NDM1Mw=="
+          },
+          {
+            "id": 204,
+            "name": "科大就业",
+            "source_id": "MjM5MDQxNTA5Mg=="
+          },
+          {
+            "id": 205,
+            "name": "中国科大网络信息服务",
+            "source_id": "MzA3Njc5NzYyNQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:56:29.848620+00:00",
+      "finished_at": "2026-09-14 03:56:42.406419+00:00"
+    },
+    {
+      "id": 46,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "南开大学",
+        "accounts": [
+          {
+            "id": 206,
+            "name": "南开大学",
+            "source_id": "MjM5NzgwNDg0MQ=="
+          },
+          {
+            "id": 207,
+            "name": "南开大学本科招生",
+            "source_id": "MzA4MjEwMzEzMA=="
+          },
+          {
+            "id": 208,
+            "name": "南开大学研究生教育",
+            "source_id": "MzkyMTQ3MTQ4NQ=="
+          },
+          {
+            "id": 209,
+            "name": "南开大学接待服务中心",
+            "source_id": "MzIzMjE5MTgwMA=="
+          },
+          {
+            "id": 210,
+            "name": "南开大学生",
+            "source_id": "MjM5NTU4MzA0Mg=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:56:42.449854+00:00",
+      "finished_at": "2026-09-14 03:56:55.520181+00:00"
+    },
+    {
+      "id": 47,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国人民大学",
+        "accounts": [
+          {
+            "id": 217,
+            "name": "中国人民大学",
+            "source_id": "MzA3ODU4MzU3OA=="
+          },
+          {
+            "id": 218,
+            "name": "人大阳光招生",
+            "source_id": "MzA4MzQ1MTkyMQ=="
+          },
+          {
+            "id": 219,
+            "name": "中国人民公安大学",
+            "source_id": "MzI1NTA3NTgwMw=="
+          },
+          {
+            "id": 220,
+            "name": "人大数智",
+            "source_id": "MzA4NzUwNTAyNA=="
+          },
+          {
+            "id": 221,
+            "name": "中国人民大学图书馆",
+            "source_id": "MzAxNjQ1MjcyNQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:56:55.561054+00:00",
+      "finished_at": "2026-09-14 03:57:07.774329+00:00"
+    },
+    {
+      "id": 52,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "北京师范大学",
+        "accounts": [
+          {
+            "id": 222,
+            "name": "北京师范大学",
+            "source_id": "MjM5MTg4NjM2MQ=="
+          },
+          {
+            "id": 223,
+            "name": "北师大心理学部心理健康服务中心",
+            "source_id": "MzI4MzU5OTE2OA=="
+          },
+          {
+            "id": 224,
+            "name": "北京师范大学图书馆",
+            "source_id": "MjM5MDE1OTU0MA=="
+          },
+          {
+            "id": 225,
+            "name": "北京师范大学昌平附属学校",
+            "source_id": "Mzg3NDkxNjU1NA=="
+          },
+          {
+            "id": 226,
+            "name": "北京师范大学学历继续教育",
+            "source_id": "MjM5NzI2Njk3NQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:57:07.812426+00:00",
+      "finished_at": "2026-09-14 03:57:21.196496+00:00"
+    },
+    {
+      "id": 53,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国教育报",
+        "accounts": [
+          {
+            "id": 227,
+            "name": "中国教育报",
+            "source_id": "MjM5OTU5MzcyMg=="
+          },
+          {
+            "id": 228,
+            "name": "中国教师报",
+            "source_id": "MzA5NDE2MDY3NA=="
+          },
+          {
+            "id": 229,
+            "name": "中国教育报好老师",
+            "source_id": "MzU5ODMxNzE4NA=="
+          },
+          {
+            "id": 230,
+            "name": "中国教育新闻网",
+            "source_id": "MzAxNjI3NzU5Mg=="
+          },
+          {
+            "id": 231,
+            "name": "中国教育报家长会",
+            "source_id": "MzAxNDA3NTcwMA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:57:21.233269+00:00",
+      "finished_at": "2026-09-14 03:57:33.979889+00:00"
+    },
+    {
+      "id": 54,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "中国教育在线",
+        "accounts": [
+          {
+            "id": 232,
+            "name": "EOL教育在线",
+            "source_id": "MjM5MjMzMTg0MQ=="
+          },
+          {
+            "id": 227,
+            "name": "中国教育报",
+            "source_id": "MjM5OTU5MzcyMg=="
+          },
+          {
+            "id": 234,
+            "name": "中国大学生在线",
+            "source_id": "MzA4MDMxNzgyNw=="
+          },
+          {
+            "id": 235,
+            "name": "中华医学教育在线",
+            "source_id": "MzUyMjE5MjAxMw=="
+          },
+          {
+            "id": 228,
+            "name": "中国教师报",
+            "source_id": "MzA5NDE2MDY3NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:57:34.016451+00:00",
+      "finished_at": "2026-09-14 03:57:47.208103+00:00"
+    },
+    {
+      "id": 55,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "新东方",
+        "accounts": [
+          {
+            "id": 237,
+            "name": "新东方",
+            "source_id": "MjM5NzQzOTgyMA=="
+          },
+          {
+            "id": 238,
+            "name": "成都新东方微服务",
+            "source_id": "Mzk0NzIzNjAxMg=="
+          },
+          {
+            "id": 239,
+            "name": "南昌新东方微服务",
+            "source_id": "MzI5NDI3Njg4Ng=="
+          },
+          {
+            "id": 240,
+            "name": "南昌新东方",
+            "source_id": "MzA4OTAwODI1Mg=="
+          },
+          {
+            "id": 241,
+            "name": "新东方家校平台",
+            "source_id": "MzI0NjE5NDI0MQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:57:47.239342+00:00",
+      "finished_at": "2026-09-14 03:58:00.625381+00:00"
+    },
+    {
+      "id": 56,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "三联生活周刊",
+        "accounts": [
+          {
+            "id": 242,
+            "name": "三联生活周刊",
+            "source_id": "MTc5MTU3NTYyMQ=="
+          },
+          {
+            "id": 243,
+            "name": "三联少年新知",
+            "source_id": "MzI1NzI3NjEwOQ=="
+          },
+          {
+            "id": 244,
+            "name": "三联生活传媒发行部",
+            "source_id": "MzU2MDcwOTk5MQ=="
+          },
+          {
+            "id": 245,
+            "name": "南方人物周刊",
+            "source_id": "MTY0MzI5NDcwMQ=="
+          },
+          {
+            "id": 246,
+            "name": "三联生活市集",
+            "source_id": "MzkwMTEyNzY2NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:58:00.686136+00:00",
+      "finished_at": "2026-09-14 03:58:13.066500+00:00"
+    },
+    {
+      "id": 57,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "一条",
+        "accounts": [
+          {
+            "id": 247,
+            "name": "一条",
+            "source_id": "MjM5MDI5OTkyOA=="
+          },
+          {
+            "id": 248,
+            "name": "一条家居生活",
+            "source_id": "Mzk0NzI4Mjk0Nw=="
+          },
+          {
+            "id": 249,
+            "name": "我的一条",
+            "source_id": "MzA5MDc1Mzc4Ng=="
+          },
+          {
+            "id": 250,
+            "name": "一条艺术",
+            "source_id": "Mzk0MTI4MDg1MQ=="
+          },
+          {
+            "id": 251,
+            "name": "一条生活馆",
+            "source_id": "MzUxNzM2NDY2NA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:58:13.109333+00:00",
+      "finished_at": "2026-09-14 03:58:26.745193+00:00"
+    },
+    {
+      "id": 58,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "读者",
+        "accounts": [
+          {
+            "id": 252,
+            "name": "读者",
+            "source_id": "MjM5NDA2NjY4MA=="
+          },
+          {
+            "id": 253,
+            "name": "读者原创版",
+            "source_id": "MjM5NTk3ODY1NA=="
+          },
+          {
+            "id": 254,
+            "name": "读者校园版",
+            "source_id": "MzA4NjM2NDAxNg=="
+          },
+          {
+            "id": 255,
+            "name": "青年文摘",
+            "source_id": "MzA5ODEzMTIxOA=="
+          },
+          {
+            "id": 256,
+            "name": "读者出版集团有限公司",
+            "source_id": "MzI2OTE1MDg3Nw=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:58:26.782372+00:00",
+      "finished_at": "2026-09-14 03:58:39.639110+00:00"
+    },
+    {
+      "id": 59,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "十点读书",
+        "accounts": [
+          {
+            "id": 257,
+            "name": "十点读书",
+            "source_id": "MjM5MDMyMzg2MA=="
+          },
+          {
+            "id": 258,
+            "name": "十点人物志",
+            "source_id": "MzU0NzUxMzQzNQ=="
+          },
+          {
+            "id": 259,
+            "name": "十点课堂",
+            "source_id": "MzIxNTI3MDYyNg=="
+          },
+          {
+            "id": 260,
+            "name": "十点读书会",
+            "source_id": "MzAwNDIyMTE3Ng=="
+          },
+          {
+            "id": 261,
+            "name": "小十点",
+            "source_id": "MzU1NDQxODYwMQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:58:39.675419+00:00",
+      "finished_at": "2026-09-14 03:58:51.738713+00:00"
+    },
+    {
+      "id": 60,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "看理想",
+        "accounts": [
+          {
+            "id": 262,
+            "name": "看理想",
+            "source_id": "MzA3MDM3NjE5NQ=="
+          },
+          {
+            "id": 263,
+            "name": "理想国imaginist",
+            "source_id": "MjM5NzIwMTIyMQ=="
+          },
+          {
+            "id": 264,
+            "name": "看理想APP",
+            "source_id": "MzUxMjk3NTA5Ng=="
+          },
+          {
+            "id": 265,
+            "name": "naive理想国",
+            "source_id": "Mzg3NjczODA5NA=="
+          },
+          {
+            "id": 266,
+            "name": "看理想生活",
+            "source_id": "MzU5NTI4OTA1OQ=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:58:51.779529+00:00",
+      "finished_at": "2026-09-14 03:59:04.798890+00:00"
+    },
+    {
+      "id": 61,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 5,
+        "query": "单读",
+        "accounts": [
+          {
+            "id": 267,
+            "name": "单读",
+            "source_id": "MzA3MzYzNjMyMA=="
+          },
+          {
+            "id": 268,
+            "name": "单向历",
+            "source_id": "MzAwOTM5NzUzMw=="
+          },
+          {
+            "id": 269,
+            "name": "单单读资治通鉴",
+            "source_id": "MzU4NjgzMzMxMg=="
+          },
+          {
+            "id": 270,
+            "name": "简丶單讀",
+            "source_id": "MzI1NTcwOTcwNw=="
+          },
+          {
+            "id": 271,
+            "name": "单读美宿",
+            "source_id": "MzU1NzYzMzc0Ng=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:59:04.841969+00:00",
+      "finished_at": "2026-09-14 03:59:18.432208+00:00"
+    },
+    {
+      "id": 62,
+      "kind": "discover",
+      "status": "done",
+      "error": null,
+      "result": {
+        "count": 4,
+        "query": "新世相",
+        "accounts": [
+          {
+            "id": 272,
+            "name": "新世相",
+            "source_id": "MzI2OTA3MTA5Mg=="
+          },
+          {
+            "id": 273,
+            "name": "新世相Brand",
+            "source_id": "Mzk0MjY2NjQ5Mw=="
+          },
+          {
+            "id": 274,
+            "name": "新世相服务号",
+            "source_id": "MzU5MTAzNDE2MA=="
+          },
+          {
+            "id": 275,
+            "name": "新世相客栈",
+            "source_id": "MjM5OTA5MjAyOA=="
+          }
+        ]
+      },
+      "created_at": "2026-09-14 03:59:18.477575+00:00",
+      "finished_at": "2026-09-14 03:59:30.959956+00:00"
+    },
+    {
+      "id": 63,
+      "kind": "sync",
+      "status": "blocked",
+      "error": "WeChat ret=200013 freq control; collection paused after source rejection",
+      "result": null,
+      "created_at": "2026-09-14 04:00:35.147232+00:00",
+      "finished_at": "2026-09-14 04:01:47.593804+00:00"
+    },
+    {
+      "id": 64,
+      "kind": "sync",
+      "status": "blocked",
+      "error": "WeChat ret=200013 freq control; collection paused after source rejection",
+      "result": null,
+      "created_at": "2026-09-14 04:00:35.147232+00:00",
+      "finished_at": "2026-09-14 04:01:47.593804+00:00"
+    },
+    {
+      "id": 65,
+      "kind": "sync",
+      "status": "blocked",
+      "error": "WeChat ret=200013 freq control; collection paused after source rejection",
+      "result": null,
+      "created_at": "2026-09-14 04:00:35.147232+00:00",
+      "finished_at": "2026-09-14 04:01:47.593804+00:00"
+    },
+    {
+      "id": 66,
+      "kind": "sync",
+      "status": "blocked",
+      "error": "WeChat ret=200013 freq control; collection paused after source rejection",
+      "result": null,
+      "created_at": "2026-09-14 04:00:35.147232+00:00",
+      "finished_at": "2026-09-14 04:01:47.593804+00:00"
+    }
+  ]
+}
