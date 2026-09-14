@@ -36,7 +36,8 @@ function Start-OwnedService($Name, $Executable, $Arguments, $Directory, $Port) {
     if (Test-Path -LiteralPath $pidFile) {
         $saved = Get-Content -Raw $pidFile | ConvertFrom-Json
         $existing = Get-Process -Id $saved.id -ErrorAction SilentlyContinue
-        if ($existing -and $existing.StartTime.ToUniversalTime().ToString('o') -eq $saved.started) {
+        $savedTicks = if ($saved.started_ticks) { [long]$saved.started_ticks } else { ([datetime]$saved.started).ToUniversalTime().Ticks }
+        if ($existing -and $existing.StartTime.ToUniversalTime().Ticks -eq $savedTicks) {
             Write-Host "$Name already running"; return
         }
     }
@@ -46,7 +47,7 @@ function Start-OwnedService($Name, $Executable, $Arguments, $Directory, $Port) {
         catch [Net.Sockets.SocketException] {} finally { $connection.Dispose() }
     }
     $process = Start-Process -FilePath $Executable -ArgumentList $Arguments -WorkingDirectory $Directory -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $LogDirectory "$Name.log") -RedirectStandardError (Join-Path $LogDirectory "$Name-error.log")
-    @{id=$process.Id;started=$process.StartTime.ToUniversalTime().ToString('o')} | ConvertTo-Json | Set-Content -LiteralPath $pidFile
+    @{id=$process.Id;started_ticks=$process.StartTime.ToUniversalTime().Ticks} | ConvertTo-Json | Set-Content -LiteralPath $pidFile
 }
 
 if (Test-Path -LiteralPath 'ref/wechat-download-api/app.py') {

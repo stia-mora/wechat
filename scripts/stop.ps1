@@ -5,8 +5,10 @@ foreach ($Name in @('web','worker','api','source')) {
     if (!(Test-Path -LiteralPath $pidFile)) { continue }
     $saved = Get-Content -Raw $pidFile | ConvertFrom-Json
     $process = Get-Process -Id $saved.id -ErrorAction SilentlyContinue
-    if ($process -and $process.StartTime.ToUniversalTime().ToString('o') -eq $saved.started) {
-        Stop-Process -Id $process.Id
+    $savedTicks = if ($saved.started_ticks) { [long]$saved.started_ticks } else { ([datetime]$saved.started).ToUniversalTime().Ticks }
+    if ($process -and $process.StartTime.ToUniversalTime().Ticks -eq $savedTicks) {
+        # Python's Windows venv launcher may own a child interpreter; stop the owned tree.
+        taskkill.exe /PID $process.Id /T /F | Out-Null
         Write-Host "Stopped $Name"
     }
 }
