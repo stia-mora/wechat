@@ -185,8 +185,12 @@ def account(account_id: int, request: Request):
             ).fetchall(),
         )
         for other in others:
-            shared = set(other["tags"]) & set(row["tags"])
-            union = set(other["tags"]) | set(row["tags"])
+            # A category copied into tags must not count twice as topic evidence.
+            category_labels = {row["category"], other["category"]}
+            row_tags = set(row["tags"]) - category_labels
+            other_tags = set(other["tags"]) - category_labels
+            shared = other_tags & row_tags
+            union = other_tags | row_tags
             other["similarity"] = round((0.4 + 0.6 * len(shared) / max(1, len(union))) * 100)
             other["similarity_reason"] = (
                 "共同分类："
