@@ -20,7 +20,7 @@ def import_article(account_id, item):
             title=EXCLUDED.title,cover_url=EXCLUDED.cover_url,
             author=coalesce(nullif(EXCLUDED.author,''),articles.author),
             summary=coalesce(nullif(EXCLUDED.summary,''),articles.summary),
-            source_url=EXCLUDED.source_url,publish_time=coalesce(EXCLUDED.publish_time,articles.publish_time),
+            source_url=EXCLUDED.source_url,publish_time=coalesce(articles.body_publish_time,EXCLUDED.publish_time,articles.publish_time),
             updated_at=now() RETURNING id,content_text""",
             (
                 account_id,

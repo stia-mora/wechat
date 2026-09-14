@@ -163,3 +163,4 @@ CREATE TABLE IF NOT EXISTS discovery_requests (
 CREATE INDEX IF NOT EXISTS jobs_source_lease ON jobs(source_account_id) WHERE status='running';
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS execution_token text;
 ALTER TABLE source_accounts ADD COLUMN IF NOT EXISTS maintenance_until timestamptz;
+ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_publish_time timestamptz;

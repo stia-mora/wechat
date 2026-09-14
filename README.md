@@ -118,7 +118,13 @@ LLM_API_KEY=你的密钥
 LLM_MODEL=你的模型名称
 ```
 
-Embedding 独立配置 `EMBEDDING_API_KEY`、`EMBEDDING_MODEL`、`EMBEDDING_BASE_URL`，结果以模型 / 内容哈希 / 向量写入 PostgreSQL 的 `article_embeddings`。正文入库后自动排队，缺配置明确阻塞，不生成假向量。
+Embedding 使用硅基流动 `Qwen/Qwen3-VL-Embedding-8B`，重排使用 `Qwen/Qwen3-VL-Reranker-8B`，分别配置 `EMBEDDING_*` / `RERANK_*`。本机两套 API_KEY 通过 `${LLM_API_KEY}` 引用已有硅基流动密钥，LLM 分析模型保持独立。向量以模型 / 内容哈希 / 向量写入 PostgreSQL 的 `article_embeddings`。文章关键词搜索的「内容推荐」会对最多 100 条数据库候选重排后分页，模型不可用时退回数据库排序；其他排序不调用模型。正文入库后自动排队 Embedding，缺配置明确阻塞。
+
+正文范围由 `BODY_SINCE=2026-06-01` 控制（北京时间零点，包含当天）。微信读书只请求已知发布日期在范围内的缺失正文；日期不明的 cover 记录暂留元数据。已有正文不删除。手工链接日期未知时也会等待确认。待采集任务每批补采 20 篇，账号容量仅决定能接手多少公众号，不等于每批正文数。
+
+正文页面要求验证时，账号进入异常暂停，不自动轮换账号继续撞验证；后台显示失败原文链接。用对应微信处理页面验证后点击「检测」，系统会验证书架并重新探测失败正文；仍失败则保持暂停。验证在浏览器与采集会话间不一定通用。账号画像至少需要该公众号 3 篇正文，数量不足属于等待采集，满足条件后会自动排队。
+
+本轮接口依据：[硅基流动 Embedding](https://api-docs.siliconflow.cn/docs/api/embeddings-post)、[Rerank](https://docs.siliconflow.cn/docs/api/rerank-post)。2026-09-14 已验证真实正文生成 4096 维向量并写入 PostgreSQL，关键词检索返回指定 VL Reranker 的重排结果。29 项后端回归测试及生产构建通过。
 
 重启 worker 后在后台重试阻塞的分析任务。账号分析默认最多取最近 50 篇已读正文，每篇输入上限 6000 字符；不足 3 篇时不分析，3—19 篇会显示低样本提示。文章摘要上限 30000 字符。
 

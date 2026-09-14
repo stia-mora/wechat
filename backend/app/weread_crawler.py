@@ -5,6 +5,7 @@ import os
 from psycopg.types.json import Jsonb
 
 from . import account_pool as pool
+from .collection_policy import body_since, eligible
 from .db import db
 from .normalizer import save_article
 from .repository import enqueue
@@ -99,13 +100,21 @@ def collect(payload):
         with db() as conn:
             missing = conn.execute(
                 """SELECT a.*,o.external_id FROM articles a JOIN article_origins o ON o.article_id=a.id
-                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text=''
+                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s
                 ORDER BY a.publish_time DESC NULLS LAST,a.id DESC LIMIT %s""",
-                (target, payload.get("parse_limit", 20)),
+                (target, body_since(), payload.get("parse_limit", 20)),
             ).fetchall()
         for article in missing:
             checkpoint("补全文章正文", article_id=article["id"])
             body = adapter.content(article["external_id"])
+            if body.get("publish_time"):
+                with db() as conn:
+                    conn.execute(
+                        "UPDATE articles SET publish_time=to_timestamp(%s),body_publish_time=to_timestamp(%s),updated_at=now() WHERE id=%s",
+                        (body["publish_time"], body["publish_time"], article["id"]),
+                    )
+            if not eligible(body.get("publish_time") or article["publish_time"]):
+                continue
             save_article(
                 target,
                 book,
@@ -128,8 +137,8 @@ def collect(payload):
             ).fetchone()
             remaining = conn.execute(
                 """SELECT count(*) n FROM articles a JOIN article_origins o ON o.article_id=a.id
-                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text=''""",
-                (target,),
+                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s""",
+                (target, body_since()),
             ).fetchone()["n"]
             hours = max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "24")))
             conn.execute(
@@ -157,6 +166,7 @@ def collect(payload):
             imported=counts["total"],
             readable_articles=counts["readable"],
             missing_bodies=remaining,
+            body_since=body_since().isoformat(),
             history_complete=(exhausted or reached_known) if capability == "history" else False,
         )
         pool.release(lease, capability=capability)

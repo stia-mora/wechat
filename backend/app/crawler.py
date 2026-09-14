@@ -118,12 +118,16 @@ class SourceClient:
         return collect(payload)
 
     def parse(self, payload):
+        from .collection_policy import eligible
+
         with db() as conn:
             article = conn.execute(
                 "SELECT * FROM articles WHERE id=%s", (payload["target_id"],)
             ).fetchone()
         if not article:
             raise ValueError("文章不存在")
+        if not eligible(article["publish_time"]):
+            raise SourceBlocked("仅采集 2026-06-01 起的正文；此文章日期过早或尚未确认")
         with db() as conn:
             account = conn.execute(
                 "SELECT * FROM official_accounts WHERE id=%s", (article["account_id"],)
@@ -149,6 +153,8 @@ class SourceClient:
             if cached.get("content")
             else self.bridge("POST", f"/articles/{cached['id']}/body", remote=True)
         )
+        if not eligible(data.get("publish_time") or article["publish_time"]):
+            raise SourceBlocked("仅采集 2026-06-01 起的正文；解析后的日期不在采集范围")
         html, text = clean_content(data.get("content", ""))
         if not text.strip():
             raise ValueError("未返回可读正文")

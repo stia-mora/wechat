@@ -121,13 +121,20 @@ def run(once=False, mode="all"):
                     (str(exc), job["id"], job["execution_token"]),
                 )
         except SourceError as exc:
-            terminal = exc.category == "target" or job["attempts"] + 1 >= job["max_attempts"]
+            terminal = (
+                exc.category in ("target", "verification")
+                or job["attempts"] + 1 >= job["max_attempts"]
+            )
             with db() as conn:
                 conn.execute(
                     """UPDATE jobs SET status=%s,error=%s,lease_token=NULL,
                     run_after=now()+interval '60 seconds',finished_at=CASE WHEN %s THEN now() ELSE NULL END WHERE id=%s AND execution_token=%s""",
                     (
-                        "failed" if terminal else "queued",
+                        "blocked"
+                        if exc.category == "verification"
+                        else "failed"
+                        if terminal
+                        else "queued",
                         str(exc),
                         terminal,
                         job["id"],
@@ -151,7 +158,7 @@ def run(once=False, mode="all"):
                 )
             log.warning("job %s blocked: %s", job["id"], exc)
             # Stop related queued source work after authentication/verification failures.
-            if job["kind"] in ("discover", "parse"):
+            if job["kind"] in ("discover", "parse") and "仅采集" not in str(exc):
                 with db() as conn:
                     conn.execute(
                         "UPDATE jobs SET status='blocked',error=%s,finished_at=now() WHERE status='queued' AND kind=%s",

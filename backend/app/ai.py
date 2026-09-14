@@ -100,7 +100,7 @@ def analyze(kind, payload):
                 (target,),
             ).fetchone()["n"]
             if len(articles) < 3:
-                raise SourceBlocked("至少需要 3 篇可读文章才生成初步画像；建议采集 20—50 篇")
+                raise SourceBlocked(f"当前只有 {len(articles)} 篇可读正文，至少需要 3 篇才生成初步画像；采集达标后自动分析")
             source = {
                 "account": account,
                 "articles": [

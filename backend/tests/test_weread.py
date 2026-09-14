@@ -174,7 +174,7 @@ def test_crawl_resumes_after_expiry_and_repairs_missing_body(client, monkeypatch
                         "external_id": book + "_one",
                         "title": "测试正文",
                         "link": "https://mp.weixin.qq.com/s/" + str(account),
-                        "publish_time": 1700000000,
+                        "publish_time": 1780272000,
                     }
                 ]
                 if offset == 0
@@ -263,7 +263,7 @@ def test_cover_is_explicit_degradation_not_history_success(client, monkeypatch):
             }
 
         def content(self, rid):
-            return {"content": "<p>正文</p>"}
+            pytest.fail('Unknown publication date must not fetch a body')
 
         def credentials(self):
             return {"cookies": {}}

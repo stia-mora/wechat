@@ -18,6 +18,7 @@ type PoolAccount = {
   last_sync_at: string | null;
   last_failure_at: string | null;
   last_error: string | null;
+  verification_url?: string | null;
   cooldown_until: string | null;
 };
 type QR = { status: string; message: string; image?: string };
@@ -207,6 +208,7 @@ export function SourceAccounts({ token }: { token: string }) {
                   </p>
                   {a.cooldown_until && <p className="text-xs">冷却至 {time(a.cooldown_until)}</p>}
                   {a.last_error && <p className="max-w-sm text-xs text-red-700">{a.last_error}</p>}
+                  {a.last_error?.includes('正文页面要求验证') && <p className="max-w-sm text-xs">请用对应微信打开原文并处理验证，再点击「检测」。浏览器验证不一定解除采集接口限制。{a.verification_url && <a href={a.verification_url} target="_blank" rel="noreferrer" className="underline">打开失败原文</a>}</p>}
                 </td>
                 <td>
                   <div className="flex flex-wrap gap-2">

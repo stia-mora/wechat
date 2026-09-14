@@ -137,7 +137,9 @@ def release(lease, error=None, capability=None):
             category = getattr(error, "category", "transient")
             # A bad target/body is not evidence that the login itself is unhealthy.
             health = (
-                "expired"
+                "error"
+                if category == "verification"
+                else "expired"
                 if category == "auth"
                 else "cooldown"
                 if category in ("cooldown", "ambiguous", "transient")

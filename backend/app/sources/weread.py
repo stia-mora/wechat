@@ -185,7 +185,7 @@ class WeReadAdapter:
         body = soup.select_one("#js_content") or soup.select_one(".rich_media_content")
         if body is None or not body.get_text(strip=True):
             if "验证" in html or "captcha" in html.lower():
-                raise SourceError("verification", "正文页面要求验证", "cooldown")
+                raise SourceError("verification", "正文页面要求验证，请人工打开原文处理后检测账号", "verification")
             raise SourceError("invalid_content", "正文页面没有可读内容", "content")
         timestamp = re.search(r'(?:var\s+)?ct\s*=\s*["\'](\d{10})["\']', html)
         author = soup.select_one("#js_name")

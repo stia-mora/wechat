@@ -11,6 +11,7 @@ from app import (
     ai,
     auth,
     crawler,
+    embeddings,
     exports,
     main,
     normalizer,
@@ -45,6 +46,7 @@ def client(monkeypatch):
                     auth,
                     admin,
                     crawler,
+                    embeddings,
                     ai,
                     pipeline,
                     exports,
@@ -250,7 +252,7 @@ def test_cache_import_updates_old_body_keeps_hidden_and_needs_no_login(client, m
         {
             "id": i,
             "title": f"cached {i}",
-            "publish_time": 1700000000,
+            "publish_time": 1780272000,
             "link": f"https://mp.weixin.qq.com/s?__biz={marker}&mid={i}&idx=1",
         }
         for i in range(1, 104)
@@ -337,16 +339,19 @@ def test_manual_links_queue_parse_and_save_real_metadata(client, monkeypatch):
         return {
             "title": "解析到的标题",
             "author": "作者",
-            "publish_time": 1700000000,
+            "publish_time": 1780272000,
             "content": "<p>解析正文</p>",
         }
 
     source = crawler.SourceClient()
     monkeypatch.setattr(source, "bridge", bridge)
+    with pytest.raises(crawler.SourceBlocked, match="仅采集"):
+        source.parse(job["payload"])
+    conn.execute("UPDATE articles SET publish_time=to_timestamp(1780272000) WHERE id=%s", (job["payload"]["target_id"],))
     source.parse(job["payload"])
     article = conn.execute(
         "SELECT * FROM articles WHERE id=%s", (job["payload"]["target_id"],)
     ).fetchone()
     assert article["status"] == "ready" and article["title"] == "解析到的标题"
-    assert article["author"] == "作者" and article["publish_time"].timestamp() == 1700000000
+    assert article["author"] == "作者" and article["publish_time"].timestamp() == 1780272000
     assert calls == ["/articles", "/articles/99/body"]

@@ -32,7 +32,11 @@ def generate(payload):
             os.getenv("EMBEDDING_BASE_URL", "https://api.openai.com/v1").rstrip("/")
             + "/embeddings",
             headers={"Authorization": "Bearer " + key},
-            json={"model": model, "input": text},
+            json={
+                "model": model,
+                "input": text,
+                **({"truncate": "right"} if "VL-Embedding" in model else {}),
+            },
         )
         response.raise_for_status()
     vector = response.json()["data"][0]["embedding"]
@@ -42,6 +46,8 @@ def generate(payload):
         or any(not isinstance(v, (int, float)) or not math.isfinite(v) for v in vector)
     ):
         raise ValueError("Embedding 返回无效向量")
+    # Providers may serialize zero as an integer; psycopg arrays require one numeric type.
+    vector = [float(v) for v in vector]
     with db() as conn:
         conn.execute(
             """INSERT INTO article_embeddings(article_id,model,content_hash,embedding) VALUES (%s,%s,%s,%s)

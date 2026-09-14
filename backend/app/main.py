@@ -1,6 +1,8 @@
+import os
 from contextlib import asynccontextmanager
 from urllib.parse import urlparse
 
+import httpx
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
@@ -289,17 +291,30 @@ def articles(
         "popular": "collection_count DESC,ar.publish_time DESC NULLS LAST",
         "recommended": "coalesce((ai.data->>'quality_score')::numeric,0) DESC,ar.publish_time DESC NULLS LAST",
     }.get(sort, "ar.publish_time DESC NULLS LAST,ar.id DESC")
+    use_rerank = bool(q and sort == "recommended" and os.getenv("RERANK_MODEL"))
     with db() as conn:
         total = conn.execute("SELECT count(*) AS n" + base, args).fetchone()["n"]
         rows = conn.execute(
-            "SELECT ar.id,ar.account_id,ar.title,ar.author,ar.source_url,ar.cover_url,ar.publish_time,ar.summary,ar.status,ar.word_count,a.name AS account_name,ai.data AS ai_summary,(SELECT count(*) FROM collections c WHERE c.article_id=ar.id) AS collection_count"
+            "SELECT ar.id,ar.account_id,ar.title,ar.author,ar.source_url,ar.cover_url,ar.publish_time,ar.summary,ar.status,ar.word_count,ar.content_text,a.name AS account_name,ai.data AS ai_summary,(SELECT count(*) FROM collections c WHERE c.article_id=ar.id) AS collection_count"
             + base
             + " ORDER BY "
             + order
             + " LIMIT %s OFFSET %s",
-            args + [limit, (page - 1) * limit],
+            args + ([100, 0] if use_rerank else [limit, (page - 1) * limit]),
         ).fetchall()
-    return {"items": rows, "total": total, "page": page, "limit": limit}
+    ranking = "database"
+    if use_rerank:
+        from .reranking import rerank
+
+        try:
+            rows, ranking = rerank(q, rows)
+        except (httpx.HTTPError, ValueError, KeyError, TypeError):
+            ranking = "database_fallback"
+        total = min(total, 100)
+        rows = rows[(page - 1) * limit : page * limit]
+    for row in rows:
+        row.pop("content_text", None)
+    return {"items": rows, "total": total, "page": page, "limit": limit, "ranking": ranking}
 
 
 @app.get("/api/articles/{article_id}")

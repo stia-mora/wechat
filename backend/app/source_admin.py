@@ -42,6 +42,9 @@ def accounts():
         return conn.execute("""SELECT s.id,s.name,s.external_id,s.enabled,s.health,s.capability,
             s.max_tasks,s.max_subscriptions,s.consecutive_failures,s.total_failures,s.last_sync_at,
             s.last_failure_at,s.last_checked_at,s.cooldown_until,s.last_error,
+            (SELECT a.source_url FROM crawl_attempts c JOIN jobs j ON j.id=c.job_id
+             JOIN articles a ON a.id=(j.result->>'article_id')::bigint
+             WHERE c.source_account_id=s.id AND c.status='failed' ORDER BY c.id DESC LIMIT 1) verification_url,
             (SELECT count(*) FROM source_memberships m WHERE m.source_account_id=s.id) subscriptions,
             (SELECT count(*) FROM jobs j WHERE j.source_account_id=s.id AND j.lease_token IS NOT NULL AND j.status='running') current_tasks
             FROM source_accounts s ORDER BY s.id""").fetchall()
@@ -170,6 +173,16 @@ def check(account_id: int):
         except (InvalidToken, ValueError, OSError):
             raise SourceError("credentials", "无法解密凭据，请恢复密钥或重新登录", "auth")
         books = adapter.verify_or_renew()
+        if row["last_error"] and "正文页面要求验证" in row["last_error"]:
+            with db() as conn:
+                failed = conn.execute(
+                    """SELECT o.external_id FROM crawl_attempts c JOIN jobs j ON j.id=c.job_id
+                    JOIN article_origins o ON o.article_id=(j.result->>'article_id')::bigint AND o.source_id='weread'
+                    WHERE c.source_account_id=%s AND c.status='failed' ORDER BY c.id DESC LIMIT 1""",
+                    (account_id,),
+                ).fetchone()
+            if failed:
+                adapter.content(failed["external_id"])
         save_verified(account_id, adapter)
         return {"ok": True, "shelf_count": len(books)}
     except SourceError as exc:

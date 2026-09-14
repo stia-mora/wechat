@@ -46,7 +46,7 @@ export function SourcePipeline({
   const [busy, setBusy] = useState(false);
   const [pages, setPages] = useState(3);
   const [backfill, setBackfill] = useState(false);
-  const [bodies, setBodies] = useState(3);
+  const [bodies, setBodies] = useState(20);
   const [format, setFormat] = useState('zip');
   const [links, setLinks] = useState('');
   const headers = { Authorization: 'Bearer ' + token };
@@ -247,6 +247,7 @@ export function SourcePipeline({
         <p>
           本站数据库：{state?.articles ?? '—'} 篇文章，{state?.bodies ?? '—'} 篇正文
         </p>
+        <p>正文仅采集 2026 年 6 月 1 日及之后的文章；日期不明的文章等待确认。列表记录数不等于正文数。</p>
         {state?.job && (
           <>
             <p>
