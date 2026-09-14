@@ -59,7 +59,7 @@ Start-OwnedService 'api' $PythonExe '-X utf8 -m uvicorn app.main:app --host 127.
 Start-OwnedService 'worker' $PythonExe '-X utf8 -m app.worker' (Join-Path $ProjectRoot 'backend') 0
 Start-OwnedService 'ai-worker' $PythonExe '-X utf8 -m app.worker --mode ai' (Join-Path $ProjectRoot 'backend') 0
 $NodeExe = (Get-Command node.exe).Source
-Start-OwnedService 'web' $NodeExe 'node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 3500' (Join-Path $ProjectRoot 'web') 3500
+Start-OwnedService 'web' $NodeExe 'node_modules/next/dist/bin/next start --hostname 0.0.0.0 --port 3500' (Join-Path $ProjectRoot 'web') 3500
 Write-Host 'Website: http://localhost:3500'
 Write-Host 'Source login: http://localhost:5500/login.html'
 Write-Host 'Admin token is stored in .env; logs are in logs/.'

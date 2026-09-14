@@ -5,6 +5,7 @@
 ## 本机入口
 
 - 网站：<http://localhost:3500>
+- 局域网：`http://本机局域网IP:3500`；Windows 启动脚本监听所有网卡，防火墙仅放行本地子网的 TCP 3500。
 - 管理后台：<http://localhost:3500/admin>（密钥在项目 `.env` 的 `ADMIN_TOKEN`）
 - API 文档：<http://localhost:8500/docs>
 - 微信读书扫码：管理后台 →「微信读书账号池」→ 新增账号 → 扫码登录
