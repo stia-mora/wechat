@@ -1,9 +1,8 @@
 import os
-from urllib.parse import parse_qs, quote, urlparse
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import Response
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, Field
 
@@ -111,13 +110,14 @@ def edit_account(account_id: int, data: AccountEdit):
 
 
 class Task(BaseModel):
-    kind: str = Field(pattern="^(discover|sync|parse|account_ai|article_ai)$")
+    kind: str = Field(pattern="^(discover|sync|parse|account_ai|article_ai|embedding)$")
     query: str = Field(default="", max_length=200)
     category_id: int | None = None
     target_id: int | None = None
     pages: int = Field(default=1, ge=1, le=30)
     parse_limit: int = Field(default=3, ge=0, le=100)
     cache_only: bool = False
+    backfill: bool = False
 
 
 @router.post("/jobs")
@@ -134,6 +134,7 @@ def create_job(data: Task):
             "pages": data.pages,
             "parse_limit": data.parse_limit,
             "cache_only": data.cache_only,
+            "backfill": data.backfill,
         }
     )
     with db() as conn:
@@ -174,11 +175,18 @@ def retry(job_id: int):
 
 @router.get("/accounts/{account_id}/source")
 def source_state(account_id: int):
-    from .crawler import SourceClient
-
     with db() as conn:
-        account = conn.execute(
-            "SELECT source_id FROM official_accounts WHERE id=%s", (account_id,)
+        if not conn.execute(
+            "SELECT 1 FROM official_accounts WHERE id=%s", (account_id,)
+        ).fetchone():
+            raise HTTPException(404, "公众号不存在")
+        counts = conn.execute(
+            "SELECT count(*) articles,count(*) FILTER(WHERE content_text<>'') bodies FROM articles WHERE account_id=%s",
+            (account_id,),
+        ).fetchone()
+        subscription = conn.execute(
+            "SELECT * FROM source_subscriptions WHERE account_id=%s AND source_id='weread'",
+            (account_id,),
         ).fetchone()
         job = conn.execute(
             """SELECT * FROM jobs WHERE
@@ -187,18 +195,7 @@ def source_state(account_id: int):
             ORDER BY id DESC LIMIT 1""",
             (account_id, account_id),
         ).fetchone()
-    if not account:
-        raise HTTPException(404, "公众号不存在")
-    source = SourceClient()
-    try:
-        cached = source.bridge(
-            "GET", "/articles", params={"fakeid": account["source_id"], "limit": 1}
-        )
-    except (httpx.HTTPError, RuntimeError, ValueError) as exc:
-        raise HTTPException(502, "读取参考服务失败：" + str(exc)[:300])
-    finally:
-        source.client.close()
-    return {"articles": cached["articles"], "bodies": cached["bodies"], "job": job}
+    return {**counts, "subscription": subscription, "job": job, "provider": "weread"}
 
 
 class ArticleLinks(BaseModel):
@@ -242,35 +239,9 @@ def add_article_links(account_id: int, data: ArticleLinks):
 
 @router.get("/accounts/{account_id}/export/{format}")
 def export_account(account_id: int, format: str):
-    if format not in ("zip", "html", "xlsx", "json", "docx", "pdf", "epub"):
-        raise HTTPException(422, "不支持的导出格式")
-    with db() as conn:
-        account = conn.execute(
-            "SELECT source_id FROM official_accounts WHERE id=%s", (account_id,)
-        ).fetchone()
-    if not account:
-        raise HTTPException(404, "公众号不存在")
-    try:
-        response = httpx.get(
-            os.environ["SOURCE_API_URL"].rstrip("/")
-            + f"/api/export/account/{quote(account['source_id'], safe='')}.{format}",
-            timeout=180,
-            trust_env=False,
-        )
-        if response.status_code == 404:
-            raise HTTPException(404, "参考库中还没有可导出的正文，请先完成采集或导入缓存")
-        response.raise_for_status()
-    except httpx.HTTPError:
-        raise HTTPException(502, "参考服务导出失败，请检查服务状态或减少文章量后重试")
-    return Response(
-        response.content,
-        media_type=response.headers.get("content-type", "application/octet-stream"),
-        headers={
-            "Content-Disposition": f'attachment; filename="account-{account_id}.{format}"',
-            "Cache-Control": "no-store",
-            "X-Content-Type-Options": "nosniff",
-        },
-    )
+    from .exports import export_account as export_stored
+
+    return export_stored(account_id, format)
 
 
 class CategoryEdit(BaseModel):

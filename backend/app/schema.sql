@@ -104,3 +104,62 @@ CREATE OR REPLACE VIEW account_stats AS
 CREATE OR REPLACE VIEW article_stats AS
  SELECT a.id AS article_id, (SELECT count(*) FROM collections c WHERE c.article_id=a.id)::int AS collection_count
  FROM articles a;
+
+-- Independent source accounts and task leases (no permanent account assignment).
+CREATE TABLE IF NOT EXISTS data_sources (
+ id text PRIMARY KEY, name text NOT NULL, enabled boolean NOT NULL DEFAULT true
+);
+INSERT INTO data_sources VALUES ('weread','微信读书',true),('wechat-discovery','公众号发现',true) ON CONFLICT DO NOTHING;
+CREATE TABLE IF NOT EXISTS source_accounts (
+ id bigserial PRIMARY KEY, source_id text NOT NULL REFERENCES data_sources(id) DEFAULT 'weread',
+ name text NOT NULL, external_id text UNIQUE, credentials text NOT NULL DEFAULT '',
+ enabled boolean NOT NULL DEFAULT true,
+ health text NOT NULL DEFAULT 'unconfigured' CHECK(health IN ('unconfigured','healthy','expired','cooldown','error')),
+ capability text NOT NULL DEFAULT 'unknown' CHECK(capability IN ('unknown','history','latest_only')),
+ max_tasks int NOT NULL DEFAULT 1 CHECK(max_tasks BETWEEN 1 AND 4),
+ max_subscriptions int NOT NULL DEFAULT 100 CHECK(max_subscriptions BETWEEN 1 AND 1000),
+ consecutive_failures int NOT NULL DEFAULT 0, total_failures int NOT NULL DEFAULT 0,
+ last_sync_at timestamptz, last_failure_at timestamptz, last_checked_at timestamptz,
+ last_assigned_at timestamptz, cooldown_until timestamptz, next_request_at timestamptz,
+ last_error text, created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS source_subscriptions (
+ account_id bigint NOT NULL REFERENCES official_accounts(id), source_id text NOT NULL REFERENCES data_sources(id) DEFAULT 'weread',
+ external_id text NOT NULL, enabled boolean NOT NULL DEFAULT true,
+ history_offset int NOT NULL DEFAULT 0, history_complete boolean NOT NULL DEFAULT false,
+ capability text NOT NULL DEFAULT 'unknown', last_sync_at timestamptz, last_failure_at timestamptz,
+ next_sync_at timestamptz NOT NULL DEFAULT now(), last_error text,
+ PRIMARY KEY(account_id,source_id), UNIQUE(source_id,external_id)
+);
+CREATE TABLE IF NOT EXISTS source_memberships (
+ source_account_id bigint REFERENCES source_accounts(id), account_id bigint REFERENCES official_accounts(id),
+ joined_at timestamptz NOT NULL DEFAULT now(), last_used_at timestamptz NOT NULL DEFAULT now(),
+ PRIMARY KEY(source_account_id,account_id)
+);
+ALTER TABLE jobs DROP CONSTRAINT IF EXISTS jobs_kind_check;
+ALTER TABLE jobs ADD CONSTRAINT jobs_kind_check CHECK(kind IN ('discover','sync','parse','account_ai','article_ai','embedding'));
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_account_id bigint REFERENCES source_accounts(id);
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS lease_token text;
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS heartbeat_at timestamptz;
+CREATE TABLE IF NOT EXISTS crawl_attempts (
+ id bigserial PRIMARY KEY, job_id bigint NOT NULL REFERENCES jobs(id),
+ source_account_id bigint NOT NULL REFERENCES source_accounts(id),
+ lease_token text NOT NULL UNIQUE, status text NOT NULL DEFAULT 'running',
+ started_at timestamptz NOT NULL DEFAULT now(), finished_at timestamptz, error_code text, error text
+);
+CREATE TABLE IF NOT EXISTS article_origins (
+ source_id text NOT NULL REFERENCES data_sources(id), external_id text NOT NULL,
+ article_id bigint NOT NULL REFERENCES articles(id), book_id text NOT NULL,
+ fetched_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(source_id,external_id)
+);
+CREATE TABLE IF NOT EXISTS article_embeddings (
+ article_id bigint PRIMARY KEY REFERENCES articles(id) ON DELETE CASCADE,
+ model text NOT NULL, content_hash text NOT NULL, embedding double precision[] NOT NULL,
+ generated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS discovery_requests (
+ query text PRIMARY KEY, job_id bigint REFERENCES jobs(id), requested_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS jobs_source_lease ON jobs(source_account_id) WHERE status='running';
+ALTER TABLE jobs ADD COLUMN IF NOT EXISTS execution_token text;
+ALTER TABLE source_accounts ADD COLUMN IF NOT EXISTS maintenance_until timestamptz;

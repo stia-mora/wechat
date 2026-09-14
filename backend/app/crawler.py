@@ -89,6 +89,14 @@ class SourceClient:
                 ).fetchone()
                 index_account(conn, row["id"])
                 found.append(row)
+                from .account_pool import subscribe
+                from .sources.weread import SourceError
+
+                try:
+                    subscribe(conn, row["id"])
+                    enqueue(conn, "sync", {"target_id": row["id"], "pages": 3, "parse_limit": 20})
+                except SourceError:
+                    pass
         return {"count": len(found), "accounts": found, "query": payload["query"]}
 
     def bridge(self, method, path, remote=False, **kwargs):
@@ -101,9 +109,13 @@ class SourceClient:
         )
 
     def sync(self, payload):
-        from .pipeline import run
+        if payload.get("cache_only"):
+            from .pipeline import run
 
-        return run(self, payload)
+            return run(self, payload)
+        from .weread_crawler import collect
+
+        return collect(payload)
 
     def parse(self, payload):
         with db() as conn:

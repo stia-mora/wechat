@@ -7,3 +7,10 @@ httpx==0.28.1
 beautifulsoup4==4.15.0
 bleach==6.4.0
 pytest==9.1.1
+cryptography==50.0.1
+qrcode[pil]==8.2
+
+openpyxl==3.1.5
+python-docx==1.2.0
+reportlab==5.0.1
+EbookLib==0.20

@@ -1,4 +1,4 @@
-"""Subscribe → checkpointed history → cached body → product import → export."""
+"""Legacy local-cache import only. Active collection lives in weread_crawler."""
 
 from datetime import UTC, datetime
 from urllib.parse import parse_qs, urlencode, urlparse
@@ -95,53 +95,6 @@ def run(source, payload):
 
     checkpoint("导入缓存")
     items = cached_import()
-    if not payload.get("cache_only"):
-        checkpoint("订阅公众号")
-        source.request(
-            "POST",
-            "/api/rss/subscribe",
-            remote=False,
-            json={
-                "fakeid": account["source_id"],
-                "nickname": account["name"],
-                "alias": account["wechat_id"],
-                "head_img": account["avatar_url"],
-            },
-        )
-        for page in range(progress.get("pages_done", 0), payload.get("pages", 1)):
-            if progress.get("history_exhausted"):
-                break
-            checkpoint("获取历史列表")
-            result = source.bridge(
-                "POST",
-                "/history",
-                remote=True,
-                json={"fakeid": account["source_id"], "begin": progress.get("next_begin", 0)},
-            )
-            checkpoint(
-                "导入文章列表",
-                pages_done=page + 1,
-                next_begin=result["next_begin"],
-                history_exhausted=not result["has_more"],
-            )
-            items = cached_import()
-            if not result["has_more"]:
-                break
-        checkpoint("采集并保存正文")
-        # A retry targets the same newest N cached articles and skips completed bodies.
-        selected = sorted(items, key=lambda i: (i["publish_time"], i["id"]), reverse=True)[
-            : payload.get("parse_limit", 3)
-        ]
-        for item in selected:
-            if not item.get("content"):
-                body = source.bridge("POST", f"/articles/{item['id']}/body", remote=True)
-                import_article(account["id"], body)
-                item.update(body)
-            checkpoint(
-                "采集并保存正文",
-                cached_bodies=sum(bool(i.get("content")) for i in items),
-                last_article=item["title"],
-            )
     checkpoint("检查导出")
     items = cached_import()
     with db() as conn:

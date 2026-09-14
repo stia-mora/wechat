@@ -3,7 +3,17 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import type { Account, Job } from '@/lib/types';
 
-type State = { articles: number; bodies: number; job: Job | null };
+type State = {
+  articles: number;
+  bodies: number;
+  job: Job | null;
+  subscription?: {
+    capability: string;
+    history_complete: boolean;
+    history_offset: number;
+    last_sync_at: string | null;
+  };
+};
 const formats = [
   ['zip', 'Markdown 合集'],
   ['html', 'HTML 合集'],
@@ -34,7 +44,8 @@ export function SourcePipeline({
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
-  const [pages, setPages] = useState(1);
+  const [pages, setPages] = useState(3);
+  const [backfill, setBackfill] = useState(false);
   const [bodies, setBodies] = useState(3);
   const [format, setFormat] = useState('zip');
   const [links, setLinks] = useState('');
@@ -83,6 +94,7 @@ export function SourcePipeline({
           pages,
           parse_limit: bodies,
           cache_only: cacheOnly,
+          backfill,
         }),
       });
       setMessage(value.message);
@@ -165,12 +177,28 @@ export function SourcePipeline({
         </button>
       </div>
       <p className="mb-5 text-sm leading-7 text-stone-500">
-        订阅 → 获取历史列表 → 保存正文 → 导入本站 →
-        导出文件。已保存的正文会自动复用，任务中断后可继续。
+        待采集队列 → 动态选择微信读书账号 → 加入书架 → 采集文章 → 本站入库与分析。
+        账号失效后重新调度，已保存正文自动复用。
       </p>
+      <label className="mb-4 flex gap-2 text-sm">
+        <input type="checkbox" checked={backfill} onChange={(e) => setBackfill(e.target.checked)} />
+        从保存的历史位置继续回补（不勾选则检查最新增量）
+      </label>
+      {state?.subscription && (
+        <p className="mb-4 text-sm text-stone-500">
+          数据源能力：
+          {state.subscription.capability === 'latest_only'
+            ? '仅最新文章（已降级，历史未完成）'
+            : state.subscription.capability === 'history'
+              ? '历史分页'
+              : '待验证'}{' '}
+          · 历史偏移 {state.subscription.history_offset} ·{' '}
+          {state.subscription.history_complete ? '历史扫描完成' : '历史尚未扫描完成'}
+        </p>
+      )}
       <div className="grid gap-4 md:grid-cols-3">
         <label className="field">
-          历史页数（每页最多 10 次群发）
+          本次最多列表页数
           <input
             type="number"
             min={1}
@@ -180,7 +208,7 @@ export function SourcePipeline({
           />
         </label>
         <label className="field">
-          本批最新文章的正文上限
+          本次缺失正文补采上限
           <input
             type="number"
             min={0}
@@ -204,20 +232,20 @@ export function SourcePipeline({
             }
             onClick={() => start(false)}
           >
-            开始完整采集
+            加入微信读书采集队列
           </button>
           <button
             className="button secondary"
             disabled={busy || !!active}
             onClick={() => start(true)}
           >
-            仅导入已有缓存
+            导入旧参考库缓存
           </button>
         </div>
       </div>
       <div className="my-5 rounded-lg bg-stone-50 p-4 text-sm leading-7" aria-live="polite">
         <p>
-          参考库：{state?.articles ?? '—'} 篇文章，{state?.bodies ?? '—'} 篇正文
+          本站数据库：{state?.articles ?? '—'} 篇文章，{state?.bodies ?? '—'} 篇正文
         </p>
         {state?.job && (
           <>
@@ -230,7 +258,7 @@ export function SourcePipeline({
             </p>
             {state.job.result && state.job.kind === 'sync' && (
               <p>
-                已完成历史页数 {Number(state.job.result.pages_done || 0)} · 已导入{' '}
+                历史偏移 {Number(state.job.result.offset || 0)} · 已导入{' '}
                 {Number(state.job.result.imported || 0)} 篇
               </p>
             )}
@@ -265,18 +293,12 @@ export function SourcePipeline({
         <button className="button secondary" disabled={busy || !state?.bodies} onClick={download}>
           下载已保存文章
         </button>
-        <a
-          className="text-sm underline"
-          href="http://localhost:5500/login.html"
-          target="_blank"
-          rel="noreferrer"
-        >
-          打开扫码登录
+        <a className="text-sm underline" href="/admin" target="_blank" rel="noreferrer">
+          在账号池中扫码登录
         </a>
       </div>
       <p className="mt-3 text-xs leading-6 text-stone-500">
-        Excel / JSON 导出文章清单；其他格式包含正文。导出仅包含参考库已有正文的文章；Word、PDF、EPUB
-        会下载配图。列表采集受微信登录与频率限制影响。
+        导出本站已保存正文的文章。微信读书列表能力取决于账号会话；仅最新文章模式无法补齐历史。
       </p>
       <details className="mt-5 border-t border-stone-200 pt-4">
         <summary className="cursor-pointer text-sm font-medium">已有文章链接？直接采集正文</summary>

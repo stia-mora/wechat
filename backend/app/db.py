@@ -18,6 +18,9 @@ def db():
 def initialize():
     with db() as conn:
         conn.execute("SELECT pg_advisory_xact_lock(271828)")
+        from .credentials import cipher
+
+        cipher()
         conn.execute(Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
         from .taxonomy import CATEGORIES
 

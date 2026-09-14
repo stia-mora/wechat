@@ -1,0 +1,128 @@
+{
+  "checked_at": "2026-09-14T08:10:51.917601+00:00",
+  "scope": "Two real WeRead logins, two bounded collection tasks; no full live test",
+  "reference_commit": "d8feb6a42c6773d7374e03c487d3ae3426084af8",
+  "tasks": [
+    {
+      "id": 126,
+      "status": "done",
+      "payload": {
+        "pages": 1,
+        "backfill": true,
+        "target_id": 21,
+        "parse_limit": 1
+      },
+      "result": {
+        "stage": "本批完成",
+        "offset": 20,
+        "imported": 21,
+        "account_id": 21,
+        "article_id": 1759,
+        "capability": "history",
+        "missing_bodies": 20,
+        "history_complete": false,
+        "readable_articles": 1,
+        "source_account_id": 8
+      }
+    },
+    {
+      "id": 127,
+      "status": "done",
+      "payload": {
+        "pages": 1,
+        "backfill": true,
+        "target_id": 41,
+        "parse_limit": 1
+      },
+      "result": {
+        "stage": "仅最新文章：历史能力降级",
+        "offset": 0,
+        "imported": 1,
+        "account_id": 41,
+        "article_id": 1781,
+        "capability": "latest_only",
+        "missing_bodies": 0,
+        "history_complete": false,
+        "readable_articles": 1,
+        "source_account_id": 9
+      }
+    }
+  ],
+  "accounts": [
+    {
+      "id": 8,
+      "name": "微信读书账号 1",
+      "health": "healthy",
+      "capability": "history",
+      "max_tasks": 1,
+      "max_subscriptions": 1
+    },
+    {
+      "id": 9,
+      "name": "微信读书账号 2",
+      "health": "healthy",
+      "capability": "latest_only",
+      "max_tasks": 1,
+      "max_subscriptions": 1
+    }
+  ],
+  "articles": [
+    {
+      "id": 1759,
+      "title": "追觅四大赛道 IFA 首秀：一套技术，四个出口",
+      "account_id": 21,
+      "account_name": "极客公园",
+      "body_characters": 4259
+    },
+    {
+      "id": 1781,
+      "title": "8点1氪：创始人及员工被恶意造谣，月之暗面：已报案；25位菲尔兹奖得主就AI侵入数学联合发出警告；智谱宣布融资50亿美元",
+      "account_id": 41,
+      "account_name": "36氪",
+      "body_characters": 6628
+    }
+  ],
+  "counts": {
+    "discovered_accounts": 235,
+    "approved_accounts": 50,
+    "articles": 23,
+    "readable_articles": 3
+  },
+  "read_api": "passed",
+  "exports": [
+    {
+      "format": "zip",
+      "bytes": 5772
+    },
+    {
+      "format": "html",
+      "bytes": 17437
+    },
+    {
+      "format": "json",
+      "bytes": 414
+    },
+    {
+      "format": "xlsx",
+      "bytes": 5190
+    },
+    {
+      "format": "docx",
+      "bytes": 42477
+    },
+    {
+      "format": "pdf",
+      "bytes": 14193
+    },
+    {
+      "format": "epub",
+      "bytes": 7944
+    }
+  ],
+  "verification": {
+    "backend_tests": 25,
+    "bridge_tests": 4,
+    "frontend_production_build": "passed",
+    "full_live_test": false
+  }
+}

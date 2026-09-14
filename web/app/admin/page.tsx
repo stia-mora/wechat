@@ -5,6 +5,7 @@ import { api, date, useApi } from '@/lib/api';
 import type { Account, Article, Category, Job } from '@/lib/types';
 import { ErrorState, Loading } from '@/components/ui';
 import { SourcePipeline } from '@/components/source-pipeline';
+import { SourceAccounts } from '@/components/source-accounts';
 
 type Overview = {
   accounts: { status: string; count: number }[];
@@ -33,6 +34,7 @@ const kindNames: Record<string, string> = {
   parse: '解析正文',
   account_ai: '账号画像',
   article_ai: '文章摘要',
+  embedding: '文章向量',
 };
 
 export default function Admin() {
@@ -167,6 +169,7 @@ export default function Admin() {
         {[
           ['overview', '概览'],
           ['accounts', '公众号审核'],
+          ['sources', '微信读书账号池'],
           ['articles', '文章管理'],
           ['jobs', '采集 / AI 任务'],
           ['categories', '分类'],
@@ -478,6 +481,7 @@ export default function Admin() {
           </div>
         </>
       )}
+      {tab === 'sources' && <SourceAccounts token={token} />}
       {tab === 'jobs' && (
         <>
           <form

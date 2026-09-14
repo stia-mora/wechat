@@ -1,13 +1,14 @@
 # 公众号发现 · WeChat Source
 
-按项目 PRD 实现的中文信息源发现与聚合平台。Next.js / TypeScript 前端，FastAPI 后端，PostgreSQL 数据库，独立采集与 AI worker。实际数据通过 `ref/wechat-download-api` HTTP API 获取，不以手写名单充当采集结果。
+按项目 PRD 实现的中文信息源发现与聚合平台。Next.js / TypeScript 前端，FastAPI 后端，PostgreSQL 数据库，独立采集与 AI worker。公众号发现使用独立发现服务，文章列表和正文由独立 WeRead Adapter 获取，直接写入 PostgreSQL。协议参考 `ref/we-mp-rss`，不运行或复制整个参考应用。
 
 ## 本机入口
 
 - 网站：<http://localhost:3500>
 - 管理后台：<http://localhost:3500/admin>（密钥在项目 `.env` 的 `ADMIN_TOKEN`）
 - API 文档：<http://localhost:8500/docs>
-- 参考服务扫码：<http://localhost:5500/login.html>
+- 微信读书扫码：管理后台 →「微信读书账号池」→ 新增账号 → 扫码登录
+- 公众号发现服务扫码（仅发现 / 兼容入口）：<http://localhost:5500/login.html>
 - PostgreSQL：`127.0.0.1:55439`，数据库 `wechat_source`
 
 项目避开本机已有的 3000 / 5000 / 8000 / 5432 / 55432 服务。公开浏览不需要登录；站内注册登录后可以收藏、关注和查看浏览历史。站内账号不等于微信采集登录。
@@ -40,7 +41,7 @@ npm run build
 npm run start
 ```
 
-参考服务保留独立代码库，不复制到产品后端。`source_bridge/service.py` 在参考应用内注册桥接接口（AGPL-3.0，许可证在 `source_bridge/LICENSE`），复用其订阅、正文解析、SQLite 存储与导出实现；原参考代码不作修改。当前参考版本为 `043c2f9828401220a00b7b125686b334581745e0`，AGPL-3.0。若 `ref` 缺失：
+参考服务保留独立代码库，不复制到产品后端。`source_bridge/service.py` 在参考应用内注册桥接接口（AGPL-3.0，许可证在 `source_bridge/LICENSE`），仅供公众号搜索、旧缓存导入和手工文章链接兼容；原参考代码不作修改。当前参考版本为 `043c2f9828401220a00b7b125686b334581745e0`，AGPL-3.0。若 `ref` 缺失：
 
 ```powershell
 git clone https://github.com/tmwgsicp/wechat-download-api.git ref/wechat-download-api
@@ -52,7 +53,7 @@ $env:SKIP_BACKGROUND_TASKS='true'
 ../../.venv/Scripts/python -X utf8 -m uvicorn service:app --app-dir ../../source_bridge --host 127.0.0.1 --port 5500
 ```
 
-使用可登录公众平台后台的微信扫码，参考服务自行将凭证保存到其 `.env`。产品只调用配置的参考服务地址，不读取或存储微信 Cookie。
+发现服务使用可登录公众平台后台的微信扫码，其凭证由该服务保管。微信读书是另一套独立登录，凭据经 Fernet 加密保存在 PostgreSQL，不返回给前端。默认密钥在忽略提交的 `data/private/source-credentials.key`；必须单独备份，并与数据库配套恢复。也可配置 `SOURCE_CREDENTIAL_KEY`，所有 API / worker 必须一致。Docker API 和 worker 共享该私有目录。
 
 ## 功能
 
@@ -79,7 +80,7 @@ $env:SKIP_BACKGROUND_TASKS='true'
 
 账号标识采用 `(platform, source_id)` 唯一约束；文章以 `__biz + mid + idx` 生成稳定标识，忽略分享追踪参数。短链以规范化路径为备选键。原公众号链接优先从文章真实 `__biz` 构建。
 
-运行 `app.collect` 时，建议先不启动 crawler worker，避免两个采集进程同时请求。默认请求至少相隔 13 秒。需要验证或登录过期时停止采集，解决后重试；不自动绕过验证。后台完整采集默认抓取一页历史（每页最多 10 次群发，一次群发可含多篇文章），补齐本批最新 3 篇的正文，可通过任务 API 的 `pages` / `parse_limit` 扩大范围。
+`app.collect` 用于发现公众号基本信息，不能代表历史正文已经采集。运行时避免与其他发现任务并发请求同一发现服务。原公众平台历史列表接口已退出主采集链路；微信读书账号登录后，worker 接管文章采集。
 
 独立 worker 模式：
 
@@ -88,23 +89,24 @@ $env:SKIP_BACKGROUND_TASKS='true'
 ../.venv/Scripts/python -m app.worker --mode ai
 ```
 
-同一参考服务只启动一个 crawler worker。AI worker 可以独立部署。默认每小时检查一次超过 24 小时未同步的已审核账号，启动时也检查。
+队列通过 PostgreSQL 行锁、任务去重、执行代次及租约支持多个 worker；同一发现服务仍建议只运行一个发现执行器。AI worker 可以独立部署。每分钟检查到期订阅，默认每 24 小时同步；历史未完成则继续回填，并检查最新一页，完成后从最新页做增量。默认自动任务每批 3 页、20 篇缺失正文，管理面板可以指定更小批次。
 
-## 文章采集、缓存与导出
+## 微信读书采集与账号池
 
-在管理后台的「公众号审核」找到目标账号，点击「采集 / 导出」：
+具体源码核查、协议与设计见 [docs/weread-integration.md](docs/weread-integration.md)。
 
-1. **开始完整采集**：自动订阅 → 按页获取历史列表并写入参考库 → 逐篇获取正文并回写参考库 → 导入本站。每页、每篇完成即持久化；面板每 5 秒刷新进度。
-2. **仅导入已有缓存**：分页读取参考库文章和正文，不请求微信、不要求扫码登录。按文章标识去重，并补全旧文章后来取得的正文、作者、时间。隐藏文章仍保持隐藏。
-3. **已有文章链接**：展开链接入口，每行粘贴一条属于当前账号的 `mp.weixin.qq.com` 链接，最多 20 条。直接解析正文并写入两边数据库，进度和重试在「采集 / AI 任务」中查看。此入口不获取历史列表，文章页面本身仍可能要求登录或验证。
-4. **下载已保存文章**：支持 Markdown ZIP、HTML、Excel、JSON、Word、PDF、EPUB。Excel / JSON 是清单，其余包含正文。仅导出参考库已保存正文的文章；无正文时明确提示。Markdown / HTML / Excel / JSON 读取本地数据；Word / PDF / EPUB 的内嵌图片需要下载微信 CDN 图片。
-5. **失败续传**：登录过期或微信限流时任务进入「等待处理」，保留已成功的历史页和正文。处理原因后点击「处理后继续此任务」，不重复抓取已完成历史页和已有正文。新建完整采集任务从最新一页开始；需要更早的历史时扩大页数。
+1. 在后台「微信读书账号池」新增账号，分别扫码（或导入 Cookie），系统验证书架后加密保存。重复 VID 不能算作两个账号。可以禁用、检查登录、调整最大任务数和最大公众号数；建议每账号并行任务数为 1。
+2. 公众号发现得到唯一标识后加入订阅与采集队列。已审核的现有公众号也会自动建队列。调度器按健康状态、负载、容量、连续失败与最近分配时间选择账号。
+3. Adapter 检查登录 / 续期、确保目标已入书架，获取分页列表和正文。每页、每篇独立入库，标准化来源和发布时间。缺正文会再次补采。公众号没有永久绑定某个微信读书用户，多对多书架记录仅表示可访问范围。
+4. 登录失效、限流、网络失败分别记录，释放租约后重试时重新选账号。无可用账号进入等待状态，不消耗网络重试次数；冷却到期或重新登录后唤醒。进程中断超过 5 分钟的租约被回收，旧执行器不能完成新代次任务。
+5. 站内搜索只查 PostgreSQL。无结果时，登录用户可提交发现请求；同词请求去重，后台发现后进入采集，待审核公众号不会直接公开。
+6. 列表能力按订阅记录为 `history` 或 `latest_only`。后者只取得最新文章，不推进历史游标、不声称历史完成。账号池展示的是该账号最近任务能力，不表示该账号对所有公众号能力一致。
 
-桥接接口通过服务端 `ADMIN_TOKEN` 鉴权，微信 Cookie 仍由参考服务保管，不传给产品或浏览器。启动脚本会自动加载桥接扩展；若手动启动，必须使用上文的 `service:app --app-dir ../../source_bridge` 命令。当前扩展依赖上述固定参考版本。
+在「公众号审核」点击「采集 / 导出」可创建小批次任务、继续历史回填、查看来源状态与失败。旧缓存导入和已有文章链接入口仍可兼容，但不调用原历史接口。
 
-文章进入本站后自动排队 AI 摘要，累计满足条件时排队账号画像。未配置模型时 AI 任务会提示等待配置，已保存正文照常可读、可导出。
+**导出直接读取 PostgreSQL**，不依赖发现服务、微信读书登录或参考 SQLite。支持 Markdown ZIP、HTML、Excel、JSON（最多 3000 篇）、Word / EPUB（500 篇）、PDF（200 篇）。只导出已保存正文的文章：Excel / JSON 为清单，HTML 保留正文及图片引用，Markdown / Word / PDF / EPUB 为文字正文；当前不打包离线图片。
 
-本次验证范围：后端事务回滚测试、临时 SQLite 桥接测试、前端生产构建与本机 API 冒烟检查，没有执行全量真实端到端测试。真实小样本历史任务 #79 在 2026-09-14 返回微信 `ret=200013`；登录仍有效，任务保留在历史列表步骤。隔离测试覆盖历史分页、正文保存→ZIP 导出、限流续传、同时间文章分页、缓存补全、手工链接入口与下载鉴权，测试文章不计入真实采集数据。随后使用用户提供的新智元文章链接完成真实正文采集（任务 #90、文章 #901、3295 字），通过本站 API 验证可读，并通过后台下载接口导出 Markdown ZIP / HTML / JSON；缓存导入任务 #92 完成且文章仍只有一条。证据见 `data/pipeline-report.json`，本机导出样本在 `data/private/exports/`。
+真实小样本（2026-09-14）：两套微信读书账号均完成扫码与书架验证。极客公园入库 21 篇列表、1 篇正文（4259 字），历史分页有效但未采完；36氪入库 1 篇正文（6628 字），本次列表降级为仅最新文章。连同此前新智元正文，数据库共 23 篇文章、3 篇正文，50 个已审核公众号。真实样本与任务证据见 `data/weread-report.json`。当前两账号最大公众号数各设为 **1**，用于限定验证规模；其余 48 个订阅等待容量，在账号池编辑容量后可继续采集。
 
 ## AI 配置
 
@@ -115,6 +117,8 @@ LLM_BASE_URL=https://api.openai.com/v1
 LLM_API_KEY=你的密钥
 LLM_MODEL=你的模型名称
 ```
+
+Embedding 独立配置 `EMBEDDING_API_KEY`、`EMBEDDING_MODEL`、`EMBEDDING_BASE_URL`，结果以模型 / 内容哈希 / 向量写入 PostgreSQL 的 `article_embeddings`。正文入库后自动排队，缺配置明确阻塞，不生成假向量。
 
 重启 worker 后在后台重试阻塞的分析任务。账号分析默认最多取最近 50 篇已读正文，每篇输入上限 6000 字符；不足 3 篇时不分析，3—19 篇会显示低样本提示。文章摘要上限 30000 字符。
 
@@ -136,7 +140,7 @@ LLM_MODEL=你的模型名称
 
 ## Docker
 
-可使用 `docker compose up -d --build` 运行数据库、API、worker、web。`.env` 必须先创建，参考服务在宿主机运行，容器通过 `host.docker.internal:5500` 连接。`SOURCE_API_URL` 可以调整为独立参考服务地址。Web 通过同源 Next.js rewrite 访问 API，不将管理密钥发送到客户端。
+可使用 `docker compose up -d --build` 运行数据库、API、worker、web。`.env` 必须先创建，参考服务在宿主机运行，容器通过 `host.docker.internal:5500` 连接。`SOURCE_API_URL` 可以调整为独立参考服务地址。Web 通过同源 Next.js rewrite 访问 API，管理员需在后台输入管理密钥，服务端以 Bearer token 校验管理请求。
 
 默认端口仅映射本机地址；对外部署时使用 HTTPS 反向代理、强数据库密码，并将 `COOKIE_SECURE=true`。参考服务应置于可信网络内。这里未执行公网部署。
 

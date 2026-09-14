@@ -1,10 +1,27 @@
 'use client';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useApi } from '@/lib/api';
+import { api, useApi } from '@/lib/api';
+import { useState } from 'react';
 import type { Account, Article, Category, Page } from '@/lib/types';
 import { AccountCard, ArticleRow, Empty, ErrorState, Loading, Pagination, SearchBox } from './ui';
 
 export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' | 'rankings' }) {
+  const [discoveryMessage, setDiscoveryMessage] = useState('');
+  const [requesting, setRequesting] = useState(false);
+  async function discover(query: string) {
+    setRequesting(true);
+    try {
+      const result = await api<{ message: string }>('/discovery-requests', {
+        method: 'POST',
+        body: JSON.stringify({ query }),
+      });
+      setDiscoveryMessage(result.message);
+    } catch (e) {
+      setDiscoveryMessage((e as Error).message + '；首次申请发现请先登录本站');
+    } finally {
+      setRequesting(false);
+    }
+  }
   const params = useSearchParams(),
     router = useRouter();
   const q = params.get('q') || '',
@@ -209,6 +226,25 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
             limit={12}
             onChange={(p) => update('page', String(p))}
           />
+          {mode === 'search' && !isArticle && q.length >= 2 && !result.loading && total === 0 && (
+            <div className="mt-6 rounded-xl border border-stone-200 bg-white p-5">
+              <p className="mb-3 text-sm text-stone-500">
+                本站尚无匹配结果。可申请发现公众号，找到后进入采集与审核流程。
+              </p>
+              <button
+                disabled={requesting}
+                className="button secondary"
+                onClick={() => discover(q)}
+              >
+                申请发现并采集
+              </button>
+              {discoveryMessage && (
+                <p role="status" className="mt-3 text-sm">
+                  {discoveryMessage}
+                </p>
+              )}
+            </div>
+          )}
         </section>
       </div>
     </>

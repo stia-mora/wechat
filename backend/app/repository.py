@@ -4,6 +4,8 @@ from psycopg.types.json import Jsonb
 
 
 def enqueue(conn, kind, payload, key=None):
+    if kind == "sync" and not payload.get("cache_only"):
+        key = "weread-sync:" + str(payload["target_id"])
     key = key or kind + ":" + json.dumps(payload, sort_keys=True, ensure_ascii=False)
     row = conn.execute(
         "INSERT INTO jobs(kind,payload,dedupe_key) VALUES (%s,%s,%s) ON CONFLICT(dedupe_key) WHERE status IN ('queued','running') DO NOTHING RETURNING id",

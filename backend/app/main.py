@@ -3,13 +3,14 @@ from urllib.parse import urlparse
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .admin import router as admin_router
 from .auth import current_user
 from .auth import router as auth_router
 from .db import db, initialize
 from .repository import ACCOUNT_SELECT, rank_account
+from .source_admin import router as source_admin_router
 
 
 @asynccontextmanager
@@ -20,6 +21,60 @@ async def lifespan(app):
 
 app = FastAPI(title="WeChat Source", lifespan=lifespan)
 app.include_router(auth_router)
+app.include_router(source_admin_router)
+
+
+class DiscoveryRequest(BaseModel):
+    query: str = Field(min_length=2, max_length=100)
+
+
+@app.post("/api/discovery-requests")
+def request_discovery(data: DiscoveryRequest, request: Request):
+    from .repository import enqueue
+
+    current_user(request)
+    query = data.query.strip()
+    if len(query) < 2:
+        raise HTTPException(422, "请输入至少两个字符")
+    with db() as conn:
+        # Search misses are deduplicated in PostgreSQL, never an inline external scrape.
+        existing = conn.execute(
+            "SELECT id,status FROM official_accounts WHERE name ILIKE %s LIMIT 1",
+            ("%" + query + "%",),
+        ).fetchone()
+        if existing:
+            return {
+                "status": "existing",
+                "message": "公众号已收录"
+                if existing["status"] == "approved"
+                else "公众号已收录，正在审核，未重复抓取",
+            }
+        conn.execute("SELECT pg_advisory_xact_lock(314159)")
+        previous = conn.execute(
+            "SELECT job_id,requested_at>now()-interval '24 hours' AS recent FROM discovery_requests WHERE query=%s",
+            (query,),
+        ).fetchone()
+        if previous and previous["recent"]:
+            return {
+                "status": "queued",
+                "message": "已有发现请求，请稍后查看",
+                "job_id": previous["job_id"],
+            }
+        count = conn.execute(
+            "SELECT count(*) n FROM discovery_requests WHERE requested_at>now()-interval '1 hour'"
+        ).fetchone()["n"]
+        if count >= 20:
+            raise HTTPException(429, "发现请求较多，请稍后再试")
+        job_id = enqueue(conn, "discover", {"query": query})
+        conn.execute(
+            "INSERT INTO discovery_requests(query,job_id) VALUES (%s,%s) ON CONFLICT(query) DO UPDATE SET job_id=EXCLUDED.job_id,requested_at=now()",
+            (query, job_id),
+        )
+    return {
+        "status": "queued",
+        "job_id": job_id,
+        "message": "发现请求已排队，找到公众号后将进入微信读书采集队列",
+    }
 
 
 @app.middleware("http")

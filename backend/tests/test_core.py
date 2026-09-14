@@ -5,7 +5,20 @@ import httpx
 import pytest
 from fastapi.testclient import TestClient
 
-from app import admin, ai, auth, crawler, main, pipeline
+from app import (
+    account_pool,
+    admin,
+    ai,
+    auth,
+    crawler,
+    exports,
+    main,
+    normalizer,
+    pipeline,
+    source_admin,
+    weread_crawler,
+    worker,
+)
 from app.content import article_key, clean_content
 from app.db import db
 from app.repository import enqueue, index_account, index_article
@@ -27,7 +40,20 @@ def client(monkeypatch):
                     with conn.transaction():
                         yield conn
 
-                for module in (main, auth, admin, crawler, ai, pipeline):
+                for module in (
+                    main,
+                    auth,
+                    admin,
+                    crawler,
+                    ai,
+                    pipeline,
+                    exports,
+                    account_pool,
+                    normalizer,
+                    weread_crawler,
+                    source_admin,
+                    worker,
+                ):
                     monkeypatch.setattr(module, "db", test_db)
                 monkeypatch.setenv("ADMIN_TOKEN", "test-only-admin-token-long-enough")
                 auth.attempts.clear()
@@ -216,65 +242,6 @@ def test_ai_profile_is_structured_and_preserves_manual_review(client, monkeypatc
         ai.analyze("account_ai", {"target_id": account})
 
 
-def test_pipeline_resumes_bodies_without_refetching_history(client, monkeypatch):
-    _, conn = client
-    account = fixture_account(conn)
-    job_id = enqueue(conn, "sync", {"target_id": account})
-    marker = secrets.token_hex(8)
-    cached, calls = [], []
-    fail = True
-
-    def bridge(method, path, **kw):
-        nonlocal fail
-        calls.append(path)
-        if path == "/history":
-            cached.extend(
-                {
-                    "id": i,
-                    "title": f"article {i}",
-                    "publish_time": 1700000000,
-                    "link": f"https://mp.weixin.qq.com/s?__biz={marker}&mid={i}&idx=1",
-                }
-                for i in range(1, 4)
-            )
-            return {"next_begin": 10, "has_more": True}
-        if path == "/articles":
-            return {
-                "items": [dict(i) for i in cached if i["id"] > kw["params"]["after"]],
-                "next_after": 3,
-            }
-        item = next(i for i in cached if i["id"] == int(path.split("/")[2]))
-        if item["id"] == 2 and fail:
-            fail = False
-            raise crawler.SourceBlocked("ret=200013")
-        item.update(content="<p>真实链路的隔离测试正文</p>")
-        return dict(item)
-
-    source = crawler.SourceClient()
-    monkeypatch.setattr(source, "bridge", bridge)
-    monkeypatch.setattr(source, "request", lambda *a, **kw: {"success": True})
-    payload = {"target_id": account, "pages": 1, "parse_limit": 3, "_job_id": job_id}
-    with pytest.raises(crawler.SourceBlocked):
-        source.sync(payload)
-    assert (
-        conn.execute(
-            "SELECT count(*) n FROM articles WHERE account_id=%s AND status='ready'", (account,)
-        ).fetchone()["n"]
-        == 1
-    )
-    progress = conn.execute("SELECT result FROM jobs WHERE id=%s", (job_id,)).fetchone()["result"]
-    assert progress["pages_done"] == 1
-    result = source.sync({**payload, "_progress": progress})
-    assert result["readable_articles"] == 3 and result["export_available"]
-    assert calls.count("/history") == 1 and calls.count("/articles/3/body") == 1
-    assert (
-        marker
-        in conn.execute(
-            "SELECT source_url FROM official_accounts WHERE id=%s", (account,)
-        ).fetchone()["source_url"]
-    )
-
-
 def test_cache_import_updates_old_body_keeps_hidden_and_needs_no_login(client, monkeypatch):
     _, conn = client
     account = fixture_account(conn)
@@ -314,25 +281,22 @@ def test_cache_import_updates_old_body_keeps_hidden_and_needs_no_login(client, m
     assert hidden["summary"] == "补全摘要"
 
 
-def test_admin_export_requires_auth_and_proxies_file(client, monkeypatch):
+def test_admin_export_requires_auth_and_uses_postgres(client, monkeypatch):
     api, conn = client
     account = fixture_account(conn)
     url = f"/api/admin/accounts/{account}/export/zip"
     assert api.get(url).status_code == 403
+    conn.execute(
+        "INSERT INTO articles(account_id,source_key,title,source_url,content_text,content_html,status) VALUES (%s,%s,'正文测试','https://mp.weixin.qq.com/s/test','本地正文','<p>本地正文</p>','ready')",
+        (account, secrets.token_hex(16)),
+    )
     monkeypatch.setattr(
-        admin.httpx,
-        "get",
-        lambda *a, **kw: httpx.Response(
-            200,
-            content=b"PK-test-export",
-            headers={"Content-Type": "application/zip"},
-            request=httpx.Request("GET", "http://source/export"),
-        ),
+        admin.httpx, "get", lambda *a, **kw: pytest.fail("export must not contact source")
     )
     headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
     response = api.get(url, headers=headers)
     assert (
-        response.content == b"PK-test-export"
+        response.content.startswith(b"PK")
         and "attachment" in response.headers["content-disposition"]
     )
     assert api.get(url.replace("/zip", "/exe"), headers=headers).status_code == 422
