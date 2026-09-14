@@ -40,7 +40,7 @@ npm run build
 npm run start
 ```
 
-参考服务保留独立代码库，不复制到产品后端。当前参考版本为 `043c2f9828401220a00b7b125686b334581745e0`，AGPL-3.0。若 `ref` 缺失：
+参考服务保留独立代码库，不复制到产品后端。`source_bridge/service.py` 在参考应用内注册桥接接口（AGPL-3.0，许可证在 `source_bridge/LICENSE`），复用其订阅、正文解析、SQLite 存储与导出实现；原参考代码不作修改。当前参考版本为 `043c2f9828401220a00b7b125686b334581745e0`，AGPL-3.0。若 `ref` 缺失：
 
 ```powershell
 git clone https://github.com/tmwgsicp/wechat-download-api.git ref/wechat-download-api
@@ -49,7 +49,7 @@ git -C ref/wechat-download-api checkout 043c2f9828401220a00b7b125686b334581745e0
 cd ref/wechat-download-api
 $env:SITE_URL='http://localhost:5500'
 $env:SKIP_BACKGROUND_TASKS='true'
-../../.venv/Scripts/python -X utf8 -m uvicorn app:app --host 127.0.0.1 --port 5500
+../../.venv/Scripts/python -X utf8 -m uvicorn service:app --app-dir ../../source_bridge --host 127.0.0.1 --port 5500
 ```
 
 使用可登录公众平台后台的微信扫码，参考服务自行将凭证保存到其 `.env`。产品只调用配置的参考服务地址，不读取或存储微信 Cookie。
@@ -79,7 +79,7 @@ $env:SKIP_BACKGROUND_TASKS='true'
 
 账号标识采用 `(platform, source_id)` 唯一约束；文章以 `__biz + mid + idx` 生成稳定标识，忽略分享追踪参数。短链以规范化路径为备选键。原公众号链接优先从文章真实 `__biz` 构建。
 
-运行 `app.collect` 时，建议先不启动 crawler worker，避免两个采集进程同时请求。默认请求至少相隔 13 秒。需要验证或登录过期时停止采集，解决后重试；不自动绕过验证。后台同步默认抓取一页文章并解析最多三篇，可通过任务 API 的 `pages` / `parse_limit` 扩大范围。
+运行 `app.collect` 时，建议先不启动 crawler worker，避免两个采集进程同时请求。默认请求至少相隔 13 秒。需要验证或登录过期时停止采集，解决后重试；不自动绕过验证。后台完整采集默认抓取一页历史（每页最多 10 次群发，一次群发可含多篇文章），补齐本批最新 3 篇的正文，可通过任务 API 的 `pages` / `parse_limit` 扩大范围。
 
 独立 worker 模式：
 
@@ -89,6 +89,22 @@ $env:SKIP_BACKGROUND_TASKS='true'
 ```
 
 同一参考服务只启动一个 crawler worker。AI worker 可以独立部署。默认每小时检查一次超过 24 小时未同步的已审核账号，启动时也检查。
+
+## 文章采集、缓存与导出
+
+在管理后台的「公众号审核」找到目标账号，点击「采集 / 导出」：
+
+1. **开始完整采集**：自动订阅 → 按页获取历史列表并写入参考库 → 逐篇获取正文并回写参考库 → 导入本站。每页、每篇完成即持久化；面板每 5 秒刷新进度。
+2. **仅导入已有缓存**：分页读取参考库文章和正文，不请求微信、不要求扫码登录。按文章标识去重，并补全旧文章后来取得的正文、作者、时间。隐藏文章仍保持隐藏。
+3. **已有文章链接**：展开链接入口，每行粘贴一条属于当前账号的 `mp.weixin.qq.com` 链接，最多 20 条。直接解析正文并写入两边数据库，进度和重试在「采集 / AI 任务」中查看。此入口不获取历史列表，文章页面本身仍可能要求登录或验证。
+4. **下载已保存文章**：支持 Markdown ZIP、HTML、Excel、JSON、Word、PDF、EPUB。Excel / JSON 是清单，其余包含正文。仅导出参考库已保存正文的文章；无正文时明确提示。Markdown / HTML / Excel / JSON 读取本地数据；Word / PDF / EPUB 的内嵌图片需要下载微信 CDN 图片。
+5. **失败续传**：登录过期或微信限流时任务进入「等待处理」，保留已成功的历史页和正文。处理原因后点击「处理后继续此任务」，不重复抓取已完成历史页和已有正文。新建完整采集任务从最新一页开始；需要更早的历史时扩大页数。
+
+桥接接口通过服务端 `ADMIN_TOKEN` 鉴权，微信 Cookie 仍由参考服务保管，不传给产品或浏览器。启动脚本会自动加载桥接扩展；若手动启动，必须使用上文的 `service:app --app-dir ../../source_bridge` 命令。当前扩展依赖上述固定参考版本。
+
+文章进入本站后自动排队 AI 摘要，累计满足条件时排队账号画像。未配置模型时 AI 任务会提示等待配置，已保存正文照常可读、可导出。
+
+本次验证范围：后端事务回滚测试、临时 SQLite 桥接测试、前端生产构建与本机 API 冒烟检查，没有执行全量真实端到端测试。真实小样本历史任务 #79 在 2026-09-14 返回微信 `ret=200013`；登录仍有效，任务保留在历史列表步骤。隔离测试覆盖历史分页、正文保存→ZIP 导出、限流续传、同时间文章分页、缓存补全、手工链接入口与下载鉴权，测试文章不计入真实采集数据。随后使用用户提供的新智元文章链接完成真实正文采集（任务 #90、文章 #901、3295 字），通过本站 API 验证可读，并通过后台下载接口导出 Markdown ZIP / HTML / JSON；缓存导入任务 #92 完成且文章仍只有一条。证据见 `data/pipeline-report.json`，本机导出样本在 `data/private/exports/`。
 
 ## AI 配置
 

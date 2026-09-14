@@ -1,0 +1,36 @@
+{
+  "account": "新智元",
+  "account_id": 7,
+  "source_url": "https://mp.weixin.qq.com/s/kYMoiUGsGhfAWbsPWPS_dw",
+  "article_id": 901,
+  "parse_job": 90,
+  "history_job": 79,
+  "history_status": "blocked: WeChat ret=200013",
+  "exports": [
+    {
+      "format": "zip",
+      "bytes": 5442,
+      "sha256": "c1582bc46c4e4d3f794fd204bce3776a1daf1696bcf8f15b55d728dbed8026b2"
+    },
+    {
+      "format": "html",
+      "bytes": 107493,
+      "sha256": "8049236068b187090e2d67bb051d862f66207799576048be521f146b4f0e0b6b"
+    },
+    {
+      "format": "json",
+      "bytes": 385,
+      "sha256": "f02b8f164538397649bf0f8535ed8f4f256ba6eb8e6ef40101015dedd84c806c"
+    }
+  ],
+  "title": "OpenAI关停$200套餐，这款大模型依旧全免费！AgnesCode猛猛蹬",
+  "word_count": 3295,
+  "reader_status": 200,
+  "cache_import_job": 92,
+  "cache_import_status": "done",
+  "deduplicated_articles": 1,
+  "validation": "14 backend tests + 4 bridge tests; Next production build; real link body, reader API and zip/html/json exports; no full live E2E test",
+  "unique_accounts": 235,
+  "approved_accounts": 50,
+  "browser_visual_check": "Not run: browser connector unavailable; HTTP routes and API verified"
+}

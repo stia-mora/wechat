@@ -4,6 +4,7 @@ import { ArrowClockwise, LockKey } from '@phosphor-icons/react';
 import { api, date, useApi } from '@/lib/api';
 import type { Account, Article, Category, Job } from '@/lib/types';
 import { ErrorState, Loading } from '@/components/ui';
+import { SourcePipeline } from '@/components/source-pipeline';
 
 type Overview = {
   accounts: { status: string; count: number }[];
@@ -28,7 +29,7 @@ const stateNames: Record<string, string> = {
 };
 const kindNames: Record<string, string> = {
   discover: '发现公众号',
-  sync: '同步文章',
+  sync: '采集 / 缓存导入',
   parse: '解析正文',
   account_ai: '账号画像',
   article_ai: '文章摘要',
@@ -47,6 +48,7 @@ export default function Admin() {
     [articles, setArticles] = useState<Article[]>([]),
     [tags, setTags] = useState<{ id: number; name: string; account_count: number }[]>([]),
     [ranking, setRanking] = useState<Record<string, number>>({});
+  const [pipelineAccount, setPipelineAccount] = useState<Account | null>(null);
   const [editing, setEditing] = useState<Account | null>(null),
     [profileText, setProfileText] = useState(''),
     [search, setSearch] = useState(''),
@@ -185,6 +187,13 @@ export default function Admin() {
           </button>
         ))}
       </div>
+      {pipelineAccount && (
+        <SourcePipeline
+          account={pipelineAccount}
+          token={token}
+          onClose={() => setPipelineAccount(null)}
+        />
+      )}
       {error && <ErrorState message={error} />}{' '}
       {message && (
         <p role="status" className="mb-6 rounded-lg bg-[#eaf0e2] p-4 text-sm text-[#3e6231]">
@@ -449,9 +458,9 @@ export default function Admin() {
                         <button
                           disabled={busy}
                           className="button secondary small"
-                          onClick={() => queue('sync', a.id)}
+                          onClick={() => setPipelineAccount(a)}
                         >
-                          同步
+                          采集 / 导出
                         </button>
                         <button
                           disabled={busy}
@@ -544,7 +553,8 @@ export default function Admin() {
                     </td>
                     <td>
                       <p className="max-w-md break-all text-xs leading-6">
-                        {j.error || JSON.stringify(j.result || {})}
+                        {j.result && JSON.stringify(j.result)}
+                        {j.error && <span className="block text-red-700">{j.error}</span>}
                       </p>
                     </td>
                     <td>
