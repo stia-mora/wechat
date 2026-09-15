@@ -43,7 +43,7 @@ def schedule():
             )
             conn.execute(
                 "UPDATE source_subscriptions SET next_sync_at=now()+(%s*interval '1 hour') WHERE account_id=%s AND source_id='weread'",
-                (max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "24"))), row["id"]),
+                (max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "3"))), row["id"]),
             )
         conn.execute("""UPDATE jobs SET status='queued',run_after=now(),error=NULL
             WHERE kind='sync' AND status='blocked' AND error LIKE '没有健康%%'
@@ -145,7 +145,7 @@ def run(once=False, mode="all"):
                     conn.execute(
                         "UPDATE source_subscriptions SET next_sync_at=now()+(%s*interval '1 hour') WHERE account_id=%s AND source_id='weread'",
                         (
-                            max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "24"))),
+                            max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "3"))),
                             job["payload"].get("target_id"),
                         ),
                     )

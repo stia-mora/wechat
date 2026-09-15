@@ -160,7 +160,7 @@ def collect(payload):
                 WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s""",
                 (target, body_since()),
             ).fetchone()["n"]
-            hours = max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "24")))
+            hours = max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "3")))
             conn.execute(
                 """UPDATE source_subscriptions SET last_sync_at=now(),last_error=NULL,capability=%s,
                 next_sync_at=now()+(%s*interval '1 hour') WHERE account_id=%s AND source_id='weread'""",
