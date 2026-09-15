@@ -91,9 +91,11 @@ export function AccountCard({
           </p>
         </div>
       </div>
-      <p className="mt-5 line-clamp-2 min-h-12 text-sm leading-6 text-stone-600">
-        {account.description || '账号基本信息已从微信公众平台收录，简介待完善。'}
-      </p>
+      {account.description?.trim() && (
+        <p className="mt-5 line-clamp-2 text-sm leading-6 text-stone-600">
+          {account.description}
+        </p>
+      )}
       <div className="mt-4 flex min-h-6 flex-wrap gap-2">
         {account.tags.slice(0, 4).map((tag) => (
           <Link className="tag" href={'/search?q=' + encodeURIComponent(tag)} key={tag}>

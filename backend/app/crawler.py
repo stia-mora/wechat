@@ -73,6 +73,7 @@ class SourceClient:
                     """INSERT INTO official_accounts(source_id,name,wechat_id,avatar_url,description,original_description,primary_category_id,source_url,last_crawled_at)
                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,now()) ON CONFLICT(platform,source_id) DO UPDATE SET
                   name=EXCLUDED.name,wechat_id=EXCLUDED.wechat_id,avatar_url=EXCLUDED.avatar_url,
+                  description=CASE WHEN official_accounts.description='' THEN EXCLUDED.description ELSE official_accounts.description END,
                   original_description=CASE WHEN EXCLUDED.original_description<>'' THEN EXCLUDED.original_description ELSE official_accounts.original_description END,
                   primary_category_id=coalesce(official_accounts.primary_category_id,EXCLUDED.primary_category_id),last_crawled_at=now(),updated_at=now()
                   RETURNING id,name,source_id""",

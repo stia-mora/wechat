@@ -62,9 +62,11 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             <ActionButton kind="account" targetId={a.id} initial={a.collected} />
           </div>
         </div>
-        <p className="mt-7 max-w-3xl text-sm leading-7 text-stone-600">
-          {a.description || '账号简介待完善。以下文章来自该账号的实际采集记录。'}
-        </p>
+        {a.description?.trim() && (
+          <p className="mt-7 max-w-3xl text-sm leading-7 text-stone-600">
+            {a.description}
+          </p>
+        )}
         <div className="mt-7 flex flex-wrap items-center justify-between gap-5 border-t border-stone-100 pt-6">
           <div className="flex flex-wrap gap-7 text-xs text-stone-500">
             <span>
