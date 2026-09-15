@@ -87,7 +87,7 @@ export default function ArticlePage({ params }: { params: Promise<{ id: string }
             内容版权归原作者所有。平台保留原文出处，文章以原始发布页面为准。
           </p>
         </article>
-        <aside className="lg:sticky lg:top-6">
+        <aside aria-label="AI 阅读助手" tabIndex={0} className="lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:overscroll-contain">
           <details open className="rounded-xl bg-[#eff2e8] p-6">
             <summary className="cursor-pointer text-lg font-semibold">AI 阅读助手</summary>
             {summary ? (

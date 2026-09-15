@@ -130,6 +130,8 @@ def analyze(kind, payload):
                 (data["account_type"], target),
             )
             index_account(conn, target)
+            from .classification import link_profile_categories
+            link_profile_categories(conn, target, data)
         else:
             conn.execute(
                 "INSERT INTO ai_article_summaries(article_id,data,model_name,prompt_version) VALUES (%s,%s,%s,%s) ON CONFLICT(article_id) DO UPDATE SET data=EXCLUDED.data,model_name=EXCLUDED.model_name,prompt_version=EXCLUDED.prompt_version,generated_at=now()",

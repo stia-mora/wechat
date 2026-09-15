@@ -143,6 +143,19 @@ def test_search_and_hidden_content_boundaries(client):
     assert api.get("/api/admin/accounts").status_code == 403
 
 
+def test_profile_subcategory_filter(client):
+    from app.classification import link_profile_categories
+    api, conn = client
+    account = fixture_account(conn)
+    category = conn.execute("SELECT id,parent_id FROM categories WHERE name='大模型'").fetchone()
+    conn.execute('UPDATE official_accounts SET primary_category_id=%s WHERE id=%s',(category['parent_id'],account))
+    link_profile_categories(conn,account,{'topic_distribution':[{'name':'AI与大模型','percentage':60}]})
+    link_profile_categories(conn,account,{'topic_distribution':[{'name':'AI与大模型','percentage':60}]})
+    response=api.get('/api/accounts',params={'category':category['id'],'limit':100})
+    assert account in [a['id'] for a in response.json()['items']]
+    assert conn.execute('SELECT count(*) n FROM official_account_categories WHERE account_id=%s AND category_id=%s',(account,category['id'])).fetchone()['n']==1
+
+
 def test_auth_collection_isolation_and_csrf(client):
     api, conn = client
     account = fixture_account(conn)

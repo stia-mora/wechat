@@ -280,8 +280,8 @@ def articles(
         clauses.append("ar.account_id=%s")
         args.append(account_id)
     if category:
-        clauses.append("a.primary_category_id=%s")
-        args.append(category)
+        clauses.append("(a.primary_category_id=%s OR a.id IN(SELECT account_id FROM official_account_categories WHERE category_id=%s))")
+        args.extend([category, category])
     base = (
         " FROM articles ar JOIN official_accounts a ON a.id=ar.account_id LEFT JOIN ai_article_summaries ai ON ai.article_id=ar.id WHERE "
         + " AND ".join(clauses)

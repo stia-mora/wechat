@@ -46,8 +46,10 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
     categories = useApi<Category[]>('/categories');
   const result = isArticle ? articles : accounts,
     total = result.data?.total || 0;
+  const selectedCategory = categories.data?.find((c) => String(c.id) === category);
+  const parentCategory = selectedCategory?.parent_id ? String(selectedCategory.parent_id) : category;
   const root = categories.data?.filter((c) => !c.parent_id) || [],
-    children = categories.data?.filter((c) => String(c.parent_id) === category) || [];
+    children = categories.data?.filter((c) => String(c.parent_id) === parentCategory) || [];
   return (
     <>
       <section className="pb-9 pt-12">
@@ -88,7 +90,7 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
         </div>
       )}
       <div className="grid gap-8 lg:grid-cols-[200px_1fr]">
-        <aside>
+        <aside aria-label="筛选公众号" className="self-start lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto lg:overscroll-contain">
           <h2 className="mb-4 text-sm font-semibold">内容领域</h2>
           <div className="flex flex-wrap gap-2 lg:flex-col">
             <button
@@ -111,7 +113,7 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
           {children.length > 0 && (
             <div className="mt-4 flex flex-wrap gap-2">
               {children.map((c) => (
-                <button key={c.id} className="tag" onClick={() => update('category', String(c.id))}>
+                <button key={c.id} aria-pressed={category === String(c.id)} className={`tag ${category === String(c.id) ? 'ring-1 ring-[#245745]' : ''}`} onClick={() => update('category', String(c.id))}>
                   {c.name}
                 </button>
               ))}
