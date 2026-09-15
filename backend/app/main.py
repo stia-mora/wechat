@@ -175,7 +175,7 @@ def accounts(
         + filtered
         + """), factors AS (
       SELECT candidates.*,
-      coalesce((SELECT avg(value::numeric)*20 FROM jsonb_each_text(coalesce(profile->'quality_scores','{}'::jsonb))),0) AS quality,
+      CASE WHEN profile->>'scoring_version'='2026-09-evidence-v2' THEN coalesce((profile->>'overall_score')::numeric,0) ELSE 0 END AS quality,
       ((name<>'')::int+(wechat_id<>'')::int+(avatar_url<>'')::int+(description<>'')::int+(category IS NOT NULL)::int)*20 AS completeness,
       name ILIKE %s AS name_match FROM candidates
     ), scored AS (SELECT factors.*,
@@ -214,6 +214,14 @@ def account(account_id: int, request: Request):
         if not row:
             raise HTTPException(404, "公众号未收录或已隐藏")
         row = ranked(conn, [row])[0]
+        peers = conn.execute("""SELECT (p.data->>'overall_score')::numeric AS score FROM ai_account_profiles p
+            JOIN official_accounts a ON a.id=p.account_id WHERE a.status='approved' AND a.primary_category_id=%s
+            AND p.data->>'scoring_version'='2026-09-evidence-v2' AND p.data->>'overall_score' IS NOT NULL""",
+            (row['primary_category_id'],)).fetchall()
+        row['quality_comparison'] = None
+        if row['quality_score'] is not None and len(peers)>=5:
+            score = row['quality_score']
+            row['quality_comparison'] = {'count':len(peers),'percentile':round(100*sum(float(p['score'])<score for p in peers)/len(peers))}
         remember(conn, user, "account", account_id)
         row["following"] = bool(
             user

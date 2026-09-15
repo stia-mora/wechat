@@ -358,6 +358,16 @@ def edit_profile(account_id: int, data: dict):
     except ValueError:
         raise HTTPException(422, "画像结构或评分不合法")
     with db() as conn:
+        from .scoring import finalize
+        stored = conn.execute('SELECT data FROM ai_account_profiles WHERE account_id=%s',(account_id,)).fetchone()
+        if not stored:
+            raise HTTPException(404, '请先生成画像')
+        samples = conn.execute("SELECT id,content_text FROM articles WHERE account_id=%s AND status='ready' AND id=ANY(%s)",
+            (account_id,stored['data'].get('sample_article_ids',[]))).fetchall()
+        try:
+            validated = finalize(validated,samples)
+        except ValueError:
+            raise HTTPException(422,'证据必须来自已分析文章的原文')
         row = conn.execute(
             "UPDATE ai_account_profiles SET data=%s,reviewed=true WHERE account_id=%s RETURNING account_id",
             (Jsonb(validated), account_id),

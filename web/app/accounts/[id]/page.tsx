@@ -130,12 +130,17 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
                   </div>
                   <div>
                     <h3 className="mb-4 text-sm font-semibold">内容能力评分</h3>
-                    {Object.entries(profile.quality_scores).map(([name, value]) => (
-                      <div key={name} className="mb-3 flex justify-between text-sm">
-                        <span className="text-stone-500">{name}</span>
-                        <span className="font-mono text-[#55734a]">{value.toFixed(1)} / 5</span>
-                      </div>
-                    ))}
+                    {profile.scoring_version === '2026-09-evidence-v2' ? <>
+                      <p className="mb-4 text-xs leading-6 text-stone-500">3 分为合格，4 分为优秀，5 分需充分证据。无法判断不计作零分。{profile.sample_policy}</p>
+                      {profile.assessments?.map((item) => <details key={item.dimension} className="mb-4 border-b border-stone-100 pb-3">
+                        <summary className="cursor-pointer text-sm">{item.dimension}<span className="float-right font-mono text-[#55734a]">{item.score == null ? '无法判断' : `${item.score.toFixed(1)} / 5`}</span></summary>
+                        <p className="mt-3 text-sm leading-6">{item.reason}</p>
+                        <p className="mt-2 text-xs leading-6 text-stone-500">局限：{item.limitation}</p>
+                        {item.evidence.map((e, index) => <blockquote key={index} className="mt-3 border-l-2 border-stone-200 pl-3 text-xs leading-6"><Link className="underline" href={`/articles/${e.article_id}`}>文章 #{e.article_id}</Link>：“{e.quote}”</blockquote>)}
+                      </details>)}
+                      <p className="text-sm">综合分：{profile.overall_score == null ? '样本或证据不足，暂不计算' : `${profile.overall_score.toFixed(1)} / 100`}</p>
+                      <p className="mt-2 text-xs text-stone-500">{a.quality_comparison ? `同大类 ${a.quality_comparison.count} 个采用相同评分标准的账号中，高于 ${a.quality_comparison.percentile}%（同分不计入）。` : '同类可比较样本不足，暂不展示相对位置。'}</p>
+                    </> : <p className="text-sm leading-7 text-stone-500">旧版评分标准不统一，已停止展示分数，等待按新标准重新分析。</p>}
                   </div>
                 </div>
                 <p className="mt-5 border-t border-stone-100 pt-4 text-xs leading-6 text-stone-400">

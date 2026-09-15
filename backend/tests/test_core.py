@@ -221,8 +221,6 @@ def test_admin_ranking_validation(client):
 
 
 def test_ai_profile_is_structured_and_preserves_manual_review(client, monkeypatch):
-    scores = ai.Profile.model_json_schema()['properties']['quality_scores']['additionalProperties']
-    assert scores['minimum'] == 0 and scores['maximum'] == 5
     _, conn = client
     account = fixture_account(conn)
     for i in range(3):
@@ -241,7 +239,7 @@ def test_ai_profile_is_structured_and_preserves_manual_review(client, monkeypatc
         "weaknesses": ["样本较少"],
         "recommendation_reason": "用于隔离测试",
         "not_recommended_for": [],
-        "quality_scores": {"专业度": 4},
+        "assessments": [{"dimension":d,"score":None,"reason":"样本证据不足无法可靠评价","limitation":"只测试结构","evidence":[]} for d in ai.DIMENSIONS],
     }
     monkeypatch.setattr(
         ai,

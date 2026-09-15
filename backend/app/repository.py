@@ -63,8 +63,10 @@ ACCOUNT_SELECT = """SELECT a.*, c.name AS category, s.article_count,s.articles_l
 
 
 def rank_account(row, weights):
-    scores = (row.get("profile") or {}).get("quality_scores", {})
-    quality = sum(scores.values()) / len(scores) * 20 if scores else 0
+    profile = row.get('profile') or {}
+    from .scoring import VERSION
+    overall = profile.get('overall_score') if profile.get('scoring_version') == VERSION else None
+    quality = overall if overall is not None else 0
     completeness = (
         sum(
             bool(row.get(k)) for k in ("name", "wechat_id", "avatar_url", "description", "category")
@@ -79,7 +81,7 @@ def rank_account(row, weights):
     }
     row["rank_score"] = round(sum(factors[key] * weights[key] for key in factors), 1)
     row["rank_factors"] = factors
-    row["quality_score"] = round(quality, 1) if scores else None
+    row["quality_score"] = round(quality, 1) if overall is not None else None
     row["recommendation_reason"] = (row.get("profile") or {}).get("recommendation_reason") or (
         "已收录于" + (row.get("category") or "待分类") + "目录，可先浏览账号和近期文章。"
     )

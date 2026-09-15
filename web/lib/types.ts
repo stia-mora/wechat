@@ -9,7 +9,11 @@ export interface Profile {
   weaknesses: string[];
   recommendation_reason: string;
   not_recommended_for: string[];
-  quality_scores: Record<string, number>;
+  quality_scores: Record<string, number | null>;
+  scoring_version?: string;
+  overall_score?: number | null;
+  sample_policy?: string;
+  assessments?: { dimension: string; score: number | null; reason: string; limitation: string; evidence: {article_id: number; quote: string}[] }[];
 }
 export interface Account {
   id: number;
@@ -34,6 +38,7 @@ export interface Account {
   rank_score: number;
   rank_factors: Record<string, number>;
   quality_score: number | null;
+  quality_comparison?: {count: number; percentile: number} | null;
   recommendation_reason: string;
   last_crawled_at: string | null;
   last_article_at: string | null;
