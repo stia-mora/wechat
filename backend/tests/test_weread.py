@@ -85,7 +85,9 @@ def test_verification_requires_visible_challenge(html, category):
     adapter.close()
 
 
-@pytest.mark.parametrize("code,category", [(-2012, "auth"), (-2041, "ambiguous"), (-2010, "auth")])
+@pytest.mark.parametrize(
+    "code,category", [(-2012, "auth"), (-2041, "ambiguous"), (-2010, "auth"), (-2013, "auth")]
+)
 def test_adapter_business_errors(code, category):
     adapter = WeReadAdapter(
         transport=httpx.MockTransport(
@@ -97,6 +99,31 @@ def test_adapter_business_errors(code, category):
     with pytest.raises(SourceError) as exc:
         adapter.shelf()
     assert exc.value.category == category and "sensitive" not in str(exc.value)
+    adapter.close()
+
+
+def test_auth_2013_renews_and_verifies_new_cookie():
+    calls = []
+
+    def remote(request):
+        calls.append(request.url.path)
+        if request.url.path == "/web/login/renewal":
+            return httpx.Response(
+                200,
+                json={},
+                headers={"set-cookie": "wr_skey=renewed; Path=/; Domain=weread.qq.com"},
+            )
+        if len(calls) == 1:
+            return httpx.Response(200, json={"errCode": -2013})
+        assert "wr_skey=renewed" in request.headers["cookie"]
+        return httpx.Response(200, json={"books": []})
+
+    adapter = WeReadAdapter(
+        {"cookies": {"wr_rt": "test", "wr_skey": "old"}}, transport=httpx.MockTransport(remote)
+    )
+    assert adapter.verify_or_renew() == []
+    assert calls == ["/web/shelf/sync", "/web/login/renewal", "/web/shelf/sync"]
+    assert adapter.credentials()["cookies"]["wr_skey"] == "renewed"
     adapter.close()
 
 

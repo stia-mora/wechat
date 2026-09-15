@@ -108,7 +108,7 @@ class WeReadAdapter:
         if code != "0":
             category = (
                 "auth"
-                if code in ("-2012", "-2010")
+                if code in ("-2012", "-2010", "-2013")
                 else "ambiguous"
                 if code == "-2041"
                 else "transient"
