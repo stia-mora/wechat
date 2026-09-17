@@ -28,7 +28,7 @@ def schedule():
             except SourceError:
                 continue
         rows = conn.execute("""SELECT s.account_id AS id,s.history_complete FROM source_subscriptions s
-            JOIN official_accounts a ON a.id=s.account_id WHERE s.enabled AND a.status<>'hidden'
+            JOIN official_accounts a ON a.id=s.account_id WHERE s.enabled AND a.status='approved'
             AND s.next_sync_at<=now()""").fetchall()
         for row in rows:
             enqueue(

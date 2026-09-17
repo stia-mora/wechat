@@ -15,6 +15,10 @@ from .sources.weread import SourceError, WeReadAdapter
 def collect(payload):
     job_id, target = payload["_job_id"], payload["target_id"]
     with db() as conn:
+        if not conn.execute(
+            "SELECT 1 FROM official_accounts WHERE id=%s AND status='approved'", (target,)
+        ).fetchone():
+            raise SourceError("account_status", "仅采集已审核公众号", "target")
         subscription = pool.subscribe(conn, target)
     lease = pool.acquire(job_id, target, payload.get("_execution_token"))
     adapter = None

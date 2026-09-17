@@ -36,6 +36,19 @@ def job(conn, account_id):
     return jid
 
 
+def test_pending_account_is_not_collected(client):
+    _, conn = client
+    source = base64.b64encode(str(secrets.randbelow(10**14)).encode()).decode()
+    account = conn.execute(
+        "INSERT INTO official_accounts(source_id,name) VALUES (%s,'待审核公众号') RETURNING id",
+        (source,),
+    ).fetchone()["id"]
+    jid = job(conn, account)
+
+    with pytest.raises(SourceError, match="仅采集已审核公众号"):
+        weread_crawler.collect({"_job_id": jid, "target_id": account})
+
+
 def test_adapter_identity_and_group_pagination():
     assert book_id("MTIz") == "MP_WXS_123"
     assert article_url("MP_WXS_123_a_b~c", "MP_WXS_123").endswith("/a_b~c")
