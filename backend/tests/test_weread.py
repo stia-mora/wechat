@@ -36,7 +36,7 @@ def job(conn, account_id):
     return jid
 
 
-def test_pending_account_is_not_collected(client):
+def test_pending_account_can_be_collected(client, monkeypatch):
     _, conn = client
     source = base64.b64encode(str(secrets.randbelow(10**14)).encode()).decode()
     account = conn.execute(
@@ -44,8 +44,10 @@ def test_pending_account_is_not_collected(client):
         (source,),
     ).fetchone()["id"]
     jid = job(conn, account)
+    monkeypatch.setattr(weread_crawler.pool, "subscribe", lambda conn, account_id: {"external_id": "MP_WXS_1", "history_offset": 0, "history_complete": True})
+    monkeypatch.setattr(weread_crawler.pool, "acquire", lambda *args: (_ for _ in ()).throw(SourceError("stop", "expected")))
 
-    with pytest.raises(SourceError, match="仅采集已审核公众号"):
+    with pytest.raises(SourceError, match="expected"):
         weread_crawler.collect({"_job_id": jid, "target_id": account})
 
 

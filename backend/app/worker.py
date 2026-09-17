@@ -21,15 +21,16 @@ def schedule():
 
     with db() as conn:
         for row in conn.execute(
-            "SELECT id FROM official_accounts WHERE status='approved'"
+            "SELECT id FROM official_accounts WHERE status IN ('approved','pending')"
         ).fetchall():
             try:
                 subscribe(conn, row["id"])
             except SourceError:
                 continue
         rows = conn.execute("""SELECT s.account_id AS id,s.history_complete FROM source_subscriptions s
-            JOIN official_accounts a ON a.id=s.account_id WHERE s.enabled AND a.status='approved'
-            AND s.next_sync_at<=now()""").fetchall()
+            JOIN official_accounts a ON a.id=s.account_id WHERE s.enabled
+            AND a.status IN ('approved','pending') AND s.next_sync_at<=now()
+            ORDER BY CASE a.status WHEN 'approved' THEN 0 ELSE 1 END,s.last_sync_at NULLS FIRST,s.account_id""").fetchall()
         for row in rows:
             enqueue(
                 conn,
@@ -76,7 +77,12 @@ def run(once=False, mode="all"):
                 else ["discover", "sync", "parse", "article_ai", "account_ai", "embedding"]
             )
             job = conn.execute(
-                "SELECT * FROM jobs WHERE status='queued' AND run_after<=now() AND kind=ANY(%s) ORDER BY CASE kind WHEN 'discover' THEN 0 WHEN 'sync' THEN 1 ELSE 2 END,id FOR UPDATE SKIP LOCKED LIMIT 1",
+                """SELECT j.* FROM jobs j LEFT JOIN official_accounts a ON j.kind='sync'
+                AND a.id=(j.payload->>'target_id')::bigint WHERE j.status='queued'
+                AND j.run_after<=now() AND j.kind=ANY(%s)
+                ORDER BY CASE j.kind WHEN 'discover' THEN 0 WHEN 'sync' THEN 1 ELSE 2 END,
+                CASE WHEN j.kind='sync' AND a.status='approved' THEN 0 ELSE 1 END,j.id
+                FOR UPDATE OF j SKIP LOCKED LIMIT 1""",
                 (types,),
             ).fetchone()
             if job:
