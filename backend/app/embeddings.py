@@ -12,7 +12,7 @@ def generate(payload):
     key = os.getenv("EMBEDDING_API_KEY")
     model = os.getenv("EMBEDDING_MODEL")
     if not key or not model:
-        raise SourceBlocked("未配置 EMBEDDING_API_KEY / EMBEDDING_MODEL，向量任务等待配置")
+        return {"skipped": True, "reason": "未配置 Embedding 模型"}
     with db() as conn:
         row = conn.execute(
             "SELECT content_text FROM articles WHERE id=%s", (payload["target_id"],)
