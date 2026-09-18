@@ -320,7 +320,7 @@ def test_cover_is_explicit_degradation_not_history_success(client, monkeypatch):
             }
 
         def content(self, rid):
-            pytest.fail("Unknown publication date must not fetch a body")
+            return {"content": "<p>日期仍未确认</p>", "publish_time": None}
 
         def credentials(self):
             return {"cookies": {}}

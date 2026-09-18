@@ -169,3 +169,21 @@ npm run build
 ```
 
 第一阶段使用可解释规则推荐，不实现 PRD 后期的 pgvector 语义搜索、个性化学习排序或其他内容平台。没有 LLM 配置时，账号画像与摘要功能处于待分析状态，数据发现 / 搜索 / 阅读 / 收藏仍可使用。
+
+
+### 微信读书日期缺失与阅读器诊断
+
+最新一篇接口可能不提供发布时间。补采任务会尝试读取这些文章的原文以确认日期；
+日期不早于 `BODY_SINCE` 才保存正文。仍无法确认日期时延后 24 小时重试，
+不会用抓取时间冒充发布时间。已经确认早于截止日期的文章不再补采正文。
+
+可用本机 Chrome 对单个账号进行持久化阅读器诊断（不批量抓取、不自动处理验证码）：
+
+```powershell
+.venv/Scripts/python.exe -X utf8 scripts/probe_weread_reader.py --account 178 --target 161 --headed
+```
+
+参数分别是后台微信读书账号 ID 和本站公众号 ID。脚本使用 `data/private/weread-browser/<账号ID>`
+独立保存浏览器会话，与个人 Chrome 配置隔离；先安装 backend/requirements.txt，并确保本机安装 Chrome。
+人工完成登录/验证后，在运行脚本的终端按回车，会尝试读取一页列表。
+该脚本仅诊断并在验证成功后保存凭据，尚未作为后台自动采集 Adapter 接入。

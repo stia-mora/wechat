@@ -107,7 +107,7 @@ def collect(payload):
         with db() as conn:
             missing = conn.execute(
                 """SELECT a.*,o.external_id FROM articles a JOIN article_origins o ON o.article_id=a.id
-                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s
+                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND (a.publish_time>=%s OR a.publish_time IS NULL)
                 AND (a.body_retry_after IS NULL OR a.body_retry_after<=now())
                 ORDER BY a.publish_time DESC NULLS LAST,a.id DESC LIMIT %s""",
                 (target, body_since(), payload.get("parse_limit", 20)),
@@ -139,7 +139,15 @@ def collect(payload):
                         "UPDATE articles SET publish_time=to_timestamp(%s),body_publish_time=to_timestamp(%s),updated_at=now() WHERE id=%s",
                         (body["publish_time"], body["publish_time"], article["id"]),
                     )
-            if not eligible(body.get("publish_time") or article["publish_time"]):
+            published = body.get("publish_time") or article["publish_time"]
+            if not published:
+                with db() as conn:
+                    conn.execute(
+                        "UPDATE articles SET body_error=%s,body_retry_after=now()+interval '24 hours' WHERE id=%s",
+                        ("原文未提供可确认的发布时间，暂不保存正文", article["id"]),
+                    )
+                continue
+            if not eligible(published):
                 continue
             save_article(
                 target,
@@ -163,7 +171,7 @@ def collect(payload):
             ).fetchone()
             remaining = conn.execute(
                 """SELECT count(*) n FROM articles a JOIN article_origins o ON o.article_id=a.id
-                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND a.publish_time>=%s""",
+                WHERE a.account_id=%s AND o.source_id='weread' AND a.content_text='' AND (a.publish_time>=%s OR a.publish_time IS NULL)""",
                 (target, body_since()),
             ).fetchone()["n"]
             hours = max(1, int(os.getenv("SYNC_INTERVAL_HOURS", "3")))

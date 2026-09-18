@@ -45,7 +45,8 @@ def test_body_cutoff_shanghai_boundary(monkeypatch):
 
 
 @pytest.mark.parametrize("unreadable", [False, True])
-def test_corrected_old_body_date_is_not_refetched(client, monkeypatch, unreadable):
+@pytest.mark.parametrize("undated", [False, True])
+def test_corrected_old_body_date_is_not_refetched(client, monkeypatch, unreadable, undated):
     from types import SimpleNamespace
 
     from test_weread import job, source_account, target
@@ -77,7 +78,7 @@ def test_corrected_old_body_date_is_not_refetched(client, monkeypatch, unreadabl
                     "external_id": book + "_" + name,
                     "title": name,
                     "link": f"https://mp.weixin.qq.com/s/{aid}{name}",
-                    "publish_time": 1780272000,
+                    "publish_time": None if undated else 1780272000,
                 }
                 for name in ("old", "new")
             ],
@@ -125,3 +126,33 @@ def test_rerank_maps_original_rows_and_rejects_bad_indices(monkeypatch):
     results[0]["index"] = 0
     with pytest.raises(ValueError):
         rerank("问题", rows)
+
+
+def test_unknown_date_is_probed_once_then_deferred(client, monkeypatch):
+    from types import SimpleNamespace
+    from test_weread import job, source_account, target
+    from app import weread_crawler
+    _, conn = client
+    conn.execute("UPDATE source_accounts SET enabled=false")
+    source_account(conn, monkeypatch)
+    aid = target(conn)
+    jid = job(conn, aid)
+    calls = []
+    def content(rid):
+        calls.append(rid)
+        return {"content": "<p>没有日期的正文</p>", "publish_time": None}
+    adapter = SimpleNamespace(
+        verify_or_renew=list, credentials=lambda: {"cookies": {}},
+        ensure_subscription=lambda b: None, close=lambda: None, content=content,
+        articles=lambda book, offset: {"items": [{"external_id": book + "_undated",
+            "title": "未知日期", "link": f"https://mp.weixin.qq.com/s/{aid}undated",
+            "publish_time": None}], "next_offset": 1, "exhausted": True})
+    monkeypatch.setattr(weread_crawler, "WeReadAdapter", lambda *a, **k: adapter)
+    payload = {"_job_id": jid, "target_id": aid, "pages": 1}
+    weread_crawler.collect(payload)
+    weread_crawler.collect(payload)
+    row = conn.execute("SELECT content_text,body_error,body_retry_after FROM articles WHERE account_id=%s", (aid,)).fetchone()
+    assert len(calls) == 1
+    assert row["content_text"] == ""
+    assert row["body_retry_after"] is not None
+    assert "发布时间" in row["body_error"]
