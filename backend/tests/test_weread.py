@@ -125,7 +125,7 @@ def test_auth_2013_renews_and_verifies_new_cookie():
         if request.url.path == "/web/login/renewal":
             return httpx.Response(
                 200,
-                json={},
+                json={"succ": 1},
                 headers={"set-cookie": "wr_skey=renewed; Path=/; Domain=weread.qq.com"},
             )
         if len(calls) == 1:

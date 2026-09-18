@@ -41,6 +41,7 @@ def collect(payload):
         adapter = WeReadAdapter(
             pool.credentials(lease), before_request=lambda: pool.throttle(lease)
         )
+        adapter.on_credentials_changed = lambda credentials: pool.save_credentials(lease, credentials)
         book = subscription["external_id"]
         checkpoint("检查登录与加入微信读书书架")
         adapter.verify_or_renew()
@@ -70,6 +71,7 @@ def collect(payload):
                 adapter.shelf()
                 page = {"items": [adapter.latest(book)], "next_offset": 0, "exhausted": False}
                 capability = "latest_only"
+                checkpoint("历史列表暂不可用，继续采集最新文章", list_error_code=exc.code, list_error=str(exc))
             with db() as conn:
                 ids = [i["external_id"] for i in page["items"]]
                 known = (

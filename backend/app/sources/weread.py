@@ -53,6 +53,7 @@ def article_url(review_id, book):
 class WeReadAdapter:
     def __init__(self, credentials=None, before_request=None, transport=None):
         self.before_request = before_request or (lambda: None)
+        self.on_credentials_changed = lambda credentials: None
         self.client = httpx.Client(
             base_url="https://weread.qq.com",
             timeout=35,
@@ -67,7 +68,7 @@ class WeReadAdapter:
             },
         )
         for key, value in (credentials or {}).get("cookies", {}).items():
-            self.client.cookies.set(key, value, domain="weread.qq.com", path="/")
+            self.client.cookies.set(key, value, domain=".weread.qq.com", path="/")
         if (credentials or {}).get("ticket"):
             self.client.headers["x-wr-ticket"] = credentials["ticket"]
 
@@ -81,6 +82,39 @@ class WeReadAdapter:
         }
 
     def request(self, method, path, html=False, **kwargs):
+        try:
+            return self._request(method, path, html=html, **kwargs)
+        except SourceError as exc:
+            # Retry a read once after renewal, never replay shelf writes or login calls.
+            recoverable = exc.category == "auth" or (exc.category == "ambiguous" and path == "/web/shelf/sync" and self.credentials()["cookies"].get("wr_rt"))
+            if not recoverable or method != "GET" or "/auth/" in path:
+                raise
+            self.renew()
+            return self._request(method, path, html=html, **kwargs)
+
+    def _request(self, method, path, html=False, **kwargs):
+        previous = self.credentials()
+        try:
+            result = self._checked_request(method, path, html=html, **kwargs)
+            if self.credentials() != previous:
+                self.on_credentials_changed(self.credentials())
+            return result
+        except Exception:
+            self.client.cookies.clear()
+            for key, value in previous["cookies"].items():
+                self.client.cookies.set(key, value, domain=".weread.qq.com", path="/")
+            raise
+
+    def _accept_credentials(self, response):
+        values = self.credentials()["cookies"]
+        # The response wins even if httpx retained an older host-only cookie.
+        for cookie in response.cookies.jar:
+            values[cookie.name] = cookie.value
+        self.client.cookies.clear()
+        for key, value in values.items():
+            self.client.cookies.set(key, value, domain=".weread.qq.com", path="/")
+
+    def _checked_request(self, method, path, html=False, **kwargs):
         self.before_request()
         try:
             response = self.client.request(method, path, **kwargs)
@@ -100,6 +134,7 @@ class WeReadAdapter:
             data = response.json()
         except ValueError:
             if html:
+                self._accept_credentials(response)
                 return response.text
             raise SourceError("invalid_json", "微信读书返回非 JSON 数据")
         if not isinstance(data, dict):
@@ -117,6 +152,9 @@ class WeReadAdapter:
             raise SourceError(code, f"微信读书返回错误 {code}", category)
         if html:
             raise SourceError("invalid_content", "正文接口未返回 HTML")
+        if path == "/web/login/renewal" and data.get("succ") != 1:
+            raise SourceError("renewal_failed", "登录续期未确认成功，请重新登录", "auth")
+        self._accept_credentials(response)
         return data
 
     def shelf(self):
@@ -225,17 +263,14 @@ class WeReadAdapter:
             return {"status": "waiting", "message": "等待扫码确认"}
         vid = inner.get("webLoginVid") or inner.get("vid") or data.get("vid")
         if vid:
-            self.client.cookies.set("wr_vid", str(vid), domain="weread.qq.com", path="/")
+            self.client.cookies.set("wr_vid", str(vid), domain=".weread.qq.com", path="/")
         self.verify_or_renew()
         return {"status": "done", "message": "登录与书架验证成功"}
 
-    def verify_or_renew(self):
-        try:
-            return self.shelf()
-        except SourceError as exc:
-            if exc.category not in ("auth", "ambiguous"):
-                raise
+    def renew(self):
         if not self.credentials()["cookies"].get("wr_rt"):
             raise SourceError("expired", "登录凭据无效，请重新扫码或导入完整 Cookie", "auth")
-        self.request("POST", "/web/login/renewal", json={"rq": "%2Fweb%2Fbook%2Fread", "ql": True})
+        self._request("POST", "/web/login/renewal", json={"rq": "%2Fweb%2Fbook%2Fread", "ql": False})
+
+    def verify_or_renew(self):
         return self.shelf()
