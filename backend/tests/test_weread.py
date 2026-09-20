@@ -142,6 +142,20 @@ def test_auth_2013_renews_and_verifies_new_cookie():
     adapter.close()
 
 
+def test_pool_prefers_account_with_known_membership(client, monkeypatch):
+    _, conn = client
+    conn.execute("UPDATE source_accounts SET enabled=false")
+    s1 = source_account(conn, monkeypatch)
+    s2 = source_account(conn, monkeypatch)
+    account = target(conn)
+    conn.execute(
+        "INSERT INTO source_memberships(source_account_id,account_id) VALUES (%s,%s)",
+        (s2, account),
+    )
+    lease = pool.acquire(job(conn, account), account)
+    assert lease["account"]["id"] == s2
+
+
 def test_pool_balances_reserves_capacity_and_migrates(client, monkeypatch):
     _, conn = client
     # Isolate from any real accounts already configured on this machine.

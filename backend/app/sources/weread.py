@@ -170,7 +170,9 @@ class WeReadAdapter:
         if not any(str(i.get("bookId")) == book for i in shelf):
             self.request("POST", "/web/shelf/add", json={"bookIds": [book]})
             if not any(str(i.get("bookId")) == book for i in self.shelf()):
-                raise SourceError("shelf_add", "加入书架后未找到公众号", "target")
+                # This account cannot access the target. Let the task retry and
+                # acquire another account rather than terminating the job.
+                raise SourceError("shelf_add", "加入书架后未找到公众号", "membership")
 
     def articles(self, book, offset=0):
         data = self.request("GET", "/web/mp/articles", params={"bookId": book, "offset": offset})

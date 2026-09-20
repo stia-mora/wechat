@@ -44,11 +44,12 @@ def acquire(job_id, account_id, execution_token=None):
           AND (EXISTS(SELECT 1 FROM source_memberships m WHERE m.source_account_id=s.id AND m.account_id=%s)
             OR (SELECT count(*) FROM source_memberships m WHERE m.source_account_id=s.id)
              +(SELECT count(*) FROM jobs j WHERE j.source_account_id=s.id AND j.status='running' AND j.lease_token IS NOT NULL)<s.max_subscriptions)
-          ORDER BY (SELECT count(*)::float FROM jobs j WHERE j.source_account_id=s.id AND j.status='running' AND j.lease_token IS NOT NULL)/s.max_tasks,
+          ORDER BY CASE WHEN EXISTS(SELECT 1 FROM source_memberships m WHERE m.source_account_id=s.id AND m.account_id=%s) THEN 0 ELSE 1 END,
+            (SELECT count(*)::float FROM jobs j WHERE j.source_account_id=s.id AND j.status='running' AND j.lease_token IS NOT NULL)/s.max_tasks,
             (SELECT count(*)::float FROM source_memberships m WHERE m.source_account_id=s.id)/s.max_subscriptions,
             s.consecutive_failures,s.last_assigned_at NULLS FIRST,s.id
           FOR UPDATE OF s SKIP LOCKED LIMIT 1""",
-            (account_id,),
+            (account_id, account_id),
         ).fetchone()
         if not account:
             raise PoolWaiting("没有健康且有空余负载的微信读书账号，等待登录、冷却或释放容量")
