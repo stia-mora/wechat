@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, apiPath } from '@/lib/api';
 import type { Account, Job } from '@/lib/types';
 
 type State = {
@@ -122,7 +122,7 @@ export function SourcePipeline({
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api' + base + '/export/' + format, { headers });
+      const response = await fetch(apiPath(base + '/export/' + format), { headers });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         throw new Error(data?.detail || '导出失败，请稍后重试');

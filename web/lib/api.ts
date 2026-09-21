@@ -1,8 +1,10 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
 
+export const apiPath = (path: string) => '/wechat/api' + path;
+
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch('/api' + path, {
+  const response = await fetch(apiPath(path), {
     ...options,
     headers: { 'Content-Type': 'application/json', ...options.headers },
   });
