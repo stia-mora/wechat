@@ -91,6 +91,13 @@ async def same_origin(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["Cache-Control"] = "no-store"
+    rate = getattr(request.state, "api_rate", None)
+    if rate:
+        response.headers["X-RateLimit-Limit"] = str(rate["limit"])
+        response.headers["X-RateLimit-Remaining"] = str(rate["remaining"])
+        response.headers["X-RateLimit-Reset"] = str(int(rate["reset"].timestamp()))
+        response.headers["X-Usage-Daily-Limit"] = str(rate["daily_limit"])
+        response.headers["X-Usage-Daily-Remaining"] = str(rate["daily_remaining"])
     return response
 
 

@@ -115,6 +115,8 @@ export interface ApiKey {
   id: number;
   name: string;
   key_prefix: string;
+  scope_mode: 'inherit' | 'restricted';
+  capabilities: string[];
   created_at: string;
   last_used_at: string | null;
   revoked_at: string | null;
@@ -134,6 +136,8 @@ export interface ApiAccess {
   subscriptions_remaining: number;
   subscriptions: ApiSubscription[];
   keys: ApiKey[];
+  plan: ApiPlan;
+  capabilities: ApiCapability[];
 }
 export interface ApiCandidate {
   id: number;
@@ -153,4 +157,25 @@ export interface ApiAdminUser {
   subscriptions_used: number;
   key_count: number;
   last_used_at: string | null;
+  plan_code: string;
+  plan_name: string;
+  calls_today: number;
+}
+export interface ApiCapability {
+  code: string;
+  name: string;
+  layer: string;
+  enabled: boolean;
+  customized?: boolean;
+  requests_per_minute: number;
+  requests_per_day: number;
+  calls_today?: number;
+  remaining_today?: number;
+}
+export interface ApiPlan {
+  code: string;
+  name: string;
+  description: string;
+  sort_order?: number;
+  capabilities?: ApiCapability[];
 }

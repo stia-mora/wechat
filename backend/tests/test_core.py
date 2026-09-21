@@ -4,6 +4,7 @@ from contextlib import contextmanager
 import httpx
 import pytest
 from fastapi.testclient import TestClient
+from psycopg.types.json import Jsonb
 
 from app import (
     account_pool,
@@ -23,7 +24,7 @@ from app import (
 )
 from app.content import article_key, clean_content
 from app.db import db
-from app.repository import enqueue, index_account, index_article
+from app.repository import enqueue, index_account, index_article, set_tags
 
 
 @pytest.fixture
@@ -276,6 +277,159 @@ def test_admin_api_quota_requires_removing_subscriptions_before_reduction(client
     assert api.delete(endpoint + "/subscriptions/" + str(accounts[0]), headers=headers).status_code == 200
     assert api.put(endpoint + "/access", headers=headers, json={"subscription_limit": 2}).status_code == 200
     assert api.get(endpoint + "/subscriptions", headers=headers).json()[0]["id"] in accounts[1:]
+
+
+def test_api_capabilities_metering_limits_and_key_scopes(client):
+    api, conn = client
+    account = fixture_account(conn)
+    article = conn.execute(
+        """INSERT INTO articles(account_id,source_key,title,source_url,content_text,status)
+        VALUES (%s,%s,'计量测试','https://mp.weixin.qq.com/s/test','可导出正文','ready') RETURNING id""",
+        (account, secrets.token_hex(16)),
+    ).fetchone()["id"]
+    user = api.post(
+        "/api/auth/register",
+        json={"email": secrets.token_hex(8) + "@example.invalid", "password": "test-password-unique"},
+    ).json()
+    api.post("/api/me/api/subscriptions", json={"account_id": account})
+    first_key, first_row = create_api_key(api, "restricted worker")
+    second_key, _ = create_api_key(api, "second worker")
+    admin_headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
+    admin_base = "/api/admin/api-users/" + str(user["id"])
+    plans = api.get("/api/admin/api-plans", headers=admin_headers).json()
+    assert [plan["code"] for plan in plans] == ["basic", "research", "agent_pro", "enterprise"]
+    assert api.put(admin_base + "/plan", headers=admin_headers, json={"plan_code": "research"}).status_code == 200
+    assert api.put(
+        admin_base + "/capabilities/feed.read",
+        headers=admin_headers,
+        json={"enabled": True, "requests_per_minute": 10, "requests_per_day": 1},
+    ).status_code == 200
+    assert api.put(
+        "/api/me/api/keys/" + str(first_row["id"]) + "/scopes",
+        json={"capabilities": ["feed.read"]},
+    ).status_code == 200
+    first_headers = {"Authorization": "Bearer " + first_key}
+    response = api.get("/api/v1/feed", headers=first_headers)
+    assert response.status_code == 200 and response.headers["x-ratelimit-limit"] == "10"
+    assert api.get("/api/v1/subscriptions", headers=first_headers).status_code == 403
+    limited = api.get("/api/v1/feed", headers={"Authorization": "Bearer " + second_key})
+    assert limited.status_code == 429 and limited.headers["retry-after"]
+    assert limited.headers["x-usage-daily-remaining"] == "0"
+    usage = api.get("/api/me/api/usage").json()
+    feed = next(capability for capability in usage["capabilities"] if capability["code"] == "feed.read")
+    assert usage["plan"]["code"] == "research" and feed["calls_today"] == 1
+    assert api.put(
+        admin_base + "/capabilities/feed.read",
+        headers=admin_headers,
+        json={"enabled": False},
+    ).status_code == 200
+    assert api.get("/api/v1/feed", headers=first_headers).status_code == 403
+    assert api.get("/api/v1/articles/" + str(article), headers=first_headers).status_code == 403
+
+
+def test_agent_ai_insights_tags_and_search_are_capability_scoped(client):
+    api, conn = client
+    account = fixture_account(conn)
+    conn.execute(
+        "UPDATE official_accounts SET description='面向 Agent 的人工智能研究公众号' WHERE id=%s",
+        (account,),
+    )
+    article = conn.execute(
+        """INSERT INTO articles(account_id,source_key,title,source_url,summary,content_text,status)
+        VALUES (%s,%s,'检索与 Agent','https://mp.weixin.qq.com/s/test','关键词检索摘要','Agent 检索词与重排内容','ready')
+        RETURNING id""",
+        (account, secrets.token_hex(16)),
+    ).fetchone()["id"]
+    conn.execute(
+        """INSERT INTO ai_article_summaries(article_id,data,model_name,prompt_version)
+        VALUES (%s,%s,'test-model','test-v1')""",
+        (
+            article,
+            Jsonb(
+                {
+                    "summary": "这篇文章说明 Agent 如何调用检索接口。",
+                    "key_points": ["关键词检索", "结果重排"],
+                    "keywords": ["Agent", "检索"],
+                    "target_audience": ["开发者"],
+                    "article_type": "教程",
+                    "sentiment": "neutral",
+                    "quality_score": 80,
+                }
+            ),
+        ),
+    )
+    conn.execute(
+        """INSERT INTO ai_account_profiles(account_id,data,model_name,prompt_version,source_article_count,source_total_count)
+        VALUES (%s,%s,'test-model','test-v1',3,3)""",
+        (
+            account,
+            Jsonb(
+                {
+                    "profile_summary": "关注 Agent 与人工智能研究。",
+                    "account_type": "研究型",
+                    "target_audience": ["开发者"],
+                    "content_style": ["分析"],
+                    "expertise_level": "专业",
+                    "topic_distribution": [{"name": "AI", "percentage": 100}],
+                    "strengths": ["研究"],
+                    "weaknesses": [],
+                    "recommendation_reason": "适合 Agent 开发。",
+                    "not_recommended_for": [],
+                    "scoring_version": "2026-09-evidence-v2",
+                    "overall_score": None,
+                    "quality_scores": {"论证深度": 3},
+                    "assessments": [{"dimension": "论证深度", "score": 3, "evidence": []}],
+                    "sample_article_ids": [article],
+                    "sample_policy": "测试样本",
+                }
+            ),
+        ),
+    )
+    set_tags(conn, account, ["人工智能", "Agent"])
+    index_article(conn, article)
+    index_account(conn, account)
+    user = api.post(
+        "/api/auth/register",
+        json={"email": secrets.token_hex(8) + "@example.invalid", "password": "test-password-unique"},
+    ).json()
+    api.post("/api/me/api/subscriptions", json={"account_id": account})
+    key, _ = create_api_key(api)
+    headers = {"Authorization": "Bearer " + key}
+    admin_headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
+    admin_base = "/api/admin/api-users/" + str(user["id"])
+
+    assert api.get("/api/v1/accounts/" + str(account) + "/insight", headers=headers).status_code == 403
+    assert api.put(
+        admin_base + "/capabilities/account.insight",
+        headers=admin_headers,
+        json={"enabled": True},
+    ).status_code == 200
+    assert api.get("/api/v1/accounts/" + str(account) + "/insight", headers=headers).status_code == 200
+    assert api.put(
+        admin_base + "/plan", headers=admin_headers, json={"plan_code": "agent_pro"}
+    ).status_code == 200
+    assert api.put(
+        admin_base + "/capabilities/search.semantic",
+        headers=admin_headers,
+        json={"enabled": True},
+    ).status_code == 404
+
+    profile = api.get("/api/v1/accounts/" + str(account) + "/insight", headers=headers)
+    assert profile.status_code == 200 and "assessments" not in profile.json()["profile"]
+    quality = api.get("/api/v1/accounts/" + str(account) + "/quality-evidence", headers=headers)
+    assert quality.status_code == 200 and quality.json()["assessments"][0]["dimension"] == "论证深度"
+    insight = api.get("/api/v1/articles/" + str(article) + "/insight", headers=headers)
+    assert insight.status_code == 200 and insight.json()["insight"]["keywords"] == ["Agent", "检索"]
+    assert "人工智能" in [item["name"] for item in api.get("/api/v1/tags", headers=headers).json()["items"]]
+    account_search = api.get("/api/v1/search", params={"q": "人工智能", "kind": "accounts"}, headers=headers)
+    assert account_search.status_code == 200 and account_search.json()["items"][0]["account"]["id"] == account
+    article_search = api.get(
+        "/api/v1/search", params={"q": "检索词", "mode": "rerank"}, headers=headers
+    )
+    assert article_search.status_code == 200 and article_search.json()["items"][0]["id"] == article
+    assert "content_text" not in article_search.json()["items"][0]
+    spec = api.get("/api/v1/openapi.json", headers=headers).json()
+    assert "/api/v1/search" in spec["paths"] and "semantic" not in str(spec["paths"])
 
 
 def test_article_search_and_detail(client):

@@ -11,6 +11,8 @@ export function ApiAccessManager() {
   const candidates = useApi<ApiCandidate[]>('/me/api/candidates?q=' + encodeURIComponent(query));
   const [keyName, setKeyName] = useState('默认 Agent');
   const [newKey, setNewKey] = useState<ApiKey & { key: string } | null>(null);
+  const [scopeKey, setScopeKey] = useState<ApiKey | null>(null);
+  const [scopeCapabilities, setScopeCapabilities] = useState<string[]>([]);
   const [apiRoot, setApiRoot] = useState('/wechat/api/v1');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -45,6 +47,16 @@ export function ApiAccessManager() {
       setBusy(false);
     }
   }
+  async function saveKeyScopes(mode: 'inherit' | 'restricted') {
+    if (!scopeKey) return;
+    await change(async () => {
+      await api('/me/api/keys/' + scopeKey.id + '/scopes', {
+        method: 'PUT',
+        body: JSON.stringify({ mode, capabilities: scopeCapabilities }),
+      });
+      setScopeKey(null);
+    });
+  }
   if (access.loading) return <Loading />;
   if (access.error)
     return access.error === '请先登录' ? (
@@ -66,13 +78,45 @@ export function ApiAccessManager() {
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div>
             <p className="eyebrow">AGENT API</p>
-            <h2 className="mt-2 text-2xl font-semibold">API 订阅额度</h2>
+            <h2 className="mt-2 text-2xl font-semibold">{data.plan.name}</h2>
+            <p className="mt-1 text-sm text-stone-500">{data.plan.description}</p>
           </div>
           <div className="flex gap-6 text-sm">
             <span>已用 {data.subscriptions_used}</span>
             <span>剩余 {data.subscriptions_remaining}</span>
             <span>上限 {data.subscription_limit}</span>
           </div>
+        </div>
+      </section>
+
+      <section>
+        <h2 className="text-xl font-semibold">能力与调用额度</h2>
+        <div className="mt-4 overflow-x-auto border border-stone-200 bg-white">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>能力</th>
+                <th>状态</th>
+                <th>本日调用</th>
+                <th>每分钟</th>
+                <th>每日</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.capabilities.filter((capability) => capability.enabled).map((capability) => (
+                <tr key={capability.code}>
+                  <td>
+                    <strong>{capability.name}</strong>
+                    <p className="mt-1 font-mono text-xs text-stone-400">{capability.code}</p>
+                  </td>
+                  <td>已开通</td>
+                  <td>{capability.calls_today} / {capability.requests_per_day}</td>
+                  <td>{capability.requests_per_minute}</td>
+                  <td>剩余 {capability.remaining_today}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
 
@@ -119,6 +163,7 @@ export function ApiAccessManager() {
                 <th>前缀</th>
                 <th>创建时间</th>
                 <th>最近调用</th>
+                <th>权限范围</th>
                 <th>状态</th>
                 <th>操作</th>
               </tr>
@@ -130,9 +175,20 @@ export function ApiAccessManager() {
                   <td className="font-mono text-xs">{key.key_prefix}...</td>
                   <td>{date(key.created_at)}</td>
                   <td>{date(key.last_used_at)}</td>
+                  <td>{key.scope_mode === 'inherit' ? '继承套餐' : `${key.capabilities.length} 项能力`}</td>
                   <td>{key.revoked_at ? '已撤销' : '有效'}</td>
                   <td>
-                    {!key.revoked_at && (
+                    {!key.revoked_at && <div className="flex gap-2">
+                      <button
+                        disabled={busy}
+                        className="button secondary small"
+                        onClick={() => {
+                          setScopeKey(key);
+                          setScopeCapabilities(key.capabilities);
+                        }}
+                      >
+                        权限
+                      </button>
                       <button
                         disabled={busy}
                         className="button secondary small"
@@ -140,13 +196,44 @@ export function ApiAccessManager() {
                       >
                         撤销
                       </button>
-                    )}
+                    </div>}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        {scopeKey && (
+          <div className="mt-4 border border-stone-200 bg-white p-5">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <h3 className="font-semibold">{scopeKey.name} 的权限范围</h3>
+                <p className="mt-1 text-sm text-stone-500">受限 Key 只能调用选中的能力。</p>
+              </div>
+              <button className="button secondary small" onClick={() => setScopeKey(null)}>关闭</button>
+            </div>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              {data.capabilities.filter((capability) => capability.enabled).map((capability) => (
+                <label className="flex items-center gap-3 text-sm" key={capability.code}>
+                  <input
+                    type="checkbox"
+                    checked={scopeCapabilities.includes(capability.code)}
+                    onChange={(e) => setScopeCapabilities(
+                      e.target.checked
+                        ? [...scopeCapabilities, capability.code]
+                        : scopeCapabilities.filter((code) => code !== capability.code),
+                    )}
+                  />
+                  <span>{capability.name}</span>
+                </label>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <button disabled={busy} className="button" onClick={() => void saveKeyScopes('restricted')}>保存受限权限</button>
+              <button disabled={busy} className="button secondary" onClick={() => void saveKeyScopes('inherit')}>恢复套餐权限</button>
+            </div>
+          </div>
+        )}
       </section>
 
       <section>

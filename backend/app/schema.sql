@@ -62,15 +62,90 @@ CREATE TABLE IF NOT EXISTS user_following (
  user_id bigint REFERENCES users(id) ON DELETE CASCADE, account_id bigint REFERENCES official_accounts(id) ON DELETE CASCADE,
  created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(user_id,account_id)
 );
+CREATE TABLE IF NOT EXISTS api_plans (
+ code text PRIMARY KEY, name text NOT NULL, description text NOT NULL DEFAULT '', sort_order int NOT NULL
+);
+CREATE TABLE IF NOT EXISTS api_capabilities (
+ code text PRIMARY KEY, name text NOT NULL, layer text NOT NULL, active boolean NOT NULL DEFAULT true,
+ default_requests_per_minute int NOT NULL CHECK(default_requests_per_minute>0),
+ default_requests_per_day int NOT NULL CHECK(default_requests_per_day>0)
+);
+ALTER TABLE api_capabilities ADD COLUMN IF NOT EXISTS active boolean NOT NULL DEFAULT true;
+CREATE TABLE IF NOT EXISTS api_plan_capabilities (
+ plan_code text NOT NULL REFERENCES api_plans(code) ON DELETE CASCADE,
+ capability text NOT NULL REFERENCES api_capabilities(code) ON DELETE CASCADE,
+ requests_per_minute int NOT NULL CHECK(requests_per_minute>0),
+ requests_per_day int NOT NULL CHECK(requests_per_day>0),
+ PRIMARY KEY(plan_code,capability)
+);
+INSERT INTO api_plans(code,name,description,sort_order) VALUES
+ ('basic','基础版','订阅内容与全文读取',1),
+ ('research','研究版','内容、AI 洞察与质量证据',2),
+ ('agent_pro','Agent 专业版','研究能力、搜索与自动化',3),
+ ('enterprise','企业版','全部能力、团队与企业集成',4)
+ON CONFLICT(code) DO NOTHING;
+INSERT INTO api_capabilities(code,name,layer,default_requests_per_minute,default_requests_per_day) VALUES
+ ('subscriptions.read','订阅列表','content',30,1000),
+ ('feed.read','订阅 Feed','content',30,1000),
+ ('article.read','文章全文','content',30,1000),
+ ('docs.read','OpenAPI 文档','content',30,100),
+ ('article.insight','文章洞察','insight',30,2000),
+ ('account.insight','公众号画像','insight',30,2000),
+ ('tags.read','标签目录','insight',30,2000),
+ ('quality.evidence.read','质量评分证据','insight',30,2000),
+ ('search.keyword','关键词搜索','search',60,10000),
+ ('search.rerank','重排搜索','search',30,5000),
+ ('search.semantic','语义搜索','search',30,2000),
+ ('watchlist.manage','主题监控','automation',20,1000),
+ ('webhook.receive','Webhook','enterprise',20,1000),
+ ('team.manage','团队管理','enterprise',10,500),
+ ('audit.read','审计记录','enterprise',10,500)
+ON CONFLICT(code) DO NOTHING;
+UPDATE api_capabilities SET active=false WHERE code IN
+ ('search.semantic','watchlist.manage','webhook.receive','team.manage','audit.read');
+INSERT INTO api_plan_capabilities(plan_code,capability,requests_per_minute,requests_per_day) VALUES
+ ('basic','subscriptions.read',30,1000),('basic','feed.read',30,1000),('basic','article.read',30,1000),('basic','docs.read',30,100),
+ ('research','subscriptions.read',60,10000),('research','feed.read',60,10000),('research','article.read',60,10000),('research','docs.read',60,1000),
+ ('research','article.insight',30,2000),('research','account.insight',30,2000),('research','tags.read',30,2000),('research','quality.evidence.read',30,2000),
+ ('agent_pro','subscriptions.read',120,50000),('agent_pro','feed.read',120,50000),('agent_pro','article.read',120,50000),('agent_pro','docs.read',120,5000),
+ ('agent_pro','article.insight',60,10000),('agent_pro','account.insight',60,10000),('agent_pro','tags.read',60,10000),('agent_pro','quality.evidence.read',60,10000),
+ ('agent_pro','search.keyword',60,10000),('agent_pro','search.rerank',30,5000),('agent_pro','search.semantic',30,2000),('agent_pro','watchlist.manage',20,1000),
+ ('enterprise','subscriptions.read',300,200000),('enterprise','feed.read',300,200000),('enterprise','article.read',300,200000),('enterprise','docs.read',300,10000),
+ ('enterprise','article.insight',120,50000),('enterprise','account.insight',120,50000),('enterprise','tags.read',120,50000),('enterprise','quality.evidence.read',120,50000),
+ ('enterprise','search.keyword',120,50000),('enterprise','search.rerank',60,20000),('enterprise','search.semantic',60,10000),('enterprise','watchlist.manage',60,10000),
+ ('enterprise','webhook.receive',60,10000),('enterprise','team.manage',30,2000),('enterprise','audit.read',30,2000)
+ON CONFLICT(plan_code,capability) DO NOTHING;
 CREATE TABLE IF NOT EXISTS user_api_access (
  user_id bigint PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
  subscription_limit int NOT NULL DEFAULT 3 CHECK(subscription_limit>=0),
+ plan_code text NOT NULL DEFAULT 'basic' REFERENCES api_plans(code),
  updated_at timestamptz NOT NULL DEFAULT now()
 );
+ALTER TABLE user_api_access ADD COLUMN IF NOT EXISTS plan_code text NOT NULL DEFAULT 'basic' REFERENCES api_plans(code);
 CREATE TABLE IF NOT EXISTS api_keys (
  id bigserial PRIMARY KEY, user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
  name text NOT NULL, key_prefix text NOT NULL, token_hash text NOT NULL UNIQUE,
+ scope_mode text NOT NULL DEFAULT 'inherit' CHECK(scope_mode IN ('inherit','restricted')),
  created_at timestamptz NOT NULL DEFAULT now(), last_used_at timestamptz, revoked_at timestamptz
+);
+ALTER TABLE api_keys ADD COLUMN IF NOT EXISTS scope_mode text NOT NULL DEFAULT 'inherit' CHECK(scope_mode IN ('inherit','restricted'));
+CREATE TABLE IF NOT EXISTS api_key_capabilities (
+ api_key_id bigint NOT NULL REFERENCES api_keys(id) ON DELETE CASCADE,
+ capability text NOT NULL REFERENCES api_capabilities(code) ON DELETE CASCADE,
+ PRIMARY KEY(api_key_id,capability)
+);
+CREATE TABLE IF NOT EXISTS user_api_capabilities (
+ user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ capability text NOT NULL REFERENCES api_capabilities(code) ON DELETE CASCADE,
+ enabled boolean NOT NULL, requests_per_minute int CHECK(requests_per_minute IS NULL OR requests_per_minute>0),
+ requests_per_day int CHECK(requests_per_day IS NULL OR requests_per_day>0), updated_at timestamptz NOT NULL DEFAULT now(),
+ PRIMARY KEY(user_id,capability)
+);
+CREATE TABLE IF NOT EXISTS api_usage_counters (
+ user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ capability text NOT NULL REFERENCES api_capabilities(code) ON DELETE CASCADE,
+ period text NOT NULL CHECK(period IN ('minute','day')), period_start timestamptz NOT NULL,
+ calls int NOT NULL DEFAULT 0 CHECK(calls>=0), PRIMARY KEY(user_id,capability,period,period_start)
 );
 CREATE TABLE IF NOT EXISTS api_subscriptions (
  user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,

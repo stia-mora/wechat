@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from psycopg.types.json import Jsonb
 from pydantic import BaseModel, Field
 
+from .api_access import capabilities_for_user, plan_for_user
 from .auth import require_admin
 from .content import article_key
 from .db import db
@@ -386,16 +387,102 @@ class ApiAccessEdit(BaseModel):
 def api_users(q: str = Query("", max_length=100), page: int = Query(1, ge=1)):
     with db() as conn:
         return conn.execute(
-            """SELECT u.id,u.email,u.display_name,u.created_at,
+            """SELECT u.id,u.email,u.display_name,u.created_at,coalesce(access.plan_code,'basic') AS plan_code,
+            plan.name AS plan_name,
             coalesce(access.subscription_limit,3) AS subscription_limit,
             (SELECT count(*) FROM api_subscriptions s WHERE s.user_id=u.id) AS subscriptions_used,
             (SELECT count(*) FROM api_keys k WHERE k.user_id=u.id AND k.revoked_at IS NULL) AS key_count,
-            (SELECT max(last_used_at) FROM api_keys k WHERE k.user_id=u.id) AS last_used_at
+            (SELECT max(last_used_at) FROM api_keys k WHERE k.user_id=u.id) AS last_used_at,
+            coalesce((SELECT sum(calls) FROM api_usage_counters usage WHERE usage.user_id=u.id
+              AND usage.period='day' AND usage.period_start=date_trunc('day',now())),0)::int AS calls_today
             FROM users u LEFT JOIN user_api_access access ON access.user_id=u.id
+            LEFT JOIN api_plans plan ON plan.code=coalesce(access.plan_code,'basic')
             WHERE (%s='' OR u.email ILIKE %s OR u.display_name ILIKE %s)
             ORDER BY u.id DESC LIMIT 100 OFFSET %s""",
             (q, "%" + q + "%", "%" + q + "%", (page - 1) * 100),
         ).fetchall()
+
+
+@router.get("/api-plans")
+def api_plans():
+    with db() as conn:
+        plans = conn.execute("SELECT * FROM api_plans ORDER BY sort_order").fetchall()
+        capabilities = conn.execute(
+            """SELECT pc.plan_code,c.code,c.name,c.layer,pc.requests_per_minute,pc.requests_per_day
+            FROM api_plan_capabilities pc JOIN api_capabilities c ON c.code=pc.capability WHERE c.active
+            ORDER BY c.layer,c.code"""
+        ).fetchall()
+    for plan in plans:
+        plan["capabilities"] = [
+            capability for capability in capabilities if capability["plan_code"] == plan["code"]
+        ]
+    return plans
+
+
+class ApiPlanEdit(BaseModel):
+    plan_code: str = Field(min_length=1, max_length=40)
+
+
+@router.put("/api-users/{user_id}/plan")
+def edit_api_plan(user_id: int, data: ApiPlanEdit):
+    with db() as conn:
+        user = conn.execute("SELECT id FROM users WHERE id=%s FOR UPDATE", (user_id,)).fetchone()
+        if not user:
+            raise HTTPException(404, "用户不存在")
+        if not conn.execute("SELECT 1 FROM api_plans WHERE code=%s", (data.plan_code,)).fetchone():
+            raise HTTPException(422, "套餐不存在")
+        conn.execute(
+            """INSERT INTO user_api_access(user_id,plan_code) VALUES (%s,%s)
+            ON CONFLICT(user_id) DO UPDATE SET plan_code=EXCLUDED.plan_code,updated_at=now()""",
+            (user_id, data.plan_code),
+        )
+    return {"ok": True, "plan_code": data.plan_code}
+
+
+class ApiCapabilityEdit(BaseModel):
+    enabled: bool
+    requests_per_minute: int | None = Field(default=None, ge=1, le=10000)
+    requests_per_day: int | None = Field(default=None, ge=1, le=1000000)
+
+
+@router.get("/api-users/{user_id}/capabilities")
+def user_api_capabilities(user_id: int):
+    with db() as conn:
+        if not conn.execute("SELECT 1 FROM users WHERE id=%s", (user_id,)).fetchone():
+            raise HTTPException(404, "用户不存在")
+        return {"plan": plan_for_user(conn, user_id), "capabilities": capabilities_for_user(conn, user_id)}
+
+
+@router.put("/api-users/{user_id}/capabilities/{capability}")
+def edit_user_api_capability(user_id: int, capability: str, data: ApiCapabilityEdit):
+    with db() as conn:
+        user = conn.execute("SELECT id FROM users WHERE id=%s FOR UPDATE", (user_id,)).fetchone()
+        if not user:
+            raise HTTPException(404, "用户不存在")
+        if not conn.execute(
+            "SELECT 1 FROM api_capabilities WHERE code=%s AND active", (capability,)
+        ).fetchone():
+            raise HTTPException(404, "API 能力不存在")
+        conn.execute(
+            """INSERT INTO user_api_capabilities(user_id,capability,enabled,requests_per_minute,requests_per_day)
+            VALUES (%s,%s,%s,%s,%s) ON CONFLICT(user_id,capability) DO UPDATE SET
+            enabled=EXCLUDED.enabled,requests_per_minute=EXCLUDED.requests_per_minute,
+            requests_per_day=EXCLUDED.requests_per_day,updated_at=now()""",
+            (user_id, capability, data.enabled, data.requests_per_minute, data.requests_per_day),
+        )
+    return {"ok": True}
+
+
+@router.delete("/api-users/{user_id}/capabilities/{capability}")
+def reset_user_api_capability(user_id: int, capability: str):
+    with db() as conn:
+        row = conn.execute(
+            "DELETE FROM user_api_capabilities WHERE user_id=%s AND capability=%s RETURNING capability",
+            (user_id, capability),
+        ).fetchone()
+    if not row:
+        raise HTTPException(404, "没有可重置的定制能力")
+    return {"ok": True}
 
 
 @router.put("/api-users/{user_id}/access")
