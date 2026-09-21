@@ -9,6 +9,7 @@ from app import (
     account_pool,
     admin,
     ai,
+    api_access,
     auth,
     crawler,
     embeddings,
@@ -45,6 +46,7 @@ def client(monkeypatch):
                     main,
                     auth,
                     admin,
+                    api_access,
                     crawler,
                     embeddings,
                     ai,
@@ -185,6 +187,95 @@ def test_auth_collection_isolation_and_csrf(client):
         "/api/auth/register", json={"email": "other-" + email, "password": "test-password-unique"}
     )
     assert api.get("/api/me/library?view=collections").json()["accounts"] == []
+
+
+def create_api_key(api, name="测试 Agent"):
+    response = api.post("/api/me/api/keys", json={"name": name})
+    assert response.status_code == 201
+    return response.json()["key"], response.json()["api_key"]
+
+
+def test_api_subscription_quota_keys_and_following_are_independent(client):
+    api, conn = client
+    accounts = [fixture_account(conn) for _ in range(4)]
+    email = secrets.token_hex(8) + "@example.invalid"
+    assert api.post("/api/auth/register", json={"email": email, "password": "test-password-unique"}).status_code == 200
+    assert api.get("/api/me/api").json()["subscription_limit"] == 3
+    assert api.put(
+        "/api/me/actions", json={"kind": "follow", "target_id": accounts[0], "enabled": True}
+    ).status_code == 200
+    candidates = api.get("/api/me/api/candidates").json()
+    assert candidates[0]["id"] == accounts[0] and candidates[0]["following"]
+    for account in accounts[:3]:
+        assert api.post("/api/me/api/subscriptions", json={"account_id": account}).status_code == 201
+    assert api.post("/api/me/api/subscriptions", json={"account_id": accounts[3]}).status_code == 409
+    overview = api.get("/api/me/api").json()
+    assert overview["subscriptions_used"] == 3
+    assert api.get("/api/me/library?view=following").json()["accounts"][0]["id"] == accounts[0]
+    first_key, first_row = create_api_key(api, "worker one")
+    second_key, _ = create_api_key(api, "worker two")
+    assert first_key != second_key and first_key not in str(api.get("/api/me/api").json())
+    assert api.post("/api/me/api/keys", json={"name": "   "}).status_code == 422
+    headers = {"Authorization": "Bearer " + first_key}
+    assert api.get("/api/v1/subscriptions", headers=headers).json()["subscriptions_used"] == 3
+    assert next(key for key in api.get("/api/me/api").json()["keys"] if key["id"] == first_row["id"])["last_used_at"]
+    assert api.delete("/api/me/api/keys/" + str(first_row["id"])).status_code == 200
+    assert api.get("/api/v1/subscriptions", headers=headers).status_code == 401
+
+
+def test_agent_feed_cursor_article_access_and_user_isolation(client):
+    api, conn = client
+    account = fixture_account(conn)
+    email = secrets.token_hex(8) + "@example.invalid"
+    api.post("/api/auth/register", json={"email": email, "password": "test-password-unique"})
+    api.post("/api/me/api/subscriptions", json={"account_id": account})
+    articles = []
+    for title, status, text in (("第一篇", "ready", "纯文本一"), ("第二篇", "ready", "纯文本二"), ("隐藏篇", "hidden", "不应导出"), ("待正文", "metadata", "")):
+        row = conn.execute(
+            """INSERT INTO articles(account_id,source_key,title,source_url,content_html,content_text,status)
+            VALUES (%s,%s,%s,'https://mp.weixin.qq.com/s/test','<p>不应返回</p>',%s,%s) RETURNING id""",
+            (account, secrets.token_hex(16), title, text, status),
+        ).fetchone()
+        articles.append(row["id"])
+    key, _ = create_api_key(api)
+    headers = {"Authorization": "Bearer " + key}
+    assert api.get("/api/v1/feed").status_code == 401
+    first = api.get("/api/v1/feed?limit=1", headers=headers).json()
+    assert len(first["items"]) == 1 and first["next_cursor"]
+    assert api.get("/api/v1/feed?cursor=invalid", headers=headers).status_code == 422
+    second = api.get("/api/v1/feed", params={"cursor": first["next_cursor"], "limit": 1}, headers=headers).json()
+    ids = {first["items"][0]["id"], second["items"][0]["id"]}
+    assert ids == set(articles[:2])
+    assert api.get("/api/v1/feed", params={"updated_since": "2999-01-01T00:00:00Z"}, headers=headers).json()["items"] == []
+    detail = api.get("/api/v1/articles/" + str(articles[0]), headers=headers)
+    assert detail.status_code == 200 and detail.json()["content_text"] == "纯文本一"
+    assert "content_html" not in detail.json() and detail.json()["account"]["id"] == account
+    assert api.get("/api/v1/articles/" + str(articles[2]), headers=headers).status_code == 404
+    api.delete("/api/auth/session")
+    api.post("/api/auth/register", json={"email": "other-" + email, "password": "test-password-unique"})
+    other_key, _ = create_api_key(api, "other worker")
+    assert api.get("/api/v1/articles/" + str(articles[0]), headers={"Authorization": "Bearer " + other_key}).status_code == 404
+    assert api.get("/api/v1/openapi.json").status_code == 401
+    spec = api.get("/api/v1/openapi.json", headers={"Authorization": "Bearer " + other_key}).json()
+    assert spec["openapi"] == "3.1.0" and "/api/v1/feed" in spec["paths"]
+
+
+def test_admin_api_quota_requires_removing_subscriptions_before_reduction(client):
+    api, conn = client
+    accounts = [fixture_account(conn) for _ in range(3)]
+    email = secrets.token_hex(8) + "@example.invalid"
+    user = api.post("/api/auth/register", json={"email": email, "password": "test-password-unique"}).json()
+    for account in accounts:
+        api.post("/api/me/api/subscriptions", json={"account_id": account})
+    key, _ = create_api_key(api)
+    headers = {"Authorization": "Bearer test-only-admin-token-long-enough"}
+    endpoint = "/api/admin/api-users/" + str(user["id"])
+    assert api.put(endpoint + "/access", headers=headers, json={"subscription_limit": 2}).status_code == 409
+    listed = api.get("/api/admin/api-users?q=" + email, headers=headers).json()
+    assert listed[0]["key_count"] == 1 and key not in str(listed)
+    assert api.delete(endpoint + "/subscriptions/" + str(accounts[0]), headers=headers).status_code == 200
+    assert api.put(endpoint + "/access", headers=headers, json={"subscription_limit": 2}).status_code == 200
+    assert api.get(endpoint + "/subscriptions", headers=headers).json()[0]["id"] in accounts[1:]
 
 
 def test_article_search_and_detail(client):

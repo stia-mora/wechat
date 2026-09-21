@@ -69,6 +69,7 @@ def authenticate(action: str, data: Credentials, request: Request, response: Res
                     "INSERT INTO users(email,display_name,password_hash) VALUES (%s,%s,%s) RETURNING id,email,display_name",
                     (data.email.lower(), data.display_name, hash_password(data.password)),
                 ).fetchone()
+                conn.execute("INSERT INTO user_api_access(user_id) VALUES (%s)", (user["id"],))
             except UniqueViolation:
                 raise HTTPException(409, "该邮箱已注册")
         else:

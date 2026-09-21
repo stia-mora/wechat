@@ -5,13 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import { api, useApi, date } from '@/lib/api';
 import type { Account, Article } from '@/lib/types';
 import { AccountCard, ArticleRow, Empty, ErrorState, Loading } from '@/components/ui';
+import { ApiAccessManager } from '@/components/api-access';
 function Library() {
   const view = useSearchParams().get('view') || 'following';
   const { data, error, loading, reload } = useApi<{
     accounts?: Account[];
     articles?: Article[];
     history?: { kind: string; target_id: number; title: string; visited_at: string }[];
-  }>('/me/library?view=' + view);
+  }>(view === 'api' ? null : '/me/library?view=' + view);
   return (
     <>
       <section className="flex items-center justify-between gap-4 py-12">
@@ -34,13 +35,16 @@ function Library() {
           ['following', '我的关注'],
           ['collections', '我的收藏'],
           ['history', '最近浏览'],
+          ['api', 'Agent API'],
         ].map(([v, t]) => (
           <Link key={v} className={view === v ? 'selected' : ''} href={'/library?view=' + v}>
             {t}
           </Link>
         ))}
       </div>
-      {loading ? (
+      {view === 'api' ? (
+        <ApiAccessManager />
+      ) : loading ? (
         <Loading />
       ) : error ? (
         error === '请先登录' ? (

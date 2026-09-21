@@ -6,6 +6,7 @@ import type { Account, Article, Category, Job } from '@/lib/types';
 import { ErrorState, Loading } from '@/components/ui';
 import { SourcePipeline } from '@/components/source-pipeline';
 import { SourceAccounts } from '@/components/source-accounts';
+import { ApiUserAdmin } from '@/components/api-user-admin';
 
 type Overview = {
   accounts: { status: string; count: number }[];
@@ -175,6 +176,7 @@ export default function Admin() {
           ['categories', '分类'],
           ['tags', '标签'],
           ['ranking', '推荐 / 排行'],
+          ['api-users', '用户 API'],
         ].map(([v, t]) => (
           <button
             key={v}
@@ -776,6 +778,7 @@ export default function Admin() {
           </button>
         </form>
       )}
+      {tab === 'api-users' && <ApiUserAdmin token={token} />}
       {['accounts', 'jobs', 'articles'].includes(tab) && (
         <div className="mt-7 flex items-center justify-center gap-5">
           <button

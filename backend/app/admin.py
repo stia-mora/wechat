@@ -321,7 +321,7 @@ def edit_article(article_id: int, data: ArticleEdit):
             raise HTTPException(404)
         if data.status == "ready" and not row["content_text"]:
             raise HTTPException(422, "文章没有正文，无法设为可读")
-        conn.execute("UPDATE articles SET status=%s WHERE id=%s", (data.status, article_id))
+        conn.execute("UPDATE articles SET status=%s,updated_at=now() WHERE id=%s", (data.status, article_id))
     return {"ok": True}
 
 
@@ -375,4 +375,68 @@ def edit_profile(account_id: int, data: dict):
         if not row:
             raise HTTPException(404, "请先生成画像")
         index_account(conn, account_id)
+    return {"ok": True}
+
+
+class ApiAccessEdit(BaseModel):
+    subscription_limit: int = Field(ge=0, le=10000)
+
+
+@router.get("/api-users")
+def api_users(q: str = Query("", max_length=100), page: int = Query(1, ge=1)):
+    with db() as conn:
+        return conn.execute(
+            """SELECT u.id,u.email,u.display_name,u.created_at,
+            coalesce(access.subscription_limit,3) AS subscription_limit,
+            (SELECT count(*) FROM api_subscriptions s WHERE s.user_id=u.id) AS subscriptions_used,
+            (SELECT count(*) FROM api_keys k WHERE k.user_id=u.id AND k.revoked_at IS NULL) AS key_count,
+            (SELECT max(last_used_at) FROM api_keys k WHERE k.user_id=u.id) AS last_used_at
+            FROM users u LEFT JOIN user_api_access access ON access.user_id=u.id
+            WHERE (%s='' OR u.email ILIKE %s OR u.display_name ILIKE %s)
+            ORDER BY u.id DESC LIMIT 100 OFFSET %s""",
+            (q, "%" + q + "%", "%" + q + "%", (page - 1) * 100),
+        ).fetchall()
+
+
+@router.put("/api-users/{user_id}/access")
+def edit_api_access(user_id: int, data: ApiAccessEdit):
+    with db() as conn:
+        user = conn.execute("SELECT id FROM users WHERE id=%s FOR UPDATE", (user_id,)).fetchone()
+        if not user:
+            raise HTTPException(404, "用户不存在")
+        used = conn.execute(
+            "SELECT count(*) AS count FROM api_subscriptions WHERE user_id=%s", (user_id,)
+        ).fetchone()["count"]
+        if data.subscription_limit < used:
+            raise HTTPException(409, "订阅数高于新上限，请先移除该用户的 API 订阅")
+        conn.execute(
+            """INSERT INTO user_api_access(user_id,subscription_limit,updated_at) VALUES (%s,%s,now())
+            ON CONFLICT(user_id) DO UPDATE SET subscription_limit=EXCLUDED.subscription_limit,updated_at=now()""",
+            (user_id, data.subscription_limit),
+        )
+    return {"ok": True, "subscription_limit": data.subscription_limit}
+
+
+@router.get("/api-users/{user_id}/subscriptions")
+def user_api_subscriptions(user_id: int):
+    with db() as conn:
+        if not conn.execute("SELECT 1 FROM users WHERE id=%s", (user_id,)).fetchone():
+            raise HTTPException(404, "用户不存在")
+        return conn.execute(
+            """SELECT a.id,a.name,a.wechat_id,a.status,s.created_at FROM api_subscriptions s
+            JOIN official_accounts a ON a.id=s.account_id WHERE s.user_id=%s
+            ORDER BY a.name,a.id""",
+            (user_id,),
+        ).fetchall()
+
+
+@router.delete("/api-users/{user_id}/subscriptions/{account_id}")
+def remove_user_api_subscription(user_id: int, account_id: int):
+    with db() as conn:
+        row = conn.execute(
+            "DELETE FROM api_subscriptions WHERE user_id=%s AND account_id=%s RETURNING account_id",
+            (user_id, account_id),
+        ).fetchone()
+    if not row:
+        raise HTTPException(404, "API 订阅不存在")
     return {"ok": True}

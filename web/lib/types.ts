@@ -111,3 +111,46 @@ export interface Job {
   created_at: string;
   result: Record<string, unknown> | null;
 }
+export interface ApiKey {
+  id: number;
+  name: string;
+  key_prefix: string;
+  created_at: string;
+  last_used_at: string | null;
+  revoked_at: string | null;
+}
+export interface ApiSubscription {
+  id: number;
+  name: string;
+  wechat_id: string;
+  avatar_url?: string;
+  description?: string;
+  status: string;
+  created_at: string;
+}
+export interface ApiAccess {
+  subscription_limit: number;
+  subscriptions_used: number;
+  subscriptions_remaining: number;
+  subscriptions: ApiSubscription[];
+  keys: ApiKey[];
+}
+export interface ApiCandidate {
+  id: number;
+  name: string;
+  wechat_id: string;
+  avatar_url: string;
+  description: string;
+  following: boolean;
+  subscribed: boolean;
+}
+export interface ApiAdminUser {
+  id: number;
+  email: string;
+  display_name: string;
+  created_at: string;
+  subscription_limit: number;
+  subscriptions_used: number;
+  key_count: number;
+  last_used_at: string | null;
+}

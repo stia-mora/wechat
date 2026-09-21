@@ -62,6 +62,23 @@ CREATE TABLE IF NOT EXISTS user_following (
  user_id bigint REFERENCES users(id) ON DELETE CASCADE, account_id bigint REFERENCES official_accounts(id) ON DELETE CASCADE,
  created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(user_id,account_id)
 );
+CREATE TABLE IF NOT EXISTS user_api_access (
+ user_id bigint PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+ subscription_limit int NOT NULL DEFAULT 3 CHECK(subscription_limit>=0),
+ updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS api_keys (
+ id bigserial PRIMARY KEY, user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ name text NOT NULL, key_prefix text NOT NULL, token_hash text NOT NULL UNIQUE,
+ created_at timestamptz NOT NULL DEFAULT now(), last_used_at timestamptz, revoked_at timestamptz
+);
+CREATE TABLE IF NOT EXISTS api_subscriptions (
+ user_id bigint NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ account_id bigint NOT NULL REFERENCES official_accounts(id) ON DELETE CASCADE,
+ created_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(user_id,account_id)
+);
+CREATE INDEX IF NOT EXISTS api_keys_user_active ON api_keys(user_id) WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS api_subscriptions_account ON api_subscriptions(account_id,user_id);
 CREATE TABLE IF NOT EXISTS collections (
  id bigserial PRIMARY KEY, user_id bigint REFERENCES users(id) ON DELETE CASCADE,
  account_id bigint REFERENCES official_accounts(id) ON DELETE CASCADE,

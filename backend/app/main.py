@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 from .admin import router as admin_router
+from .api_access import router as api_access_router
 from .auth import current_user
 from .auth import router as auth_router
 from .db import db, initialize
@@ -24,6 +25,7 @@ async def lifespan(app):
 app = FastAPI(title="WeChat Source", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(source_admin_router)
+app.include_router(api_access_router)
 
 
 class DiscoveryRequest(BaseModel):
