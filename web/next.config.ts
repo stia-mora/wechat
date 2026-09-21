@@ -1,6 +1,16 @@
 import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   basePath: '/wechat',
+  async redirects() {
+    return [
+      {
+        source: '/library',
+        destination: '/wechat/library',
+        permanent: true,
+        basePath: false,
+      },
+    ];
+  },
   async rewrites() {
     return [
       {
