@@ -38,3 +38,29 @@ For an update, pull the target commit and recreate the application containers:
 git pull --ff-only
 docker compose -f compose.yaml -f compose.server.yaml up -d --build
 ```
+
+## Restricted server egress
+
+If the ECS cannot reach GitHub, Docker Hub, or package registries reliably, build
+the images on a machine with normal Internet access and transfer them over SSH.
+Use the server's Compose project name so the loaded tags match the service tags:
+
+```powershell
+docker compose -p wechat -f compose.yaml -f compose.server.yaml build
+docker image save -o "$env:TEMP\wechat-images.tar" `
+  wechat-api wechat-worker wechat-web wechat-source
+scp "$env:TEMP\wechat-images.tar" root@SERVER:/root/wechat-images.tar
+```
+
+Then, on the server:
+
+```sh
+docker load -i /root/wechat-images.tar
+cd /opt/wechat
+docker compose -f compose.yaml -f compose.server.yaml up -d --no-build
+```
+
+For a code-only update when `git pull` also times out, transfer an incremental Git
+bundle from the local machine and fast-forward it on the server. Confirm the
+current server commit first, then use it as the bundle base; this leaves ignored
+private data and runtime-generated reports untouched.
