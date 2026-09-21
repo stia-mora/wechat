@@ -1,0 +1,10 @@
+.git/
+.venv/
+.pytest_cache/
+.ruff_cache/
+logs/
+ref/
+data/private/
+web/node_modules/
+web/.next/
+**/__pycache__/

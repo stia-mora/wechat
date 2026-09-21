@@ -1,0 +1,41 @@
+services:
+  source:
+    build:
+      context: .
+      dockerfile: source_bridge/Dockerfile
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    volumes:
+      - ./data/source-bridge/upstream-data:/app/ref/wechat-download-api/data
+      - ./data/source-bridge/upstream.env:/app/ref/wechat-download-api/.env:ro
+      - ./.env:/app/.env:ro
+    expose:
+      - "5500"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:5500/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  api:
+    restart: unless-stopped
+    environment:
+      SOURCE_API_URL: http://source:5500
+    depends_on:
+      source:
+        condition: service_healthy
+
+  worker:
+    restart: unless-stopped
+    environment:
+      SOURCE_API_URL: http://source:5500
+
+  web:
+    restart: unless-stopped
+    ports:
+      - "80:3000"
+
+  db:
+    restart: unless-stopped
