@@ -27,10 +27,12 @@ docker compose -f compose.yaml -f compose.server.yaml ps
 curl -fsS http://127.0.0.1:8500/api/health
 ```
 
-The server compose file exposes only the Next.js application on TCP port 80.
+The server compose file exposes only the Next.js application on TCP port 80 at
+`http://SERVER/wechat`.
 PostgreSQL and the API remain bound to loopback, and the source bridge remains
 on the internal Docker network. The ECS security group must permit inbound TCP
-80 before the site can be reached from the Internet.
+80 before the site can be reached from the Internet. Add this rule under the
+security group's **inbound** direction, not its outbound direction.
 
 For an update, pull the target commit and recreate the application containers:
 

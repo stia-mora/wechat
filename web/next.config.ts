@@ -1,5 +1,6 @@
 import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
+  basePath: '/wechat',
   async rewrites() {
     return [
       {
