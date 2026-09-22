@@ -70,11 +70,19 @@ def run(once=False, mode="all"):
                 "UPDATE jobs SET status='queued',execution_token=NULL,error='Worker 中断，重新排队' WHERE status='running' AND lease_token IS NULL AND started_at<now()-interval '3 hours'"
             )
             types = (
-                ["article_ai", "account_ai", "embedding"]
+                ["article_ai", "account_ai", "embedding", "account_embedding"]
                 if mode == "ai"
                 else ["discover", "sync", "parse"]
                 if mode == "crawler"
-                else ["discover", "sync", "parse", "article_ai", "account_ai", "embedding"]
+                else [
+                    "discover",
+                    "sync",
+                    "parse",
+                    "article_ai",
+                    "account_ai",
+                    "embedding",
+                    "account_embedding",
+                ]
             )
             job = conn.execute(
                 """SELECT j.* FROM jobs j LEFT JOIN official_accounts a ON j.kind='sync'

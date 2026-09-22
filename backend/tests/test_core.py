@@ -184,6 +184,26 @@ def test_account_search_ranks_keyword_before_semantic_and_ignores_article_mentio
     assert second_page.json()["total"] == 2 and second_page.json()["items"][0]["id"] == semantic
 
 
+def test_worker_processes_account_embedding_jobs(client, monkeypatch):
+    _, conn = client
+    conn.execute("UPDATE jobs SET run_after=now()+interval '1 day' WHERE status='queued'")
+    account = fixture_account(conn)
+    job_id = enqueue(conn, "account_embedding", {"target_id": account})
+    calls = []
+    monkeypatch.setattr(worker, "initialize", lambda: None)
+    monkeypatch.setattr(worker, "SourceClient", lambda: None)
+    monkeypatch.setattr(
+        embeddings,
+        "refresh_account",
+        lambda payload: calls.append(payload) or {"account_id": account},
+    )
+
+    worker.run(once=True, mode="ai")
+
+    assert calls == [{"target_id": account}]
+    assert conn.execute("SELECT status FROM jobs WHERE id=%s", (job_id,)).fetchone()["status"] == "done"
+
+
 def test_profile_subcategory_filter(client):
     from app.classification import link_profile_categories
     api, conn = client
