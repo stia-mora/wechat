@@ -88,7 +88,7 @@ def run(once=False, mode="all"):
                 """SELECT j.* FROM jobs j LEFT JOIN official_accounts a ON j.kind='sync'
                 AND a.id=(j.payload->>'target_id')::bigint WHERE j.status='queued'
                 AND j.run_after<=now() AND j.kind=ANY(%s)
-                ORDER BY CASE j.kind WHEN 'discover' THEN 0 WHEN 'sync' THEN 1 ELSE 2 END,
+                ORDER BY CASE j.kind WHEN 'account_embedding' THEN 0 WHEN 'discover' THEN 1 WHEN 'sync' THEN 2 ELSE 3 END,
                 CASE WHEN j.kind='sync' AND a.status='approved' THEN 0 ELSE 1 END,j.id
                 FOR UPDATE OF j SKIP LOCKED LIMIT 1""",
                 (types,),

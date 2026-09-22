@@ -188,9 +188,11 @@ def test_worker_processes_account_embedding_jobs(client, monkeypatch):
     _, conn = client
     conn.execute("UPDATE jobs SET run_after=now()+interval '1 day' WHERE status='queued'")
     account = fixture_account(conn)
+    enqueue(conn, "sync", {"target_id": account})
     job_id = enqueue(conn, "account_embedding", {"target_id": account})
     calls = []
     monkeypatch.setattr(worker, "initialize", lambda: None)
+    monkeypatch.setattr(worker, "schedule", lambda: None)
     monkeypatch.setattr(worker, "SourceClient", lambda: None)
     monkeypatch.setattr(
         embeddings,
@@ -198,7 +200,7 @@ def test_worker_processes_account_embedding_jobs(client, monkeypatch):
         lambda payload: calls.append(payload) or {"account_id": account},
     )
 
-    worker.run(once=True, mode="ai")
+    worker.run(once=True)
 
     assert calls == [{"target_id": account}]
     assert conn.execute("SELECT status FROM jobs WHERE id=%s", (job_id,)).fetchone()["status"] == "done"
