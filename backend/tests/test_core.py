@@ -1,5 +1,6 @@
 import secrets
 from contextlib import contextmanager
+from datetime import datetime, timedelta, timezone
 
 import httpx
 import pytest
@@ -204,6 +205,32 @@ def test_worker_processes_account_embedding_jobs(client, monkeypatch):
 
     assert calls == [{"target_id": account}]
     assert conn.execute("SELECT status FROM jobs WHERE id=%s", (job_id,)).fetchone()["status"] == "done"
+
+
+def test_ai_worker_start_interval_uses_global_last_start(monkeypatch):
+    class Connection:
+        def __init__(self, started_at):
+            self.started_at = started_at
+            self.calls = []
+
+        def execute(self, query, params=()):
+            self.calls.append((query, params))
+            return self
+
+        def fetchone(self):
+            return {"started_at": self.started_at}
+
+    monkeypatch.setenv("AI_JOB_START_INTERVAL_SECONDS", "12")
+    recent = Connection(datetime.now(timezone.utc) - timedelta(seconds=1))
+    ready = Connection(datetime.now(timezone.utc) - timedelta(seconds=13))
+
+    assert not worker.ai_start_ready(recent, ["article_ai", "account_ai"])
+    assert worker.ai_start_ready(ready, ["article_ai", "account_ai"])
+    assert "pg_advisory_xact_lock" in recent.calls[0][0]
+
+    monkeypatch.setenv("AI_JOB_START_INTERVAL_SECONDS", "0")
+    disabled = Connection(datetime.now(timezone.utc))
+    assert worker.ai_start_ready(disabled, ["article_ai"]) and disabled.calls == []
 
 
 def test_profile_subcategory_filter(client):

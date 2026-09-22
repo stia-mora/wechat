@@ -3,6 +3,7 @@ import logging
 import os
 import secrets
 import time
+from datetime import datetime, timedelta, timezone
 
 from psycopg.types.json import Jsonb
 
@@ -13,6 +14,21 @@ from .repository import enqueue
 from .sources.weread import SourceError
 
 log = logging.getLogger("worker")
+
+AI_START_LOCK = 1911760657
+
+
+def ai_start_ready(conn, kinds):
+    interval = max(0, int(os.getenv("AI_JOB_START_INTERVAL_SECONDS", "0")))
+    if not interval:
+        return True
+    conn.execute("SELECT pg_advisory_xact_lock(%s)", (AI_START_LOCK,))
+    row = conn.execute(
+        "SELECT max(started_at) AS started_at FROM jobs WHERE kind=ANY(%s) AND started_at IS NOT NULL",
+        (kinds,),
+    ).fetchone()
+    started_at = row["started_at"]
+    return not started_at or datetime.now(timezone.utc) - started_at >= timedelta(seconds=interval)
 
 
 def schedule():
@@ -84,15 +100,17 @@ def run(once=False, mode="all"):
                     "account_embedding",
                 ]
             )
-            job = conn.execute(
-                """SELECT j.* FROM jobs j LEFT JOIN official_accounts a ON j.kind='sync'
-                AND a.id=(j.payload->>'target_id')::bigint WHERE j.status='queued'
-                AND j.run_after<=now() AND j.kind=ANY(%s)
-                ORDER BY CASE j.kind WHEN 'account_embedding' THEN 0 WHEN 'discover' THEN 1 WHEN 'sync' THEN 2 ELSE 3 END,
-                CASE WHEN j.kind='sync' AND a.status='approved' THEN 0 ELSE 1 END,j.id
-                FOR UPDATE OF j SKIP LOCKED LIMIT 1""",
-                (types,),
-            ).fetchone()
+            job = None
+            if mode != "ai" or ai_start_ready(conn, types):
+                job = conn.execute(
+                    """SELECT j.* FROM jobs j LEFT JOIN official_accounts a ON j.kind='sync'
+                    AND a.id=(j.payload->>'target_id')::bigint WHERE j.status='queued'
+                    AND j.run_after<=now() AND j.kind=ANY(%s)
+                    ORDER BY CASE j.kind WHEN 'account_embedding' THEN 0 WHEN 'discover' THEN 1 WHEN 'sync' THEN 2 ELSE 3 END,
+                    CASE WHEN j.kind='sync' AND a.status='approved' THEN 0 ELSE 1 END,j.id
+                    FOR UPDATE OF j SKIP LOCKED LIMIT 1""",
+                    (types,),
+                ).fetchone()
             if job:
                 job["execution_token"] = secrets.token_hex(24)
                 conn.execute(

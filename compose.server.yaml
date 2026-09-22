@@ -36,6 +36,9 @@ services:
     restart: unless-stopped
     environment:
       SOURCE_API_URL: http://source:5500
+      AI_JOB_START_INTERVAL_SECONDS: 12
+    deploy:
+      replicas: 5
 
   web:
     restart: unless-stopped
