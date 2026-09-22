@@ -41,6 +41,7 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
   if (params.get('account_type')) query.set('account_type', params.get('account_type')!);
   if (params.get('frequency')) query.set('frequency', params.get('frequency')!);
   const isArticle = tab === 'articles' && mode === 'search';
+  const isAccountSearch = mode === 'search' && !isArticle && q.length > 0;
   const accounts = useApi<Page<Account>>(!isArticle ? '/accounts?' + query : null),
     articles = useApi<Page<Article>>(isArticle ? '/articles?' + query : null),
     categories = useApi<Category[]>('/categories');
@@ -169,35 +170,39 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
               共 <strong className="font-mono text-stone-800">{total}</strong>{' '}
               {isArticle ? '篇文章' : '个公众号'}
             </span>
-            <label className="flex items-center gap-2 text-xs text-stone-500">
-              排序
-              <select
-                value={sort}
-                onChange={(e) => update('sort', e.target.value)}
-                className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700"
-              >
-                {(isArticle
-                  ? [
-                      ['latest', '最新发布'],
-                      ['popular', '最多收藏'],
-                      ['recommended', '内容推荐'],
-                    ]
-                  : [
-                      ['recommended', '综合推荐'],
-                      ['latest', '最新更新'],
-                      ['active', '更新活跃'],
-                      ['quality', '内容质量'],
-                      ['popular', '热门关注'],
-                      ['growth', '近期增长'],
-                      ['relevance', '相关度'],
-                    ]
-                ).map(([v, t]) => (
-                  <option key={v} value={v}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {isAccountSearch ? (
+              <span className="text-xs text-stone-500">按匹配度排序</span>
+            ) : (
+              <label className="flex items-center gap-2 text-xs text-stone-500">
+                排序
+                <select
+                  value={sort}
+                  onChange={(e) => update('sort', e.target.value)}
+                  className="rounded-md border border-stone-200 bg-white px-3 py-2 text-sm text-stone-700"
+                >
+                  {(isArticle
+                    ? [
+                        ['latest', '最新发布'],
+                        ['popular', '最多收藏'],
+                        ['recommended', '内容推荐'],
+                      ]
+                    : [
+                        ['recommended', '综合推荐'],
+                        ['latest', '最新更新'],
+                        ['active', '更新活跃'],
+                        ['quality', '内容质量'],
+                        ['popular', '热门关注'],
+                        ['growth', '近期增长'],
+                        ['relevance', '相关度'],
+                      ]
+                  ).map(([v, t]) => (
+                    <option key={v} value={v}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
           </div>
           {result.loading ? (
             <Loading />

@@ -1,3 +1,4 @@
+import math
 import os
 from contextlib import asynccontextmanager
 from urllib.parse import urlparse
@@ -12,6 +13,7 @@ from .api_access import router as api_access_router
 from .auth import current_user
 from .auth import router as auth_router
 from .db import db, initialize
+from .embeddings import embed_query
 from .repository import ACCOUNT_SELECT, rank_account
 from .source_admin import router as source_admin_router
 
@@ -142,11 +144,13 @@ def accounts(
     limit: int = Query(20, ge=1, le=100),
 ):
     where, args = ["a.status='approved'"], []
+    q = q.strip()
+    semantic = None
     if q:
-        where.append("""(a.id IN (SELECT target_id FROM search_documents WHERE kind='account' AND
-          (body ILIKE %s OR document @@ plainto_tsquery('simple',%s) OR body %% %s)) OR
-          a.id IN (SELECT ar.account_id FROM search_documents d JOIN articles ar ON ar.id=d.target_id WHERE d.kind='article' AND ar.status<>'hidden' AND d.body ILIKE %s))""")
-        args.extend(["%" + q + "%", q, q, "%" + q + "%"])
+        try:
+            semantic = embed_query(q)
+        except (httpx.HTTPError, IndexError, KeyError, TypeError, ValueError):
+            pass
     if category:
         where.append(
             "(a.primary_category_id=%s OR a.id IN(SELECT account_id FROM official_account_categories WHERE category_id=%s))"
@@ -169,39 +173,96 @@ def accounts(
             }[frequency]
         )
     filtered = ACCOUNT_SELECT + " WHERE " + " AND ".join(where)
-    order = {
-        "recommended": "score DESC",
-        "quality": "quality DESC",
-        "active": "articles_last_30d DESC",
-        "growth": "growth DESC",
-        "popular": "following_count+collection_count DESC",
-        "latest": "last_article_at DESC NULLS LAST",
-        "relevance": "name_match DESC,score DESC",
-    }.get(sort, "score DESC")
-    # Rank and paginate in PostgreSQL, so a growing catalog never loads in full per request.
-    query = (
-        """WITH candidates AS ("""
-        + filtered
-        + """), factors AS (
-      SELECT candidates.*,
-      CASE WHEN profile->>'scoring_version'='2026-09-evidence-v2' THEN coalesce((profile->>'overall_score')::numeric,0) ELSE 0 END AS quality,
-      ((name<>'')::int+(wechat_id<>'')::int+(avatar_url<>'')::int+(description<>'')::int+(category IS NOT NULL)::int)*20 AS completeness,
-      name ILIKE %s AS name_match FROM candidates
-    ), scored AS (SELECT factors.*,
-      quality*(w.value->>'quality')::numeric+active_score*(w.value->>'activity')::numeric+
-      completeness*(w.value->>'completeness')::numeric+least(100,following_count*5)*(w.value->>'following')::numeric AS score
-      FROM factors CROSS JOIN settings w WHERE w.key='ranking')
-      SELECT * FROM scored ORDER BY """
-        + order
-        + ",id ASC LIMIT %s OFFSET %s"
-    )
     with db() as conn:
-        total = conn.execute(
-            "SELECT count(*) AS n FROM (" + filtered + ") counted", args
-        ).fetchone()["n"]
-        rows = ranked(
-            conn, conn.execute(query, args + ["%" + q + "%", limit, (page - 1) * limit]).fetchall()
-        )
+        if q:
+            if semantic:
+                semantic_model, semantic_vector = semantic
+                semantic_scores_sql = """SELECT candidates.id,(SELECT sum(component*query_component)
+                    FROM unnest(ae.embedding,%s::double precision[]) AS pair(component,query_component)) /
+                    nullif(sqrt((SELECT sum(component*component) FROM unnest(ae.embedding) AS component))*%s,0)
+                    AS semantic_score FROM candidates JOIN account_embeddings ae ON ae.account_id=candidates.id
+                    WHERE ae.model=%s AND array_length(ae.embedding,1)=%s"""
+                semantic_args = [
+                    semantic_vector,
+                    math.sqrt(sum(value * value for value in semantic_vector)),
+                    semantic_model,
+                    len(semantic_vector),
+                ]
+            else:
+                semantic_scores_sql = """SELECT candidates.id,0::double precision AS semantic_score
+                  FROM candidates WHERE FALSE"""
+                semantic_args = []
+            query = (
+                """WITH candidates AS ("""
+                + filtered
+                + """), keyword_matches AS (
+                  SELECT candidates.*,CASE WHEN name ILIKE %s OR wechat_id ILIKE %s THEN 2
+                    WHEN name ILIKE %s OR wechat_id ILIKE %s THEN 1 ELSE 0 END AS match_tier,
+                    coalesce(ts_rank(d.document,plainto_tsquery('simple',%s)),0)::double precision AS keyword_score,
+                    0::double precision AS semantic_score
+                  FROM candidates JOIN search_documents d ON d.kind='account' AND d.target_id=candidates.id
+                  WHERE d.body ILIKE %s OR d.document @@ plainto_tsquery('simple',%s)
+                ), semantic_scores AS ("""
+                + semantic_scores_sql
+                + """), semantic_matches AS (
+                  SELECT candidates.*,0 AS match_tier,0::double precision AS keyword_score,
+                    semantic_scores.semantic_score FROM candidates JOIN semantic_scores ON semantic_scores.id=candidates.id
+                  WHERE semantic_scores.semantic_score>=0.55 AND NOT EXISTS
+                    (SELECT 1 FROM keyword_matches k WHERE k.id=candidates.id)
+                ), matches AS (
+                  SELECT * FROM keyword_matches UNION ALL SELECT * FROM semantic_matches
+                ), factors AS (
+                  SELECT matches.*,CASE WHEN profile->>'scoring_version'='2026-09-evidence-v2'
+                    THEN coalesce((profile->>'overall_score')::numeric,0) ELSE 0 END AS quality,
+                    ((name<>'')::int+(wechat_id<>'')::int+(avatar_url<>'')::int+(description<>'')::int+(category IS NOT NULL)::int)*20 AS completeness
+                  FROM matches
+                ), scored AS (
+                  SELECT factors.*,quality*(w.value->>'quality')::numeric+active_score*(w.value->>'activity')::numeric+
+                    completeness*(w.value->>'completeness')::numeric+least(100,following_count*5)*(w.value->>'following')::numeric AS score
+                  FROM factors CROSS JOIN settings w WHERE w.key='ranking'
+                ), counted AS (SELECT count(*) AS total FROM scored)
+                SELECT page_results.*,counted.total FROM counted LEFT JOIN LATERAL (
+                  SELECT * FROM scored ORDER BY match_tier DESC,keyword_score DESC,
+                    semantic_score DESC,score DESC,id ASC LIMIT %s OFFSET %s
+                ) page_results ON TRUE"""
+            )
+            rows = conn.execute(
+                query,
+                args + [q, q, "%" + q + "%", "%" + q + "%", q, "%" + q + "%", q]
+                + semantic_args + [limit, (page - 1) * limit],
+            ).fetchall()
+            total = rows[0]["total"] if rows else 0
+            rows = [row for row in rows if row["id"] is not None]
+            for row in rows:
+                for key in ("match_tier", "keyword_score", "semantic_score", "total"):
+                    row.pop(key, None)
+        else:
+            order = {
+                "recommended": "score DESC",
+                "quality": "quality DESC",
+                "active": "articles_last_30d DESC",
+                "growth": "growth DESC",
+                "popular": "following_count+collection_count DESC",
+                "latest": "last_article_at DESC NULLS LAST",
+                "relevance": "name_match DESC,score DESC",
+            }.get(sort, "score DESC")
+            query = (
+                """WITH candidates AS ("""
+                + filtered
+                + """), factors AS (
+                  SELECT candidates.*,CASE WHEN profile->>'scoring_version'='2026-09-evidence-v2' THEN coalesce((profile->>'overall_score')::numeric,0) ELSE 0 END AS quality,
+                  ((name<>'')::int+(wechat_id<>'')::int+(avatar_url<>'')::int+(description<>'')::int+(category IS NOT NULL)::int)*20 AS completeness,
+                  name ILIKE %s AS name_match FROM candidates
+                ), scored AS (SELECT factors.*,quality*(w.value->>'quality')::numeric+active_score*(w.value->>'activity')::numeric+
+                  completeness*(w.value->>'completeness')::numeric+least(100,following_count*5)*(w.value->>'following')::numeric AS score
+                  FROM factors CROSS JOIN settings w WHERE w.key='ranking')
+                SELECT * FROM scored ORDER BY """
+                + order
+                + ",id ASC LIMIT %s OFFSET %s"
+            )
+            total = conn.execute("SELECT count(*) AS n FROM (" + filtered + ") counted", args).fetchone()["n"]
+            rows = conn.execute(query, args + ["%" + q + "%", limit, (page - 1) * limit]).fetchall()
+        rows = ranked(conn, rows)
     return {"items": rows, "total": total, "page": page, "limit": limit}
 
 

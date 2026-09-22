@@ -60,6 +60,7 @@ def client(monkeypatch):
                     worker,
                 ):
                     monkeypatch.setattr(module, "db", test_db)
+                monkeypatch.setattr(main, "embed_query", lambda query: None)
                 monkeypatch.setenv("ADMIN_TOKEN", "test-only-admin-token-long-enough")
                 auth.attempts.clear()
                 yield TestClient(main.app), conn
@@ -144,6 +145,43 @@ def test_search_and_hidden_content_boundaries(client):
     assert api.get("/api/accounts/" + str(hidden)).status_code == 404
     assert api.get("/api/categories").status_code == 200
     assert api.get("/api/admin/accounts").status_code == 403
+
+
+def test_account_search_ranks_keyword_before_semantic_and_ignores_article_mentions(client, monkeypatch):
+    api, conn = client
+    query = "稀有语义排序词"
+    keyword = conn.execute(
+        "INSERT INTO official_accounts(name,source_id,status) VALUES (%s,%s,'approved') RETURNING id",
+        (query + "观察", secrets.token_hex(16)),
+    ).fetchone()["id"]
+    semantic = conn.execute(
+        "INSERT INTO official_accounts(name,source_id,status) VALUES ('通用智能研究',%s,'approved') RETURNING id",
+        (secrets.token_hex(16),),
+    ).fetchone()["id"]
+    article_only = conn.execute(
+        "INSERT INTO official_accounts(name,source_id,status) VALUES ('财经资讯',%s,'approved') RETURNING id",
+        (secrets.token_hex(16),),
+    ).fetchone()["id"]
+    for account in (keyword, semantic, article_only):
+        index_account(conn, account)
+    article = conn.execute(
+        """INSERT INTO articles(account_id,source_key,title,source_url,content_text,status)
+        VALUES (%s,%s,'市场观察','https://mp.weixin.qq.com/s/test',%s,'ready') RETURNING id""",
+        (article_only, secrets.token_hex(16), query + "带动市场行情"),
+    ).fetchone()["id"]
+    index_article(conn, article)
+    conn.execute(
+        "INSERT INTO account_embeddings(account_id,model,source_embedding_count,embedding) VALUES (%s,'test-model',1,%s)",
+        (semantic, [1.0, 0.0]),
+    )
+    monkeypatch.setattr(main, "embed_query", lambda query: ("test-model", [1.0, 0.0]))
+    response = api.get("/api/accounts", params={"q": query, "sort": "recommended", "limit": 20})
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.json()["items"]]
+    assert ids[:2] == [keyword, semantic]
+    assert article_only not in ids
+    second_page = api.get("/api/accounts", params={"q": query, "limit": 1, "page": 2})
+    assert second_page.json()["total"] == 2 and second_page.json()["items"][0]["id"] == semantic
 
 
 def test_profile_subcategory_filter(client):

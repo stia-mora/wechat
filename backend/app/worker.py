@@ -97,10 +97,14 @@ def run(once=False, mode="all"):
             time.sleep(2)
             continue
         try:
-            if job["kind"] == "embedding":
-                from .embeddings import generate
+            if job["kind"] in ("embedding", "account_embedding"):
+                from .embeddings import generate, refresh_account
 
-                result = generate(job["payload"])
+                result = (
+                    generate(job["payload"])
+                    if job["kind"] == "embedding"
+                    else refresh_account(job["payload"])
+                )
             elif job["kind"].endswith("_ai"):
                 from .ai import analyze
 

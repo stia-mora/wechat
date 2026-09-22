@@ -19,7 +19,7 @@ def test_embedding_mixed_numeric_types_persist(client, monkeypatch):
         (secrets.token_hex(16),),
     ).fetchone()["id"]
     article = conn.execute(
-        "INSERT INTO articles(account_id,source_key,title,source_url,content_text) VALUES (%s,%s,'测试','https://mp.weixin.qq.com/s/test','正文') RETURNING id",
+        "INSERT INTO articles(account_id,source_key,title,source_url,content_text,status) VALUES (%s,%s,'测试','https://mp.weixin.qq.com/s/test','正文','ready') RETURNING id",
         (aid, secrets.token_hex(16)),
     ).fetchone()["id"]
     monkeypatch.setenv("EMBEDDING_API_KEY", "test")
@@ -35,6 +35,10 @@ def test_embedding_mixed_numeric_types_persist(client, monkeypatch):
     assert conn.execute(
         "SELECT embedding FROM article_embeddings WHERE article_id=%s", (article,)
     ).fetchone()["embedding"] == [0.0, 0.25, -0.5]
+    account_embedding = conn.execute(
+        "SELECT source_embedding_count,embedding FROM account_embeddings WHERE account_id=%s", (aid,)
+    ).fetchone()
+    assert account_embedding == {"source_embedding_count": 1, "embedding": [0.0, 0.25, -0.5]}
 
 
 def test_body_cutoff_shanghai_boundary(monkeypatch):

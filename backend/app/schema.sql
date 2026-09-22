@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS source_memberships (
  PRIMARY KEY(source_account_id,account_id)
 );
 ALTER TABLE jobs DROP CONSTRAINT IF EXISTS jobs_kind_check;
-ALTER TABLE jobs ADD CONSTRAINT jobs_kind_check CHECK(kind IN ('discover','sync','parse','account_ai','article_ai','embedding'));
+ALTER TABLE jobs ADD CONSTRAINT jobs_kind_check CHECK(kind IN ('discover','sync','parse','account_ai','article_ai','embedding','account_embedding'));
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_account_id bigint REFERENCES source_accounts(id);
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS lease_token text;
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS heartbeat_at timestamptz;
@@ -249,6 +249,22 @@ CREATE TABLE IF NOT EXISTS article_embeddings (
  model text NOT NULL, content_hash text NOT NULL, embedding double precision[] NOT NULL,
  generated_at timestamptz NOT NULL DEFAULT now()
 );
+CREATE TABLE IF NOT EXISTS account_embeddings (
+ account_id bigint PRIMARY KEY REFERENCES official_accounts(id) ON DELETE CASCADE,
+ model text NOT NULL, source_embedding_count int NOT NULL CHECK(source_embedding_count>0),
+ embedding double precision[] NOT NULL, generated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS account_embeddings_model ON account_embeddings(model);
+INSERT INTO jobs(kind,payload,dedupe_key)
+SELECT 'account_embedding',jsonb_build_object('target_id',source.account_id),'account_embedding:' || source.account_id
+FROM (
+  SELECT DISTINCT ON (ar.account_id) ar.account_id,e.model FROM articles ar
+  JOIN article_embeddings e ON e.article_id=ar.id WHERE ar.status='ready'
+  ORDER BY ar.account_id,e.generated_at DESC
+) source WHERE NOT EXISTS (
+  SELECT 1 FROM account_embeddings ae WHERE ae.account_id=source.account_id AND ae.model=source.model
+)
+ON CONFLICT(dedupe_key) WHERE status IN ('queued','running') DO NOTHING;
 CREATE TABLE IF NOT EXISTS discovery_requests (
  query text PRIMARY KEY, job_id bigint REFERENCES jobs(id), requested_at timestamptz NOT NULL DEFAULT now()
 );
