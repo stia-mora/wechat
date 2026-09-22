@@ -32,6 +32,11 @@ services:
     environment:
       SOURCE_API_URL: http://source:5500
 
+  ai-worker:
+    restart: unless-stopped
+    environment:
+      SOURCE_API_URL: http://source:5500
+
   web:
     restart: unless-stopped
     ports:

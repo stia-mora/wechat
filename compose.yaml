@@ -30,7 +30,19 @@ services:
     build: ./backend
     volumes:
       - ./data/private:/data/private
-    command: python -m app.worker
+    command: python -m app.worker --mode crawler
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://wechat:${POSTGRES_PASSWORD:-wechat_local}@db:5432/wechat_source
+      SOURCE_API_URL: http://host.docker.internal:5500
+    depends_on:
+      api:
+        condition: service_started
+  ai-worker:
+    build: ./backend
+    volumes:
+      - ./data/private:/data/private
+    command: python -m app.worker --mode ai
     env_file: .env
     environment:
       DATABASE_URL: postgresql://wechat:${POSTGRES_PASSWORD:-wechat_local}@db:5432/wechat_source
