@@ -52,6 +52,16 @@ class Summary(BaseModel):
     quality_score: float = Field(ge=0, le=100)
 
 
+def json_content(content):
+    content = content.strip()
+    if not content.startswith("```"):
+        return content
+    _, separator, content = content.partition("\n")
+    if separator and content.rstrip().endswith("```"):
+        content = content.rstrip()[:-3]
+    return content.strip()
+
+
 def generate(schema, source):
     providers = [
         (os.getenv("LLM_BASE_URL"), os.getenv("LLM_API_KEY"), os.getenv("LLM_MODEL")),
@@ -89,7 +99,7 @@ def generate(schema, source):
                     )
                     response.raise_for_status()
                     data = schema.model_validate_json(
-                        response.json()["choices"][0]["message"]["content"]
+                        json_content(response.json()["choices"][0]["message"]["content"])
                     ).model_dump()
                 return data, model
             except (httpx.HTTPError, KeyError, IndexError, ValueError) as exc:

@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 import httpx
@@ -6,6 +7,45 @@ from test_core import client as client  # noqa: PLC0414
 
 from app.collection_policy import eligible
 from app.reranking import rerank
+
+
+def test_ai_accepts_markdown_fenced_json(client, monkeypatch):
+    from app.ai import Summary, generate
+
+    monkeypatch.setenv("LLM_BASE_URL", "https://llm.example/v1")
+    monkeypatch.setenv("LLM_API_KEY", "test-key")
+    monkeypatch.setenv("LLM_MODEL", "gemini-test")
+    monkeypatch.delenv("LLM_FALLBACK_BASE_URL", raising=False)
+    monkeypatch.delenv("LLM_FALLBACK_API_KEY", raising=False)
+    monkeypatch.delenv("LLM_FALLBACK_MODEL", raising=False)
+    response_data = {
+        "summary": "summary",
+        "key_points": ["point"],
+        "keywords": ["keyword"],
+        "target_audience": ["reader"],
+        "article_type": "analysis",
+        "sentiment": "neutral",
+        "quality_score": 80,
+    }
+
+    def post(self, url, **kwargs):
+        return httpx.Response(
+            200,
+            json={
+                "choices": [
+                    {
+                        "message": {
+                            "content": "```json\n" + json.dumps(response_data) + "\n```"
+                        }
+                    }
+                ]
+            },
+            request=httpx.Request("POST", url),
+        )
+
+    monkeypatch.setattr(httpx.Client, "post", post)
+    data, model = generate(Summary, {"title": "test", "content": "body"})
+    assert model == "gemini-test" and data["summary"] == "summary"
 
 
 def test_embedding_mixed_numeric_types_persist(client, monkeypatch):
