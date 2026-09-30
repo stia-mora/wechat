@@ -34,7 +34,7 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
       <div className="flex gap-2 py-7 text-xs text-stone-500">
         <Link href="/discover">发现</Link>
         <span>/</span>
-        <Link href={'/discover?category=' + a.primary_category_id}>{a.category || '待分类'}</Link>
+        <Link href={a.primary_category_id ? '/discover?category=' + a.primary_category_id : '/discover'}>{a.category || '待分类'}</Link>
         <span>/</span>
         <span>{a.name}</span>
       </div>
