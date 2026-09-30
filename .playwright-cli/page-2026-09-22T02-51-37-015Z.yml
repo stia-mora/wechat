@@ -1,0 +1,79 @@
+- generic [active] [ref=e1]:
+  - link "跳转到主要内容" [ref=e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "公众号发现首页" [ref=e5] [cursor=pointer]:
+        - /url: /wechat
+        - generic [ref=e9]:
+          - text: 公众号发现
+          - generic [ref=e10]: WECHAT SOURCE
+      - navigation "主导航" [ref=e11]:
+        - link "首页" [ref=e12] [cursor=pointer]:
+          - /url: /wechat
+        - link "发现" [ref=e13] [cursor=pointer]:
+          - /url: /wechat/discover
+        - link "分类" [ref=e14] [cursor=pointer]:
+          - /url: /wechat/categories
+        - link "排行" [ref=e15] [cursor=pointer]:
+          - /url: /wechat/rankings
+      - generic [ref=e16]:
+        - link "搜索" [ref=e17] [cursor=pointer]:
+          - /url: /wechat/search
+        - link "收藏" [ref=e20] [cursor=pointer]:
+          - /url: /wechat/library?view=collections
+        - link "登录 / 注册" [ref=e23] [cursor=pointer]:
+          - /url: /wechat/login
+  - main [ref=e24]:
+    - generic [ref=e25]:
+      - text: EXPLORE THE SOURCE
+      - heading "搜索「人工智能」" [level=1] [ref=e26]
+      - paragraph [ref=e27]: 循着兴趣探索，把有价值的内容留在自己的阅读地图里。
+      - search [ref=e29]:
+        - generic [ref=e30]: 搜索公众号、文章、关键词
+        - textbox "搜索公众号、文章、关键词" [ref=e33]:
+          - /placeholder: 搜索公众号、文章、关键词…
+          - text: 人工智能
+        - button "搜索" [ref=e34] [cursor=pointer]
+    - generic [ref=e37]:
+      - button "公众号" [ref=e38] [cursor=pointer]
+      - button "文章" [ref=e39] [cursor=pointer]
+    - generic [ref=e40]:
+      - complementary "筛选公众号" [ref=e41]:
+        - heading "内容领域" [level=2] [ref=e42]
+        - button "全部领域" [ref=e44] [cursor=pointer]
+        - generic [ref=e45]:
+          - text: 账号类型
+          - combobox "账号类型" [ref=e46]:
+            - option "不限" [selected]
+            - option "媒体"
+            - option "个人IP"
+            - option "企业"
+            - option "高校"
+            - option "政府"
+            - option "研究机构"
+            - option "垂直社区"
+            - option "品牌账号"
+        - generic [ref=e47]:
+          - text: 近 30 天更新
+          - combobox "近 30 天更新" [ref=e48]:
+            - option "不限频率" [selected]
+            - option "高频 · 20 篇以上"
+            - option "中频 · 5—19 篇"
+            - option "低频 · 0—4 篇"
+      - generic [ref=e49]:
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - text: 共
+            - strong [ref=e52]: "0"
+            - text: 个公众号
+          - generic [ref=e53]: 按匹配度排序
+        - generic "加载中" [ref=e54]
+  - contentinfo [ref=e59]:
+    - generic [ref=e60]:
+      - generic [ref=e61]: 公众号发现 · 为持续阅读，找到更好的起点。
+      - generic [ref=e62]:
+        - generic [ref=e63]: 内容归原作者所有
+        - link "数据管理" [ref=e64] [cursor=pointer]:
+          - /url: /wechat/admin
+  - alert [ref=e67]
