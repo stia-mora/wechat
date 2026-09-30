@@ -66,3 +66,26 @@ For a code-only update when `git pull` also times out, transfer an incremental G
 bundle from the local machine and fast-forward it on the server. Confirm the
 current server commit first, then use it as the bundle base; this leaves ignored
 private data and runtime-generated reports untouched.
+
+## Directory-only expansion
+
+The article worker now requires the `articles` profile. To pause article collection
+and discover at least 10,000 real, unique WeChat accounts:
+
+```sh
+docker compose -f compose.yaml -f compose.server.yaml --profile articles stop worker
+docker compose -f compose.yaml -f compose.server.yaml --profile directory up -d --build directory-discovery
+```
+
+The collector searches the authenticated WeChat API, pages results, and deduplicates
+by `(platform, source_id)`. Search terms are never imported as account records.
+New accounts remain pending review with `article_collection_enabled=false`;
+existing accounts retain their collection setting. No article tasks are created.
+Progress is saved in `data/private/directory-discovery.json` after every page.
+The process waits on expired login or rate limits and resumes the same page after
+login is restored. Exhausting the queries does not report the target as achieved.
+The target includes the existing real accounts; it is not a promise of 10,000 new ones.
+
+To resume existing article collection explicitly, enable the `articles` profile
+and start `worker`. Newly discovered directory accounts remain excluded until
+their `article_collection_enabled` field is explicitly enabled.

@@ -275,3 +275,4 @@ ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_publish_time timestamptz;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_error text;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_failures integer NOT NULL DEFAULT 0;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_retry_after timestamptz;
+ALTER TABLE official_accounts ADD COLUMN IF NOT EXISTS article_collection_enabled boolean NOT NULL DEFAULT true;

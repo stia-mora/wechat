@@ -55,7 +55,12 @@ class SourceClient:
         return result.get("data") if "data" in result else result
 
     def discover(self, payload):
-        data = self.request("GET", "/api/public/searchbiz", params={"query": payload["query"]})
+        data = (
+            self.bridge("GET", "/accounts/search", remote=True,
+                        params={"query": payload["query"], "begin": payload.get("begin", 0)})
+            if payload.get("directory_only")
+            else self.request("GET", "/api/public/searchbiz", params={"query": payload["query"]})
+        )
         found = []
         with db() as conn:
             category = payload.get("category_id")
@@ -70,8 +75,8 @@ class SourceClient:
                 if not item.get("fakeid") or not item.get("nickname"):
                     continue
                 row = conn.execute(
-                    """INSERT INTO official_accounts(source_id,name,wechat_id,avatar_url,description,original_description,primary_category_id,source_url,last_crawled_at)
-                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,now()) ON CONFLICT(platform,source_id) DO UPDATE SET
+                    """INSERT INTO official_accounts(source_id,name,wechat_id,avatar_url,description,original_description,primary_category_id,source_url,article_collection_enabled,last_crawled_at)
+                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,now()) ON CONFLICT(platform,source_id) DO UPDATE SET
                   name=EXCLUDED.name,wechat_id=EXCLUDED.wechat_id,avatar_url=EXCLUDED.avatar_url,
                   description=CASE WHEN official_accounts.description='' THEN EXCLUDED.description ELSE official_accounts.description END,
                   original_description=CASE WHEN EXCLUDED.original_description<>'' THEN EXCLUDED.original_description ELSE official_accounts.original_description END,
@@ -86,11 +91,13 @@ class SourceClient:
                         item.get("signature") or "",
                         category,
                         "",
+                        not payload.get("directory_only", False),
                     ),
                 ).fetchone()
                 index_account(conn, row["id"])
                 found.append(row)
-        return {"count": len(found), "accounts": found, "query": payload["query"]}
+        return {"count": len(found), "accounts": found, "query": payload["query"],
+                "next_begin": data.get("next_begin"), "has_more": data.get("has_more", False)}
 
     def bridge(self, method, path, remote=False, **kwargs):
         return self.request(
@@ -119,6 +126,13 @@ class SourceClient:
             ).fetchone()
         if not article:
             raise ValueError("文章不存在")
+        with db() as conn:
+            enabled = conn.execute(
+                "SELECT article_collection_enabled FROM official_accounts WHERE id=%s",
+                (article["account_id"],),
+            ).fetchone()["article_collection_enabled"]
+        if not enabled:
+            raise SourceBlocked("仅采集公众号目录，未启用文章采集")
         if not eligible(article["publish_time"]):
             raise SourceBlocked("仅采集 2026-06-01 起的正文；此文章日期过早或尚未确认")
         with db() as conn:

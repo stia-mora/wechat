@@ -37,7 +37,7 @@ def schedule():
 
     with db() as conn:
         for row in conn.execute(
-            "SELECT id FROM official_accounts WHERE status IN ('approved','pending')"
+            "SELECT id FROM official_accounts WHERE status IN ('approved','pending') AND article_collection_enabled"
         ).fetchall():
             try:
                 subscribe(conn, row["id"])
@@ -45,7 +45,7 @@ def schedule():
                 continue
         rows = conn.execute("""SELECT s.account_id AS id,s.history_complete FROM source_subscriptions s
             JOIN official_accounts a ON a.id=s.account_id WHERE s.enabled
-            AND a.status IN ('approved','pending') AND s.next_sync_at<=now()
+            AND a.status IN ('approved','pending') AND a.article_collection_enabled AND s.next_sync_at<=now()
             ORDER BY CASE a.status WHEN 'approved' THEN 0 ELSE 1 END,s.last_sync_at NULLS FIRST,s.account_id""").fetchall()
         for row in rows:
             enqueue(

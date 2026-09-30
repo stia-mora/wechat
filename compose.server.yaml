@@ -29,8 +29,27 @@ services:
 
   worker:
     restart: unless-stopped
+    profiles: [articles]
     environment:
       SOURCE_API_URL: http://source:5500
+
+  directory-discovery:
+    build: ./backend
+    profiles: [directory]
+    restart: on-failure
+    command: python -u -m app.bulk_discover --target 10000 --wait-login
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://wechat:${POSTGRES_PASSWORD:-wechat_local}@db:5432/wechat_source
+      SOURCE_API_URL: http://source:5500
+      CRAWL_INTERVAL_SECONDS: 20
+    volumes:
+      - ./data/private:/data/private
+    depends_on:
+      source:
+        condition: service_healthy
+      db:
+        condition: service_healthy
 
   ai-worker:
     restart: unless-stopped

@@ -34,6 +34,46 @@ def authenticate(authorization: str = Header(default="")):
 router = APIRouter(prefix="/api/bridge", dependencies=[Depends(authenticate)])
 
 
+@router.get("/accounts/search")
+async def search_accounts(query: str = Query(min_length=1, max_length=100),
+                          begin: int = Query(0, ge=0, le=10000)):
+    from utils.wechat_status import is_login_expired, LOGIN_EXPIRED_MSG
+
+    creds = auth_manager.get_credentials()
+    if not creds or not creds.get("token") or not creds.get("cookie"):
+        return {"success": False, "error": "未登录，请先扫码登录"}
+    async with httpx.AsyncClient(timeout=30, trust_env=False) as client:
+        response = await client.get(
+            "https://mp.weixin.qq.com/cgi-bin/searchbiz",
+            params={"action": "search_biz", "token": creds["token"], "lang": "zh_CN",
+                    "f": "json", "ajax": 1, "query": query, "begin": begin, "count": 5},
+            headers={"Cookie": creds["cookie"], "Referer": "https://mp.weixin.qq.com/",
+                     "User-Agent": "Mozilla/5.0"},
+        )
+        if response.status_code in (401, 403, 429):
+            raise HTTPException(response.status_code, "公众号搜索需要认证或限制了请求")
+        if response.is_error:
+            raise HTTPException(502, "微信搜索接口暂不可用")
+        try:
+            result = response.json()
+        except ValueError:
+            return {"success": False, "error": LOGIN_EXPIRED_MSG}
+    base = result.get("base_resp", {})
+    if base.get("ret") != 0:
+        message = (LOGIN_EXPIRED_MSG if is_login_expired(base.get("ret"), base.get("err_msg", ""))
+                   else f"搜索失败: ret={base.get('ret')}, msg={base.get('err_msg', '')}")
+        return {"success": False, "error": message}
+    items = result.get("list", [])
+    next_begin = begin + len(items)
+    total = result.get("total")
+    has_more = bool(items) and (next_begin < int(total) if total is not None else len(items) == 5)
+    blacklisted = set(rss_store.get_active_blacklist_fakeids())
+    return {"success": True, "data": {
+        "list": [item for item in items if item.get("fakeid") not in blacklisted],
+        "total": total, "next_begin": next_begin, "has_more": has_more,
+    }}
+
+
 @router.get("/articles")
 def cached_articles(
     fakeid: str, after: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=100)

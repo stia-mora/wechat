@@ -16,7 +16,7 @@ def collect(payload):
     job_id, target = payload["_job_id"], payload["target_id"]
     with db() as conn:
         if not conn.execute(
-            "SELECT 1 FROM official_accounts WHERE id=%s AND status IN ('approved','pending')", (target,)
+            "SELECT 1 FROM official_accounts WHERE id=%s AND status IN ('approved','pending') AND article_collection_enabled", (target,)
         ).fetchone():
             raise SourceError("account_status", "公众号已隐藏或不可采集", "target")
         subscription = pool.subscribe(conn, target)
