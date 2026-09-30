@@ -22,11 +22,18 @@ class DiscoveryTests(unittest.TestCase):
             return asyncio.run(service.search_accounts(query="科技", begin=begin))
 
     def test_filtered_accounts_do_not_move_the_upstream_cursor_back(self):
-        result = self.search({"base_resp": {"ret": 0}, "total": 9,
-                              "list": [{"fakeid": "one"}, {"fakeid": "blocked"}]}, begin=5)
-        self.assertEqual(result["data"]["next_begin"], 7)
+        result = self.search({"base_resp": {"ret": 0}, "total": 5,
+                              "list": [{"fakeid": "one"}, {"fakeid": "blocked"},
+                                       {"fakeid": "two"}, {"fakeid": "three"}, {"fakeid": "four"}]}, begin=5)
+        self.assertEqual(result["data"]["next_begin"], 10)
         self.assertTrue(result["data"]["has_more"])
-        self.assertEqual(result["data"]["list"], [{"fakeid": "one"}])
+        self.assertEqual([item["fakeid"] for item in result["data"]["list"]], ["one", "two", "three", "four"])
+
+    def test_partial_page_ends_pagination(self):
+        result = self.search({"base_resp": {"ret": 0}, "total": 2,
+                              "list": [{"fakeid": "one"}, {"fakeid": "two"}]}, begin=5)
+        self.assertEqual(result["data"]["next_begin"], 7)
+        self.assertFalse(result["data"]["has_more"])
 
     def test_empty_results_end_pagination(self):
         result = self.search({"base_resp": {"ret": 0}, "total": 9, "list": []}, begin=5)

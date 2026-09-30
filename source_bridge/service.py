@@ -66,7 +66,9 @@ async def search_accounts(query: str = Query(min_length=1, max_length=100),
     items = result.get("list", [])
     next_begin = begin + len(items)
     total = result.get("total")
-    has_more = bool(items) and (next_begin < int(total) if total is not None else len(items) == 5)
+    # WeChat's total is the current page size, including on nonzero offsets.
+    # A full page can still have more results; the collector also stops repeats.
+    has_more = len(items) == 5
     blacklisted = set(rss_store.get_active_blacklist_fakeids())
     return {"success": True, "data": {
         "list": [item for item in items if item.get("fakeid") not in blacklisted],
