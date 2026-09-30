@@ -12,6 +12,7 @@ import {
 } from '@phosphor-icons/react';
 import { api, date } from '@/lib/api';
 import type { Account, Article } from '@/lib/types';
+import { WechatEntry } from './wechat-entry';
 
 export function SearchBox({ initial = '', large = false }: { initial?: string; large?: boolean }) {
   const [q, setQ] = useState(initial),
@@ -115,16 +116,7 @@ export function AccountCard({
             ? '已收录公众号资料'
             : `${account.article_count} 篇收录 · 近 30 天 ${account.articles_last_30d} 篇`}
         </span>
-        {account.source_url && (
-          <a
-            href={account.source_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 font-medium text-[#245745]"
-          >
-            打开微信公众号 <ArrowUpRight size={15} />
-          </a>
-        )}
+        <WechatEntry account={account} />
         <Link
           href={'/accounts/' + account.id}
           className="flex items-center gap-1 font-medium text-[#245745]"

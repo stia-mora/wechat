@@ -1,7 +1,8 @@
 'use client';
 import { use, useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Check, Minus } from '@phosphor-icons/react';
+import { Check, Minus } from '@phosphor-icons/react';
+import { WechatEntry } from '@/components/wechat-entry';
 import { useApi, date } from '@/lib/api';
 import type { Account, Article, Page } from '@/lib/types';
 import {
@@ -88,20 +89,11 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
               人站内关注
             </span>
           </div>
-          {a.source_url && (
-            <a
-              href={a.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button secondary"
-            >
-              打开微信公众号 <ArrowUpRight size={16} />
-            </a>
-          )}
+          <WechatEntry account={a} className="button secondary" />
         </div>
         {a.source_url && (
           <p className="mt-4 text-xs leading-6 text-stone-500">
-            微信页面如提示环境限制，请复制链接到微信打开。
+            点击可查看微信入口；在微信内访问本站时可直接前往公众号。
           </p>
         )}
       </section>

@@ -188,6 +188,7 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
                       ]
                     : [
                         ['recommended', '综合推荐'],
+                        ['featured', '权威精选'],
                         ['added', '最新收录'],
                         ['latest', '最新更新'],
                         ['active', '更新活跃'],

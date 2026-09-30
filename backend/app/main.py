@@ -1,11 +1,13 @@
 import math
 import os
 from contextlib import asynccontextmanager
+from io import BytesIO
 from urllib.parse import urlparse
 
 import httpx
+import qrcode
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
 
 from .admin import router as admin_router
@@ -14,7 +16,7 @@ from .auth import current_user
 from .auth import router as auth_router
 from .db import db, initialize
 from .embeddings import embed_query
-from .repository import ACCOUNT_SELECT, rank_account
+from .repository import ACCOUNT_SELECT, rank_account, wechat_profile_url
 from .source_admin import router as source_admin_router
 
 
@@ -144,6 +146,8 @@ def accounts(
     limit: int = Query(20, ge=1, le=100),
 ):
     where, args = ["a.status='approved'"], []
+    if sort == "featured":
+        where.append("a.platform='wechat' AND a.source_id IN (SELECT jsonb_array_elements_text(value) FROM settings WHERE key='homepage_accounts')")
     q = q.strip()
     semantic = None
     if q:
@@ -245,6 +249,7 @@ def accounts(
                 "popular": "following_count+collection_count DESC",
                 "latest": "last_article_at DESC NULLS LAST",
                 "added": "created_at DESC",
+                "featured": "array_position(ARRAY(SELECT jsonb_array_elements_text(value) FROM settings WHERE key='homepage_accounts'),source_id)",
                 "relevance": "name_match DESC,score DESC",
             }.get(sort, "score DESC")
             query = (
@@ -273,6 +278,18 @@ def remember(conn, user, kind, target_id):
             "INSERT INTO browsing_history(user_id,kind,target_id) VALUES (%s,%s,%s) ON CONFLICT(user_id,kind,target_id) DO UPDATE SET visited_at=now()",
             (user["id"], kind, target_id),
         )
+
+
+@app.get("/api/accounts/{account_id}/wechat-qr")
+def account_wechat_qr(account_id: int):
+    with db() as conn:
+        row = conn.execute("SELECT source_id FROM official_accounts WHERE id=%s AND status='approved' AND platform='wechat'", (account_id,)).fetchone()
+    url = wechat_profile_url(row["source_id"]) if row else ''
+    if not url:
+        raise HTTPException(404, "公众号微信入口不可用")
+    output = BytesIO()
+    qrcode.make(url).save(output, format="PNG")
+    return Response(output.getvalue(), media_type="image/png", headers={"Cache-Control": "public, max-age=300"})
 
 
 @app.get("/api/accounts/{account_id}")

@@ -8,6 +8,7 @@ from app import bulk_discover, crawler, worker, weread_crawler
 from app.discovery_queries import queries
 from app.sources.weread import SourceError
 from app.repository import wechat_profile_url
+from psycopg.types.json import Jsonb
 
 
 def test_directory_search_deduplicates_and_does_not_enable_articles(client, monkeypatch):
@@ -80,6 +81,38 @@ def test_wechat_profile_links_use_only_real_numeric_identities():
     )
     for source_id in ("", "test-account", "YWJj", "javascript:alert(1)"):
         assert wechat_profile_url(source_id) == ""
+
+
+def test_featured_accounts_use_curated_identities_and_preserve_hidden_status(client):
+    api, conn = client
+    first = fixture_account(conn)
+    second = fixture_account(conn)
+    hidden = fixture_account(conn, status="hidden")
+    fixture_account(conn)
+    rows = conn.execute("SELECT id,source_id FROM official_accounts WHERE id IN (%s,%s,%s)", (first,second,hidden)).fetchall()
+    identities = {row['id']: row['source_id'] for row in rows}
+    other_platform = fixture_account(conn)
+    conn.execute("UPDATE official_accounts SET platform='other',source_id=%s WHERE id=%s", (identities[second],other_platform))
+    conn.execute("INSERT INTO settings(key,value) VALUES ('homepage_accounts',%s) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value", (Jsonb([identities[second],identities[hidden],identities[first]]),))
+    page = api.get('/api/accounts?sort=featured&limit=1').json()
+    assert page['total'] == 2 and [row['id'] for row in page['items']] == [second]
+    assert api.get('/api/accounts?sort=featured&page=2&limit=1').json()['items'][0]['id'] == first
+    assert api.get('/api/accounts').json()['total'] > page['total']
+
+
+def test_wechat_qr_is_available_only_for_public_wechat_identities(client):
+    api, conn = client
+    account = fixture_account(conn)
+    conn.execute("UPDATE official_accounts SET source_id='MzA3MzI4MjgzMw==',article_collection_enabled=false WHERE id=%s", (account,))
+    response = api.get(f'/api/accounts/{account}/wechat-qr')
+    assert response.status_code == 200
+    assert response.headers['content-type'] == 'image/png'
+    assert response.content.startswith(b'\x89PNG\r\n\x1a\n')
+    conn.execute("UPDATE official_accounts SET status='hidden' WHERE id=%s", (account,))
+    assert api.get(f'/api/accounts/{account}/wechat-qr').status_code == 404
+    conn.execute("UPDATE official_accounts SET status='approved',source_id='not-a-wechat-biz' WHERE id=%s", (account,))
+    assert api.get(f'/api/accounts/{account}/wechat-qr').status_code == 404
+    assert api.get('/api/accounts/987654321/wechat-qr').status_code == 404
 
 
 def test_directory_only_account_blocks_manual_body_requests(client, monkeypatch):

@@ -22,7 +22,7 @@ import {
 } from '@/components/ui';
 
 export default function Home() {
-  const accounts = useApi<Page<Account>>('/accounts?limit=12&sort=added'),
+  const accounts = useApi<Page<Account>>('/accounts?limit=12&sort=featured'),
     articles = useApi<Page<Article>>('/articles?limit=5');
   const { data: categories } = useApi<Category[]>('/categories');
   const { data: stats } = useApi<{ accounts: number; articles: number; last_crawled_at: string }>(
@@ -101,9 +101,9 @@ export default function Home() {
       </section>
       <section className="py-5">
         <SectionTitle
-          title="新收录的公众号"
-          sub={`已公开 ${stats?.accounts ?? '—'} 个公众号，点击可前往微信查看内容。`}
-          href="/discover?sort=added"
+          title="权威公众号精选"
+          sub="中央媒体与公共机构，优先关注可靠的信息源。"
+          href="/discover?sort=featured"
         />
         {accounts.loading ? (
           <Loading />
@@ -116,13 +116,13 @@ export default function Home() {
             ))}
           </div>
         ) : (
-          <Empty title="信息源目录正在建立" description="完成采集与审核后，公众号会出现在这里。" />
+          <Empty title="精选公众号暂未配置" description="你可以在发现页面浏览已收录的公众号。" />
         )}
       </section>
       <section className="mt-14 grid gap-12 lg:grid-cols-[1fr_300px]">
         <div>
           <SectionTitle
-            title="最新收录"
+            title="最新文章"
             sub="来自不同领域的新内容，保留原文出处。"
             href="/search?tab=articles"
           />
