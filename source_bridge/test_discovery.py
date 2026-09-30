@@ -22,12 +22,12 @@ class DiscoveryTests(unittest.TestCase):
             return asyncio.run(service.search_accounts(query="科技", begin=begin))
 
     def test_filtered_accounts_do_not_move_the_upstream_cursor_back(self):
-        result = self.search({"base_resp": {"ret": 0}, "total": 5,
+        result = self.search({"base_resp": {"ret": 0}, "total": 10,
                               "list": [{"fakeid": "one"}, {"fakeid": "blocked"},
-                                       {"fakeid": "two"}, {"fakeid": "three"}, {"fakeid": "four"}]}, begin=5)
-        self.assertEqual(result["data"]["next_begin"], 10)
+                                       *[{"fakeid": str(i)} for i in range(8)]]}, begin=5)
+        self.assertEqual(result["data"]["next_begin"], 15)
         self.assertTrue(result["data"]["has_more"])
-        self.assertEqual([item["fakeid"] for item in result["data"]["list"]], ["one", "two", "three", "four"])
+        self.assertEqual([item["fakeid"] for item in result["data"]["list"]], ["one", *[str(i) for i in range(8)]])
 
     def test_partial_page_ends_pagination(self):
         result = self.search({"base_resp": {"ret": 0}, "total": 2,

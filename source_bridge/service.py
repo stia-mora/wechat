@@ -32,6 +32,7 @@ def authenticate(authorization: str = Header(default="")):
 
 
 router = APIRouter(prefix="/api/bridge", dependencies=[Depends(authenticate)])
+SEARCH_PAGE_SIZE = 10
 
 
 @router.get("/accounts/search")
@@ -46,7 +47,7 @@ async def search_accounts(query: str = Query(min_length=1, max_length=100),
         response = await client.get(
             "https://mp.weixin.qq.com/cgi-bin/searchbiz",
             params={"action": "search_biz", "token": creds["token"], "lang": "zh_CN",
-                    "f": "json", "ajax": 1, "query": query, "begin": begin, "count": 5},
+                    "f": "json", "ajax": 1, "query": query, "begin": begin, "count": SEARCH_PAGE_SIZE},
             headers={"Cookie": creds["cookie"], "Referer": "https://mp.weixin.qq.com/",
                      "User-Agent": "Mozilla/5.0"},
         )
@@ -68,7 +69,7 @@ async def search_accounts(query: str = Query(min_length=1, max_length=100),
     total = result.get("total")
     # WeChat's total is the current page size, including on nonzero offsets.
     # A full page can still have more results; the collector also stops repeats.
-    has_more = len(items) == 5
+    has_more = len(items) == SEARCH_PAGE_SIZE
     blacklisted = set(rss_store.get_active_blacklist_fakeids())
     return {"success": True, "data": {
         "list": [item for item in items if item.get("fakeid") not in blacklisted],
