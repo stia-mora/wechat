@@ -27,6 +27,7 @@ export interface Account {
   tags: string[];
   account_type: string;
   status: string;
+  article_collection_enabled: boolean;
   article_count: number;
   articles_last_7d: number;
   articles_last_30d: number;

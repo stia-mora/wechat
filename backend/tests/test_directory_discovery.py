@@ -7,6 +7,7 @@ from test_core import client as client, fixture_account
 from app import bulk_discover, crawler, worker, weread_crawler
 from app.discovery_queries import queries
 from app.sources.weread import SourceError
+from app.repository import wechat_profile_url
 
 
 def test_directory_search_deduplicates_and_does_not_enable_articles(client, monkeypatch):
@@ -28,7 +29,7 @@ def test_directory_search_deduplicates_and_does_not_enable_articles(client, monk
     assert first["next_begin"] == 10 and first["has_more"]
     assert first["accounts"] == second["accounts"]
     row = conn.execute("SELECT * FROM official_accounts WHERE source_id=%s", (new_source,)).fetchone()
-    assert row["status"] == "pending" and not row["article_collection_enabled"]
+    assert row["status"] == "approved" and not row["article_collection_enabled"]
     assert conn.execute("SELECT article_collection_enabled FROM official_accounts WHERE id=%s", (existing,)).fetchone()["article_collection_enabled"]
     assert not conn.execute("SELECT 1 FROM source_subscriptions WHERE account_id=%s", (row["id"],)).fetchone()
     assert conn.execute("SELECT count(*) n FROM articles").fetchone()["n"] == before
@@ -36,6 +37,49 @@ def test_directory_search_deduplicates_and_does_not_enable_articles(client, monk
     assert not conn.execute("SELECT 1 FROM jobs WHERE kind='sync' AND (payload->>'target_id')::bigint=%s", (row["id"],)).fetchone()
     with pytest.raises(SourceError, match="不可采集"):
         weread_crawler.collect({"_job_id": 0, "target_id": row["id"]})
+
+
+def test_directory_discovery_preserves_existing_visibility_and_collection(client, monkeypatch):
+    _, conn = client
+    hidden = fixture_account(conn, status="hidden")
+    pending = fixture_account(conn, status="pending")
+    conn.execute("UPDATE official_accounts SET article_collection_enabled=false WHERE id=%s", (hidden,))
+    rows = conn.execute("SELECT source_id FROM official_accounts WHERE id IN (%s,%s)", (hidden, pending)).fetchall()
+    source = crawler.SourceClient()
+    monkeypatch.setattr(source, "bridge", lambda *args, **kwargs: {
+        "list": [{"fakeid": row["source_id"], "nickname": "现有账号"} for row in rows]
+    })
+    source.discover({"query": "现有账号", "directory_only": True})
+    assert conn.execute("SELECT status,article_collection_enabled FROM official_accounts WHERE id=%s", (hidden,)).fetchone() == {
+        "status": "hidden", "article_collection_enabled": False
+    }
+    assert conn.execute("SELECT status,article_collection_enabled FROM official_accounts WHERE id=%s", (pending,)).fetchone() == {
+        "status": "pending", "article_collection_enabled": True
+    }
+
+
+def test_public_directory_is_browsable_and_has_wechat_links_without_articles(client):
+    api, conn = client
+    account = fixture_account(conn)
+    hidden = fixture_account(conn, status="hidden")
+    source_id = "MzA3MzI4MjgzMw=="
+    conn.execute("UPDATE official_accounts SET source_id=%s,article_collection_enabled=false,created_at=now()+interval '1 day' WHERE id=%s", (source_id, account))
+    conn.execute("UPDATE official_accounts SET created_at=now()+interval '2 days' WHERE id=%s", (hidden,))
+    page = api.get("/api/accounts?sort=added&limit=1").json()
+    assert page["items"][0]["id"] == account
+    assert page["items"][0]["source_url"] == wechat_profile_url(source_id)
+    detail = api.get(f"/api/accounts/{account}").json()
+    assert detail["source_url"] == wechat_profile_url(source_id)
+    assert detail["article_count"] == 0 and not detail["article_collection_enabled"]
+    assert api.get(f"/api/accounts/{hidden}").status_code == 404
+
+
+def test_wechat_profile_links_use_only_real_numeric_identities():
+    assert wechat_profile_url("MzA3MzI4MjgzMw==") == (
+        "https://mp.weixin.qq.com/mp/profile_ext?action=home&__biz=MzA3MzI4MjgzMw%3D%3D#wechat_redirect"
+    )
+    for source_id in ("", "test-account", "YWJj", "javascript:alert(1)"):
+        assert wechat_profile_url(source_id) == ""
 
 
 def test_directory_only_account_blocks_manual_body_requests(client, monkeypatch):

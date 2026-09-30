@@ -75,8 +75,8 @@ class SourceClient:
                 if not item.get("fakeid") or not item.get("nickname"):
                     continue
                 row = conn.execute(
-                    """INSERT INTO official_accounts(source_id,name,wechat_id,avatar_url,description,original_description,primary_category_id,source_url,article_collection_enabled,last_crawled_at)
-                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,now()) ON CONFLICT(platform,source_id) DO UPDATE SET
+                    """INSERT INTO official_accounts(source_id,name,wechat_id,avatar_url,description,original_description,primary_category_id,source_url,article_collection_enabled,status,last_crawled_at)
+                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now()) ON CONFLICT(platform,source_id) DO UPDATE SET
                   name=EXCLUDED.name,wechat_id=EXCLUDED.wechat_id,avatar_url=EXCLUDED.avatar_url,
                   description=CASE WHEN official_accounts.description='' THEN EXCLUDED.description ELSE official_accounts.description END,
                   original_description=CASE WHEN EXCLUDED.original_description<>'' THEN EXCLUDED.original_description ELSE official_accounts.original_description END,
@@ -92,6 +92,7 @@ class SourceClient:
                         category,
                         "",
                         not payload.get("directory_only", False),
+                        "approved" if payload.get("directory_only") else "pending",
                     ),
                 ).fetchone()
                 index_account(conn, row["id"])

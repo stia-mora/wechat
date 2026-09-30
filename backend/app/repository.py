@@ -1,4 +1,7 @@
+import base64
+import binascii
 import json
+from urllib.parse import urlencode
 
 from psycopg.types.json import Jsonb
 
@@ -62,7 +65,21 @@ ACCOUNT_SELECT = """SELECT a.*, c.name AS category, s.article_count,s.articles_l
  JOIN account_stats s ON s.account_id=a.id LEFT JOIN ai_account_profiles p ON p.account_id=a.id"""
 
 
+def wechat_profile_url(source_id):
+    try:
+        identity = base64.b64decode(source_id, validate=True).decode('ascii')
+    except (binascii.Error, UnicodeError, ValueError):
+        return ''
+    if not identity.isascii() or not identity.isdigit():
+        return ''
+    return 'https://mp.weixin.qq.com/mp/profile_ext?' + urlencode(
+        {'action': 'home', '__biz': source_id}
+    ) + '#wechat_redirect'
+
+
 def rank_account(row, weights):
+    if row.get('platform') == 'wechat' and not row.get('source_url'):
+        row['source_url'] = wechat_profile_url(row['source_id'])
     profile = row.get('profile') or {}
     from .scoring import VERSION
     overall = profile.get('overall_score') if profile.get('scoring_version') == VERSION else None
@@ -83,6 +100,7 @@ def rank_account(row, weights):
     row["rank_factors"] = factors
     row["quality_score"] = round(quality, 1) if overall is not None else None
     row["recommendation_reason"] = (row.get("profile") or {}).get("recommendation_reason") or (
-        "已收录于" + (row.get("category") or "待分类") + "目录，可先浏览账号和近期文章。"
+        "已收录公众号资料，可前往微信查看内容。" if not row.get('article_collection_enabled', True)
+        else "已收录于" + (row.get("category") or "待分类") + "目录，可先浏览账号和近期文章。"
     )
     return row

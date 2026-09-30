@@ -22,7 +22,7 @@ import {
 } from '@/components/ui';
 
 export default function Home() {
-  const accounts = useApi<Page<Account>>('/accounts?limit=6'),
+  const accounts = useApi<Page<Account>>('/accounts?limit=12&sort=added'),
     articles = useApi<Page<Article>>('/articles?limit=5');
   const { data: categories } = useApi<Category[]>('/categories');
   const { data: stats } = useApi<{ accounts: number; articles: number; last_crawled_at: string }>(
@@ -101,9 +101,9 @@ export default function Home() {
       </section>
       <section className="py-5">
         <SectionTitle
-          title="值得发现的信息源"
-          sub="从长期内容中，寻找值得持续关注的声音。"
-          href="/discover"
+          title="新收录的公众号"
+          sub={`已公开 ${stats?.accounts ?? '—'} 个公众号，点击可前往微信查看内容。`}
+          href="/discover?sort=added"
         />
         {accounts.loading ? (
           <Loading />

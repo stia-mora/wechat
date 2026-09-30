@@ -244,6 +244,7 @@ def accounts(
                 "growth": "growth DESC",
                 "popular": "following_count+collection_count DESC",
                 "latest": "last_article_at DESC NULLS LAST",
+                "added": "created_at DESC",
                 "relevance": "name_match DESC,score DESC",
             }.get(sort, "score DESC")
             query = (

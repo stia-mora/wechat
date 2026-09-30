@@ -92,13 +92,18 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             <a
               href={a.source_url}
               target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1 text-xs text-[#245745]"
+              rel="noopener noreferrer"
+              className="button secondary"
             >
-              查看原公众号 <ArrowUpRight size={14} />
+              打开微信公众号 <ArrowUpRight size={16} />
             </a>
           )}
         </div>
+        {a.source_url && (
+          <p className="mt-4 text-xs leading-6 text-stone-500">
+            微信页面如提示环境限制，请复制链接到微信打开。
+          </p>
+        )}
       </section>
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[1fr_330px]">
         <div>
@@ -153,8 +158,9 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
               </>
             ) : (
               <div className="rounded-lg bg-[#f5f6f0] p-5 text-sm leading-7 text-stone-500">
-                画像尚未生成。需要先采集文章正文，再运行内容分析。建议使用最近 20—50
-                篇文章，以形成更可靠的账号理解。
+                {a.article_collection_enabled === false
+                  ? '当前仅收录公众号资料，暂不采集文章。可点击「打开微信公众号」查看微信上的内容。'
+                  : '画像尚未生成。需要先采集文章正文，再运行内容分析。建议使用最近 20—50 篇文章，以形成更可靠的账号理解。'}
               </div>
             )}
           </section>
@@ -200,7 +206,9 @@ export default function AccountPage({ params }: { params: Promise<{ id: string }
             ) : (
               <Empty
                 title="暂未收录匹配的文章"
-                description="账号已收录，文章可以在管理后台发起同步。"
+                description={a.article_collection_enabled === false
+                  ? '当前仅收录公众号资料，可点击「打开微信公众号」查看内容。'
+                  : '账号已收录，可前往微信公众号查看内容。'}
               />
             )}
             <Pagination

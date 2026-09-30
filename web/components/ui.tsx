@@ -109,10 +109,22 @@ export function AccountCard({
           {account.recommendation_reason}
         </div>
       )}
-      <div className="mt-5 flex items-center justify-between border-t border-stone-100 pt-4 text-xs text-stone-500">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4 text-xs text-stone-500">
         <span>
-          {account.article_count} 篇收录 · 近 30 天 {account.articles_last_30d} 篇
+          {account.article_collection_enabled === false
+            ? '已收录公众号资料'
+            : `${account.article_count} 篇收录 · 近 30 天 ${account.articles_last_30d} 篇`}
         </span>
+        {account.source_url && (
+          <a
+            href={account.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 font-medium text-[#245745]"
+          >
+            打开微信公众号 <ArrowUpRight size={15} />
+          </a>
+        )}
         <Link
           href={'/accounts/' + account.id}
           className="flex items-center gap-1 font-medium text-[#245745]"
