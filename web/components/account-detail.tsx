@@ -39,8 +39,10 @@ export default function AccountPage({ initialAccount, initialArticles }: {
       <div className="flex gap-2 py-7 text-xs text-stone-500">
         <Link href="/discover">发现</Link>
         <span>/</span>
-        <Link href={a.primary_category_id ? '/categories/' + a.primary_category_id : '/discover'}>{a.category || '待分类'}</Link>
-        <span>/</span>
+        {a.category && <>
+          <Link href={'/categories/' + a.primary_category_id}>{a.category}</Link>
+          <span>/</span>
+        </>}
         <span>{a.name}</span>
       </div>
       <section className="rounded-xl border border-stone-200 bg-white p-6 md:p-9">
@@ -50,7 +52,7 @@ export default function AccountPage({ initialAccount, initialArticles }: {
             <div>
               <h1 className="text-2xl font-semibold md:text-3xl">{a.name}</h1>
               <p className="mt-3 text-sm text-stone-500">
-                {a.wechat_id || '微信公众号'} · {a.category || '待分类'}
+                {a.wechat_id || '微信公众号'}{a.category ? ' · ' + a.category : ''}
                 {a.account_type ? ' / ' + a.account_type : ''}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">

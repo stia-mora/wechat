@@ -163,7 +163,7 @@ def accounts(
 ):
     where, args = ["a.status='approved'"], []
     if sort == "featured":
-        where.append("a.platform='wechat' AND a.source_id IN (SELECT jsonb_array_elements_text(value) FROM settings WHERE key='homepage_accounts')")
+        where.append("a.platform='wechat' AND c.status='active' AND a.source_id IN (SELECT jsonb_array_elements_text(value) FROM settings WHERE key='homepage_accounts')")
     q = q.strip()
     semantic = None
     if q:

@@ -4,7 +4,7 @@ import secrets
 import pytest
 
 from test_core import client as client, fixture_account
-from app import bulk_discover, crawler, worker, weread_crawler
+from app import bulk_discover, crawler, repair_featured_categories, worker, weread_crawler
 from app.discovery_queries import queries
 from app.sources.weread import SourceError
 from app.repository import wechat_profile_url
@@ -88,16 +88,35 @@ def test_featured_accounts_use_curated_identities_and_preserve_hidden_status(cli
     first = fixture_account(conn)
     second = fixture_account(conn)
     hidden = fixture_account(conn, status="hidden")
-    fixture_account(conn)
-    rows = conn.execute("SELECT id,source_id FROM official_accounts WHERE id IN (%s,%s,%s)", (first,second,hidden)).fetchall()
+    uncategorized = fixture_account(conn)
+    conn.execute("UPDATE official_accounts SET primary_category_id=(SELECT id FROM categories WHERE slug='科技') WHERE id=ANY(%s)", ([first,second,hidden],))
+    rows = conn.execute("SELECT id,source_id FROM official_accounts WHERE id=ANY(%s)", ([first,second,hidden,uncategorized],)).fetchall()
     identities = {row['id']: row['source_id'] for row in rows}
     other_platform = fixture_account(conn)
     conn.execute("UPDATE official_accounts SET platform='other',source_id=%s WHERE id=%s", (identities[second],other_platform))
-    conn.execute("INSERT INTO settings(key,value) VALUES ('homepage_accounts',%s) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value", (Jsonb([identities[second],identities[hidden],identities[first]]),))
+    conn.execute("INSERT INTO settings(key,value) VALUES ('homepage_accounts',%s) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value", (Jsonb([identities[second],identities[hidden],identities[uncategorized],identities[first]]),))
     page = api.get('/api/accounts?sort=featured&limit=1').json()
     assert page['total'] == 2 and [row['id'] for row in page['items']] == [second]
     assert api.get('/api/accounts?sort=featured&page=2&limit=1').json()['items'][0]['id'] == first
     assert api.get('/api/accounts').json()['total'] > page['total']
+
+
+def test_featured_category_repair_preserves_existing_categories_and_is_idempotent(client, monkeypatch):
+    _, conn = client
+    missing, categorized, unlisted = [fixture_account(conn) for _ in range(3)]
+    existing = conn.execute("SELECT id FROM categories WHERE slug='科技'").fetchone()['id']
+    conn.execute("UPDATE official_accounts SET primary_category_id=%s WHERE id=%s", (existing,categorized))
+    rows = conn.execute("SELECT id,source_id FROM official_accounts WHERE id=ANY(%s)", ([missing,categorized,unlisted],)).fetchall()
+    identities = {row['id']: row['source_id'] for row in rows}
+    monkeypatch.setattr(repair_featured_categories, 'FEATURED_CATEGORIES', {source_id: '媒体与时政' for source_id in identities.values()})
+    conn.execute("INSERT INTO settings(key,value) VALUES ('homepage_accounts',%s) ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value", (Jsonb([identities[missing],identities[categorized]]),))
+    changed = repair_featured_categories.repair_featured_categories(conn)
+    assert [row['id'] for row in changed] == [missing]
+    assert changed[0]['category'] == '媒体与时政'
+    assert '媒体与时政' in conn.execute("SELECT body FROM search_documents WHERE kind='account' AND target_id=%s", (missing,)).fetchone()['body']
+    assert conn.execute("SELECT primary_category_id FROM official_accounts WHERE id=%s", (categorized,)).fetchone()['primary_category_id'] == existing
+    assert conn.execute("SELECT primary_category_id FROM official_accounts WHERE id=%s", (unlisted,)).fetchone()['primary_category_id'] is None
+    assert repair_featured_categories.repair_featured_categories(conn) == []
 
 
 def test_wechat_qr_is_available_only_for_public_wechat_identities(client):
