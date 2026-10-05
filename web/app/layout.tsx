@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import { Shell } from '@/components/shell';
 import './globals.css';
 
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="zh-CN">
       <body>
         <Shell>{children}</Shell>
+        <Script src="/traffic/collect.js" strategy="afterInteractive" />
       </body>
     </html>
   );
