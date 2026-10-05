@@ -48,12 +48,13 @@ export async function explorerMetadata(
   const { categories } = await load(mode, query.toString());
   const category = categories.find((item) => String(item.id) === query.get('category'));
   const q = query.get('q');
+  const content = mode === 'search' && query.get('tab') === 'articles' ? '文章' : '公众号';
   const name = category
     ? `${category.name}类公众号`
     : mode === 'search'
       ? q
-        ? `搜索「${q}」· 公众号与文章`
-        : '搜索公众号与文章'
+        ? `搜索「${q}」· ${content}`
+        : `${content}搜索 · 中文内容目录`
       : mode === 'rankings'
         ? '公众号排行 · 信息源排行榜'
         : '发现公众号 · 中文信息源目录';
@@ -63,7 +64,7 @@ export async function explorerMetadata(
   if (query.get('sort') === 'recommended') query.delete('sort');
   return pageMetadata(
     name,
-    `浏览${category?.name || '中文'}信息源${q ? `中与「${q}」相关的` : '的'}真实简介、分类、历史文章和原文链接。${mode === 'rankings' ? '排行基于本站收录数据与关注行为。' : '所有条目均可打开独立详情页核对出处。'}`,
+    `${name}：浏览${category?.name || '中文'}信息源${q ? `中与「${q}」相关的` : '的'}真实简介、分类、历史文章和原文链接。${mode === 'rankings' ? '排行基于本站收录数据与关注行为。' : '所有条目均可打开独立详情页核对出处。'}`,
     path + (query.size ? `?${query}` : ''),
   );
 }
