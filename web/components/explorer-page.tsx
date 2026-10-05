@@ -59,14 +59,13 @@ export async function explorerMetadata(
         ? '公众号排行 · 信息源排行榜'
         : '发现公众号 · 中文信息源目录';
   const path = categoryId ? `/categories/${categoryId}` : `/${mode}`;
-  if (categoryId) query.delete('category');
-  if (query.get('page') === '1') query.delete('page');
-  if (query.get('sort') === 'recommended') query.delete('sort');
-  return pageMetadata(
+  const metadata = pageMetadata(
     name,
     `${name}：浏览${category?.name || '中文'}信息源${q ? `中与「${q}」相关的` : '的'}真实简介、分类、历史文章和原文链接。${mode === 'rankings' ? '排行基于本站收录数据与关注行为。' : '所有条目均可打开独立详情页核对出处。'}`,
-    path + (query.size ? `?${query}` : ''),
+    path,
   );
+  if (Object.keys(params).length) metadata.robots = { index: false, follow: true };
+  return metadata;
 }
 
 export async function ExplorerPage({

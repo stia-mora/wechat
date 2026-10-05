@@ -85,9 +85,9 @@ export function AccountCard({
             >
               {account.name}
             </Link>
-            <span className="whitespace-nowrap text-xs text-stone-500">
-              {account.category || '待分类'}
-            </span>
+            {account.category && <span className="whitespace-nowrap text-xs text-stone-500">
+              {account.category}
+            </span>}
           </div>
           <p className="mt-1 text-xs text-stone-500">
             {account.wechat_id || '微信公众账号'}

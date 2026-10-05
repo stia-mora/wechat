@@ -41,10 +41,14 @@ export function Explorer({ mode = 'discover', queryString, categoryId, categoryN
     if (value) next.set(key, value);
     else next.delete(key);
     if (key !== 'page') next.delete('page');
+    if (next.get('page') === '1') next.delete('page');
+    if (next.get('sort') === 'recommended') next.delete('sort');
+    if (categoryId) next.delete('category');
+    if (next.get('tab') === 'accounts') next.delete('tab');
+    const suffix = next.size ? '?' + next.toString() : '';
     if (categoryId && key === 'category') {
-      next.delete('category');
-      router.push((value ? '/categories/' + value : '/discover') + '?' + next.toString(), { scroll: false });
-    } else router.push('?' + next.toString(), { scroll: false });
+      router.push((value ? '/categories/' + value : '/discover') + suffix, { scroll: false });
+    } else router.push((categoryId ? '/categories/' + categoryId : '/' + mode) + suffix, { scroll: false });
   };
   const query = new URLSearchParams({ q, sort, page: String(page), limit: '12' });
   if (category) query.set('category', category);

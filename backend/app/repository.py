@@ -101,6 +101,7 @@ def rank_account(row, weights):
     row["quality_score"] = round(quality, 1) if overall is not None else None
     row["recommendation_reason"] = (row.get("profile") or {}).get("recommendation_reason") or (
         "已收录公众号资料，可前往微信查看内容。" if not row.get('article_collection_enabled', True)
-        else "已收录于" + (row.get("category") or "待分类") + "目录，可先浏览账号和近期文章。"
+        else "已收录于" + row["category"] + "目录，可先浏览账号和近期文章。" if row.get("category")
+        else "已收录公众号资料，可先浏览账号和近期文章。"
     )
     return row
