@@ -61,8 +61,31 @@ services:
 
   web:
     restart: unless-stopped
+
+  traffic:
+    image: wechat-traffic
+    build: ./traffic
+    restart: unless-stopped
+    env_file: .env.traffic
+    environment:
+      TRAFFIC_ORIGIN: https://wechat.aim888888.xyz
+      TZ: Asia/Shanghai
+    volumes:
+      - ./data/private/traffic/logs:/logs
+      - ./data/private/traffic/state:/data
+    mem_limit: 256m
+    cpus: 0.35
+
+  gateway:
+    image: wechat-traffic-gateway
+    build: ./traffic/gateway
+    restart: unless-stopped
     ports:
-      - "80:3000"
+      - "80:8080"
+    volumes:
+      - ./data/private/traffic/logs:/logs
+    mem_limit: 48m
+    cpus: 0.25
 
   db:
     restart: unless-stopped

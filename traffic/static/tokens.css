@@ -1,0 +1,20 @@
+:root {
+  --color-paper: #f7f9fc;
+  --color-surface: #ffffff;
+  --color-ink: #202a3b;
+  --color-muted: #526077;
+  --color-rule: #dce2ec;
+  --color-accent: #235ad1;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: #e8efff;
+  --color-error: #b42318;
+  --color-focus: #080f20;
+  --font-body: 'Segoe UI', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+  --font-display: var(--font-body);
+  --font-mono: Consolas, monospace;
+  --radius-control: 6px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+}

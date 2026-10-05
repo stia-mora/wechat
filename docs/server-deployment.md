@@ -34,12 +34,16 @@ docker compose -f compose.yaml -f compose.server.yaml ps
 curl -fsS http://127.0.0.1:8500/api/health
 ```
 
-The server compose file exposes only the Next.js application on TCP port 80 at
-`http://SERVER/wechat`.
+The server compose file exposes the Nginx gateway on TCP port 80. It forwards
+`/traffic` to the independent traffic monitor and other paths to Next.js at
+`http://SERVER/wechat`. The Web service also retains loopback port 3500.
 PostgreSQL and the API remain bound to loopback, and the source bridge remains
 on the internal Docker network. The ECS security group must permit inbound TCP
 80 before the site can be reached from the Internet. Add this rule under the
 security group's **inbound** direction, not its outbound direction.
+
+For traffic monitor credentials, private log permissions, local builds and the
+gateway cutover/rollback procedure, see [traffic/README.md](../traffic/README.md).
 
 For an update, first build and transfer the changed images as described below,
 then pull the target commit and replace only those services (API/Web example):

@@ -1,5 +1,6 @@
 ref/
 .env
+.env.traffic
 .venv/
 __pycache__/
 .pytest_cache/

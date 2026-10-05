@@ -8,6 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: '*',
       allow: '/',
       disallow: [
+        '/traffic',
         '/wechat/admin',
         '/wechat/api/admin',
         '/wechat/login',
