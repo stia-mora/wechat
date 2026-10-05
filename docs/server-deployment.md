@@ -1,5 +1,12 @@
 # ECS deployment
 
+The production ECS has 2 vCPU, 2 GiB RAM and no swap. Never run image builds
+there: previous builds have repeatedly coincided with loss of SSH and public
+reachability. Build and test images locally, transfer them, then use
+`--no-build --no-deps` to replace only the changed application services.
+Before replacement, check container status, available memory/disk and
+`systemctl is-active cloudflared`. Preserve backups and runtime data.
+
 The server deployment uses the committed application code plus a private migration
 archive. The archive contains PostgreSQL, environment settings, credential keys,
 private exports, and the bridge service's local state. Do not add any of these
@@ -22,7 +29,7 @@ tar -xzf /root/wechat-migration.tgz
 docker compose -f compose.yaml -f compose.server.yaml up -d db
 docker compose -f compose.yaml -f compose.server.yaml exec -T db \
   pg_restore -U wechat -d wechat_source --clean --if-exists < migration/postgres.dump
-docker compose -f compose.yaml -f compose.server.yaml up -d --build
+docker compose -f compose.yaml -f compose.server.yaml up -d --no-build
 docker compose -f compose.yaml -f compose.server.yaml ps
 curl -fsS http://127.0.0.1:8500/api/health
 ```
@@ -34,17 +41,18 @@ on the internal Docker network. The ECS security group must permit inbound TCP
 80 before the site can be reached from the Internet. Add this rule under the
 security group's **inbound** direction, not its outbound direction.
 
-For an update, pull the target commit and recreate the application containers:
+For an update, first build and transfer the changed images as described below,
+then pull the target commit and replace only those services (API/Web example):
 
 ```sh
 git pull --ff-only
-docker compose -f compose.yaml -f compose.server.yaml up -d --build
+docker compose -f compose.yaml -f compose.server.yaml up -d --no-build --no-deps api web
 ```
 
 ## Restricted server egress
 
-If the ECS cannot reach GitHub, Docker Hub, or package registries reliably, build
-the images on a machine with normal Internet access and transfer them over SSH.
+Build images on a machine with adequate memory and normal Internet access,
+even when the ECS can reach registries. Transfer the tested images over SSH.
 Use the server's Compose project name so the loaded tags match the service tags:
 
 ```powershell
@@ -74,7 +82,7 @@ and discover at least 10,000 real, unique WeChat accounts:
 
 ```sh
 docker compose -f compose.yaml -f compose.server.yaml --profile articles stop worker
-docker compose -f compose.yaml -f compose.server.yaml --profile directory up -d --build directory-discovery
+docker compose -f compose.yaml -f compose.server.yaml --profile directory up -d --no-build --no-deps directory-discovery
 ```
 
 The collector searches the authenticated WeChat API, pages results, and deduplicates
