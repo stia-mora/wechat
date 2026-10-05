@@ -4,6 +4,7 @@ import os
 import secrets
 import time
 from collections import defaultdict, deque
+from threading import Lock
 
 from fastapi import APIRouter, HTTPException, Request, Response
 from psycopg.errors import UniqueViolation
@@ -13,6 +14,8 @@ from .db import db
 
 router = APIRouter(prefix="/api/auth")
 attempts = defaultdict(deque)
+admin_failures = deque()
+admin_failure_lock = Lock()
 
 
 def hash_password(password, salt=None):
@@ -39,9 +42,23 @@ def current_user(request: Request, required=True):
 
 def require_admin(request: Request):
     expected = os.getenv("ADMIN_TOKEN", "")
-    provided = request.headers.get("authorization", "").removeprefix("Bearer ")
-    if not expected or len(expected) < 24 or not hmac.compare_digest(expected, provided):
-        raise HTTPException(403, "管理员密钥无效")
+    authorization = request.headers.get("authorization", "")
+    provided = authorization.removeprefix("Bearer ")
+    # A shared failure budget avoids trusting spoofable forwarding/IP headers.
+    # Reject requests before checking credentials once the budget is exhausted.
+    now = time.monotonic()
+    with admin_failure_lock:
+        while admin_failures and admin_failures[0] <= now - 60:
+            admin_failures.popleft()
+        headers = {"Cache-Control": "private, no-store"}
+        if len(admin_failures) >= 10:
+            headers["Retry-After"] = str(max(1, int(60 - (now - admin_failures[0])) + 1))
+            raise HTTPException(429, "尝试过于频繁，请稍后重试", headers=headers)
+        if (expected and len(expected) >= 24 and authorization.startswith("Bearer ")
+                and hmac.compare_digest(expected.encode(), provided.encode())):
+            return
+        admin_failures.append(now)
+    raise HTTPException(403, "管理员凭证无效", headers=headers)
 
 
 class Credentials(BaseModel):

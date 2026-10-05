@@ -1,10 +1,8 @@
-import { Suspense } from 'react';
-import { Explorer } from '@/components/explorer';
-import { Loading } from '@/components/ui';
-export default function Page() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Explorer />
-    </Suspense>
-  );
+import { ExplorerPage, explorerMetadata, type SearchParams } from '@/components/explorer-page';
+type Props = { searchParams: Promise<SearchParams> };
+export async function generateMetadata({ searchParams }: Props) {
+  return explorerMetadata('discover', await searchParams);
+}
+export default async function Page({ searchParams }: Props) {
+  return <ExplorerPage mode="discover" params={await searchParams} />;
 }

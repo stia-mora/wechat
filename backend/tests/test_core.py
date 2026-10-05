@@ -64,6 +64,7 @@ def client(monkeypatch):
                 monkeypatch.setattr(main, "embed_query", lambda query: None)
                 monkeypatch.setenv("ADMIN_TOKEN", "test-only-admin-token-long-enough")
                 auth.attempts.clear()
+                auth.admin_failures.clear()
                 yield TestClient(main.app), conn
                 raise Rollback()
         except Rollback:
@@ -77,6 +78,30 @@ def fixture_account(conn, status="approved"):
     ).fetchone()
     index_account(conn, row["id"])
     return row["id"]
+
+
+def test_public_sitemap_contains_only_approved_accounts_and_visible_articles(client):
+    http, conn = client
+    approved = fixture_account(conn)
+    hidden = fixture_account(conn, status="hidden")
+    ids = []
+    for account_id, status in ((approved, "ready"), (approved, "hidden"), (hidden, "ready")):
+        row = conn.execute(
+            """INSERT INTO articles(account_id,source_key,title,source_url,status)
+            VALUES (%s,%s,'索引验证文章','https://mp.weixin.qq.com/s/test',%s) RETURNING id""",
+            (account_id, secrets.token_hex(16), status),
+        ).fetchone()
+        ids.append(row["id"])
+    response = http.get("/api/public-sitemap")
+    assert response.status_code == 200
+    catalog = response.json()
+    assert approved in {row["id"] for row in catalog["accounts"]}
+    assert hidden not in {row["id"] for row in catalog["accounts"]}
+    article_ids = {row["id"] for row in catalog["articles"]}
+    assert ids[0] in article_ids
+    assert ids[1] not in article_ids
+    assert ids[2] not in article_ids
+    assert all(set(row) == {"id", "updated_at"} for rows in catalog.values() for row in rows)
 
 
 def test_article_identity_ignores_tracking():

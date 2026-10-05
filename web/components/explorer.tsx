@@ -1,11 +1,18 @@
 'use client';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { api, useApi } from '@/lib/api';
 import { useState } from 'react';
 import type { Account, Article, Category, Page } from '@/lib/types';
 import { AccountCard, ArticleRow, Empty, ErrorState, Loading, Pagination, SearchBox } from './ui';
 
-export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' | 'rankings' }) {
+export function Explorer({ mode = 'discover', queryString, categoryId, categoryName, initialResult, initialCategories }: {
+  mode?: 'discover' | 'search' | 'rankings';
+  queryString: string;
+  categoryId?: string;
+  categoryName?: string;
+  initialResult: Page<Account> | Page<Article>;
+  initialCategories: Category[];
+}) {
   const [discoveryMessage, setDiscoveryMessage] = useState('');
   const [requesting, setRequesting] = useState(false);
   async function discover(query: string) {
@@ -22,10 +29,10 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
       setRequesting(false);
     }
   }
-  const params = useSearchParams(),
+  const params = new URLSearchParams(queryString),
     router = useRouter();
   const q = params.get('q') || '',
-    category = params.get('category') || '',
+    category = categoryId || params.get('category') || '',
     tab = params.get('tab') || 'accounts',
     sort = params.get('sort') || 'recommended',
     page = Number(params.get('page')) || 1;
@@ -34,7 +41,10 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
     if (value) next.set(key, value);
     else next.delete(key);
     if (key !== 'page') next.delete('page');
-    router.push('?' + next.toString(), { scroll: false });
+    if (categoryId && key === 'category') {
+      next.delete('category');
+      router.push((value ? '/categories/' + value : '/discover') + '?' + next.toString(), { scroll: false });
+    } else router.push('?' + next.toString(), { scroll: false });
   };
   const query = new URLSearchParams({ q, sort, page: String(page), limit: '12' });
   if (category) query.set('category', category);
@@ -42,9 +52,9 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
   if (params.get('frequency')) query.set('frequency', params.get('frequency')!);
   const isArticle = tab === 'articles' && mode === 'search';
   const isAccountSearch = mode === 'search' && !isArticle && q.length > 0;
-  const accounts = useApi<Page<Account>>(!isArticle ? '/accounts?' + query : null),
-    articles = useApi<Page<Article>>(isArticle ? '/articles?' + query : null),
-    categories = useApi<Category[]>('/categories');
+  const accounts = useApi<Page<Account>>(!isArticle ? '/accounts?' + query : null, !isArticle ? initialResult as Page<Account> : undefined),
+    articles = useApi<Page<Article>>(isArticle ? '/articles?' + query : null, isArticle ? initialResult as Page<Article> : undefined),
+    categories = { data: initialCategories };
   const result = isArticle ? articles : accounts,
     total = result.data?.total || 0;
   const selectedCategory = categories.data?.find((c) => String(c.id) === category);
@@ -58,7 +68,7 @@ export function Explorer({ mode = 'discover' }: { mode?: 'discover' | 'search' |
           {mode === 'rankings' ? 'THE SOURCE RANKING' : 'EXPLORE THE SOURCE'}
         </span>
         <h1 className="mb-4 mt-3 text-3xl font-semibold">
-          {mode === 'search'
+          {categoryName ? `${categoryName}类公众号` : mode === 'search'
             ? q
               ? `搜索「${q}」`
               : '搜索你的下一处信息源'

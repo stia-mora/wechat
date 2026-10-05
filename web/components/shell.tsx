@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  ArrowUpRight,
   BookmarkSimple,
   List,
   MagnifyingGlass,
@@ -92,9 +91,6 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <span>公众号发现 · 为持续阅读，找到更好的起点。</span>
           <div className="flex gap-6">
             <span>内容归原作者所有</span>
-            <Link href="/admin" className="flex items-center gap-1">
-              数据管理 <ArrowUpRight size={12} />
-            </Link>
           </div>
         </div>
       </footer>

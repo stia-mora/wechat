@@ -120,13 +120,22 @@ export default function Admin() {
         <LockKey size={28} className="mb-6 text-[#245745]" />
         <h1 className="mb-3 text-2xl font-semibold">数据管理</h1>
         <p className="mb-6 text-sm leading-7 text-stone-500">
-          输入本机 .env 中的 ADMIN_TOKEN。密钥仅保存在当前浏览器会话，不会进入公开页面。
+          请输入管理员凭证以继续。
         </p>
         <form
-          onSubmit={(e) => {
+          onSubmit={async (e) => {
             e.preventDefault();
-            sessionStorage.setItem('ws-admin', draft);
-            setToken(draft);
+            setBusy(true);
+            setError('');
+            try {
+              await api('/admin/overview', { headers: { Authorization: 'Bearer ' + draft } });
+              sessionStorage.setItem('ws-admin', draft);
+              setToken(draft);
+            } catch (e) {
+              setError((e as Error).message);
+            } finally {
+              setBusy(false);
+            }
           }}
         >
           <label className="field">
@@ -139,8 +148,9 @@ export default function Admin() {
               onChange={(e) => setDraft(e.target.value)}
             />
           </label>
-          <button className="button mt-5 w-full">进入后台</button>
+          <button disabled={busy} className="button mt-5 w-full">{busy ? '验证中…' : '进入后台'}</button>
         </form>
+        {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
       </div>
     );
   return (
