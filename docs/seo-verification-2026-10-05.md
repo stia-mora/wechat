@@ -1,6 +1,6 @@
 # SEO / GEO 部署与 curl 验收（2026-10-05）
 
-应用代码已部署。公网根域名与根路径 robots 仍被 Cloudflare 隧道的路径规则拦截，等待控制台登录后添加转发并清理根 robots 的旧 404 缓存；源站根路径已返回 302 到 `/wechat`。
+应用代码已部署。用户已将 Cloudflare 隧道中 `wechat.aim888888.xyz` 的路径覆盖范围改为全部路径，继续转发至 `http://localhost:80`。北京时间 2026-10-05 19:58 的公网 curl 验证确认：根路径返回 302 到 `/wechat`；根 `/robots.txt` 返回 302 到 `/wechat/robots.txt`，跟随跳转后为 200；根 `/sitemap.xml` 跟随跳转后为 200。根 robots 的旧 404 缓存已不再命中，全部验收项完成。
 
 ## 修改文件
 
@@ -33,6 +33,7 @@
 - 所有受测公开页面页脚/导航均不含后台入口。管理登录页不含 `.env` 或 `ADMIN_TOKEN` 配置提示，管理 API 无凭证返回 403（达到失败预算后 429）。
 - 每个受测 HTML 的 Cache-Control 均为 `private, no-cache, no-store, max-age=0, must-revalidate`，Cloudflare 状态均为 `DYNAMIC`；静态 Next 资源仍保留长缓存。
 - `/wechat/robots.txt`、`/wechat/sitemap.xml`、`/wechat/llms.txt`、`/wechat/og-image.png` 均返回 200；robots 禁止管理、登录、个人收藏路径，允许公开内容。
+- 隧道调整后，公网根路径已返回 302 到 `/wechat`；根 robots 和 sitemap 跟随跳转后均为 200。根 robots 响应的 Cloudflare 状态为 `BYPASS`，首页仍为 `DYNAMIC`，不再返回旧 404。
 - sitemap 共 20,273 个 URL，完整包含 9,908 个公开公众号、10,298 篇公开文章、62 个分类及 5 个主要页面；每个详情条目都有 lastmod。隐藏文章、隐藏公众号的文章不进入索引。
 - 非数字的公众号/文章详情 ID 返回 404；`/wechat/rankings?page=-1` 规范化到第一页并返回 200。
 
