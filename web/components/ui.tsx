@@ -19,6 +19,8 @@ export function SearchBox({ initial = '', large = false }: { initial?: string; l
     router = useRouter();
   return (
     <form
+      action="/wechat/search"
+      method="get"
       onSubmit={(e) => {
         e.preventDefault();
         router.push('/search?q=' + encodeURIComponent(q));
@@ -32,6 +34,7 @@ export function SearchBox({ initial = '', large = false }: { initial?: string; l
       <MagnifyingGlass size={22} className="shrink-0 text-stone-400" />
       <input
         id="source-search"
+        name="q"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="搜索公众号、文章、关键词…"

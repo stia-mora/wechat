@@ -17,10 +17,10 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     );
   return data;
 }
-export function useApi<T>(path: string | null) {
-  const [data, setData] = useState<T | null>(null),
+export function useApi<T>(path: string | null, initialData?: T) {
+  const [data, setData] = useState<T | null>(initialData ?? null),
     [error, setError] = useState(''),
-    [loading, setLoading] = useState(true),
+    [loading, setLoading] = useState(initialData === undefined),
     [version, setVersion] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
@@ -28,9 +28,9 @@ export function useApi<T>(path: string | null) {
       setLoading(false);
       return;
     }
-    setLoading(true);
+    setLoading(initialData === undefined);
     setError('');
-    setData(null);
+    setData(initialData ?? null);
     api<T>(path, { signal: controller.signal })
       .then(setData)
       .catch((e) => {
@@ -40,7 +40,7 @@ export function useApi<T>(path: string | null) {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort();
-  }, [path, version]);
+  }, [path, version, initialData]);
   const reload = useCallback(() => setVersion((v) => v + 1), []);
   return { data, error, loading, reload };
 }
@@ -50,5 +50,6 @@ export const date = (value: string | null | undefined) =>
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
+        timeZone: 'Asia/Shanghai',
       })
     : '暂无日期';

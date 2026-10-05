@@ -65,6 +65,7 @@ export interface Article {
   source_url: string;
   cover_url: string;
   publish_time: string | null;
+  updated_at?: string;
   summary: string;
   status: string;
   word_count: number;

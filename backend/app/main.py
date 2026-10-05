@@ -123,7 +123,23 @@ def stats():
         return conn.execute("""SELECT (SELECT count(*) FROM official_accounts WHERE status='approved') AS accounts,
           (SELECT count(*) FROM articles ar JOIN official_accounts a ON a.id=ar.account_id WHERE a.status='approved' AND ar.status<>'hidden') AS articles,
           (SELECT count(*) FROM articles ar JOIN official_accounts a ON a.id=ar.account_id WHERE a.status='approved' AND ar.status='ready') AS readable,
-          (SELECT max(last_crawled_at) FROM official_accounts WHERE status='approved') AS last_crawled_at""").fetchone()
+          (SELECT max(last_crawled_at) FROM official_accounts WHERE status='approved') AS last_crawled_at,
+          (SELECT max(ar.publish_time) FROM articles ar JOIN official_accounts a ON a.id=ar.account_id WHERE a.status='approved' AND ar.status<>'hidden') AS last_article_at""").fetchone()
+
+
+@app.get("/api/public-sitemap")
+def public_sitemap():
+    with db() as conn:
+        accounts = conn.execute("""SELECT a.id,
+          greatest(a.updated_at,a.last_article_at,p.generated_at) AS updated_at
+          FROM official_accounts a LEFT JOIN ai_account_profiles p ON p.account_id=a.id
+          WHERE a.status='approved' ORDER BY a.id""").fetchall()
+        articles = conn.execute("""SELECT ar.id,
+          greatest(ar.updated_at,ai.generated_at) AS updated_at
+          FROM articles ar JOIN official_accounts a ON a.id=ar.account_id
+          LEFT JOIN ai_article_summaries ai ON ai.article_id=ar.id
+          WHERE a.status='approved' AND ar.status<>'hidden' ORDER BY ar.id""").fetchall()
+    return {"accounts": accounts, "articles": articles}
 
 
 @app.get("/api/categories")
