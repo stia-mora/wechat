@@ -29,4 +29,8 @@ with tempfile.TemporaryDirectory() as folder:
     assert 'hosts' not in http_report and '192.0.2.' not in (root / 'http.html').read_text(), 'Private client addresses leaked into report'
     assert summary['daily'][0]['views'] == 3
     assert browser_report['referring_sites']['metadata']['hits']['total']['value'] == 3
+    attack = root / 'attack.log'
+    attack.write_text(f'192.0.2.10 - - [{stamp}] "GET /wechat/<script>alert(987654)</script> HTTP/1.1" 404 0 "-" "curl/8.9.1"\n')
+    analyzer.analyze([attack], root / 'attack.json', root / 'attack.html')
+    assert '<script>alert(987654)</script>' not in (root / 'attack.html').read_text(), 'Untrusted request injected a script tag'
     print(json.dumps(summary, ensure_ascii=False))

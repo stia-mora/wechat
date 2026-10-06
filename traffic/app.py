@@ -53,7 +53,8 @@ async def security(request: Request, call_next):
                              'Cloudflare-CDN-Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow',
                              'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'SAMEORIGIN',
                              'Referrer-Policy': 'same-origin'})
-    scripts = "'self' 'unsafe-inline'" if request.url.path == '/traffic/report' else "'self'"
+    # GoAccess compiles its bundled templates with new Function; scope this to its private report.
+    scripts = "'self' 'unsafe-inline' 'unsafe-eval'" if request.url.path == '/traffic/report' else "'self'"
     response.headers['Content-Security-Policy'] = ("default-src 'self'; script-src " + scripts +
         "; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; form-action 'self'; frame-ancestors 'self'")
     return response

@@ -76,6 +76,8 @@ def test_period_filter_logout_and_safe_report_headers(client):
     assert response.json() == {'http_requests': 5}
     assert response.headers['X-Robots-Tag'] == 'noindex, nofollow'
     assert response.headers['Cloudflare-CDN-Cache-Control'] == 'no-store'
+    assert 'unsafe-eval' not in response.headers['Content-Security-Policy']
+    assert 'unsafe-eval' in client.get('/traffic/report').headers['Content-Security-Policy']
     assert client.post('/traffic/logout').status_code == 200
     assert client.get('/traffic/api/summary').status_code == 401
 
