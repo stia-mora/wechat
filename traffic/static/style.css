@@ -49,6 +49,13 @@ input:disabled { opacity: .55; cursor: not-allowed; }
 .row small { display: block; margin-top: 3px; }
 .row strong { flex-shrink: 0; font-weight: 500; font-variant-numeric: tabular-nums; }
 .empty { color: var(--color-muted); padding: 16px 0; font-size: 13px; }
+.geography { margin-top: 28px; }
+.geography > .section-head { margin-bottom: 16px; }
+.geo-row { display: grid; grid-template-columns: minmax(0, 1fr) 68px 68px; gap: 8px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--color-rule); }
+.geo-row > div { min-width: 0; overflow-wrap: anywhere; }
+.geo-row small { display: block; margin-top: 3px; }
+.geo-row strong, .geo-heading span:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+.geo-heading { font-size: 11px; color: var(--color-muted); }
 .trend { display: flex; align-items: flex-end; gap: 8px; height: 200px; overflow-x: auto; padding-top: 8px; }
 .day { flex: 1; min-width: 36px; max-width: 160px; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; height: 185px; font-variant-numeric: tabular-nums; }
 .bar { width: 65%; background: var(--color-accent); border-radius: 3px 3px 0 0; }

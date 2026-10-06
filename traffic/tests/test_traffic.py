@@ -100,3 +100,73 @@ def test_truncated_referrers_do_not_become_direct_visits():
     assert sources == [{'host': 'www.google.com', 'kind': '搜索引擎', 'views': 5},
                        {'host': '其他未列出的引荐域名', 'kind': '其他来源', 'views': 3},
                        {'host': '无引荐信息', 'kind': '直接 / 未知', 'views': 2}]
+
+
+def test_locations_are_gateway_provided_and_do_not_add_precise_coordinates(client):
+    response = client.post('/traffic/events', headers={'X-Real-IP': '192.0.2.99', 'CF-IPCountry': 'US',
+        'X-Traffic-Country': 'CN', 'X-Traffic-Region': 'Zhejiang', 'X-Traffic-City': 'Hangzhou'},
+        json={'path': '/wechat', 'country': 'US', 'latitude': '30.2'})
+    assert response.status_code == 204
+    line = next((analyzer.DATA / 'browser').glob('*.log')).read_text(encoding='utf-8')
+    location = json.loads(line[line.index('{"country"'):])
+    assert location == {'country': 'CN', 'region': 'Zhejiang', 'city': 'Hangzhou'}
+    assert '192.0.2.99' not in line and 'latitude' not in line and '30.2' not in line
+    assert (analyzer.DATA / 'location-started.txt').exists()
+
+
+def test_unknown_and_invalid_locations_are_not_guessed():
+    assert analyzer.clean_location({'country': 'XX', 'region': 'Zhejiang', 'city': 'Hangzhou'}) == {
+        'country': '-', 'region': '-', 'city': '-'}
+    assert analyzer.clean_location({'country': 'CN', 'region': 'Bad\nregion', 'city': '<script>'}) == {
+        'country': 'CN', 'region': '-', 'city': '-'}
+    assert analyzer.clean_location({'country': 'T1'})['country'] == 'T1'
+
+
+def test_location_summary_keeps_channels_and_historical_unknown_separate(tmp_path, monkeypatch):
+    monkeypatch.setattr(analyzer, 'LOGS', tmp_path / 'http')
+    monkeypatch.setattr(analyzer, 'DATA', tmp_path)
+    analyzer.LOGS.mkdir()
+    (tmp_path / 'browser').mkdir()
+    today = analyzer.now().date()
+    base = '192.0.2.99 - - [06/Oct/2026:10:00:00 +0800] "GET /wechat HTTP/1.1" 200 1 "-" "test"'
+    cn = ' {"country":"CN","region":"Zhejiang","city":"Hangzhou"}'
+    us = ' {"country":"US","region":"Virginia","city":"Ashburn"}'
+    (analyzer.LOGS / f'access-{today}.log').write_text(base + cn + '\n' + base + us + '\n' + base + '\n', encoding='utf-8')
+    (tmp_path / 'browser' / f'browser-{today}.log').write_text(base + cn + '\n' + base + cn + '\n' + base + '\n', encoding='utf-8')
+    geography = analyzer.location_summary(analyzer.log_files('http', 1), analyzer.log_files('browser', 1))
+    assert geography['located'] == {'http_requests': 2, 'browser_pv': 2}
+    assert next(row for row in geography['countries'] if row['country'] == 'CN') == {
+        'country': 'CN', 'browser_pv': 2, 'http_requests': 1}
+    assert next(row for row in geography['countries'] if row['country'] == '-')['browser_pv'] == 1
+    assert next(row for row in geography['cities'] if row['country'] == 'CN')['city'] == 'Hangzhou'
+    assert sum(row['browser_pv'] for row in geography['countries']) == 3
+    assert sum(row['http_requests'] for row in geography['countries']) == 3
+    assert '192.0.2.99' not in json.dumps(geography)
+
+
+def test_malformed_and_truncated_records_do_not_inflate_geography(tmp_path):
+    log = tmp_path / 'access.log'
+    base = '192.0.2.99 - - [06/Oct/2026:10:00:00 +0800] "GET /wechat HTTP/1.1" 200 1 "-" "test"'
+    log.write_text('\nnot a combined log record\n' + base + '\n' + base, encoding='utf-8')
+    assert analyzer.location_summary([log], [])['countries'] == [{'country': '-', 'http_requests': 1, 'browser_pv': 0}]
+
+
+def test_refresh_uses_same_snapshot_for_native_and_geographic_totals(tmp_path, monkeypatch):
+    monkeypatch.setattr(analyzer, 'LOGS', tmp_path / 'http')
+    monkeypatch.setattr(analyzer, 'DATA', tmp_path)
+    analyzer.LOGS.mkdir()
+    (tmp_path / 'started.txt').write_text('2026-10-06T10:00:00+08:00')
+    (tmp_path / 'location-started.txt').write_text('2026-10-06T10:00:00+08:00')
+    log = analyzer.LOGS / f'access-{analyzer.now().date()}.log'
+    line = '192.0.2.99 - - [06/Oct/2026:10:00:00 +0800] "GET /wechat HTTP/1.1" 200 1 "-" "test"\n'
+    log.write_text(line, encoding='utf-8')
+    def native(files, output, html=None):
+        count = sum(len(path.read_text(encoding='utf-8').splitlines()) for path in files)
+        with log.open('a', encoding='utf-8') as stream:
+            stream.write(line)
+        return {'general': {'valid_requests': count}}
+    monkeypatch.setattr(analyzer, 'analyze', native)
+    analyzer.refresh()
+    for days in (1, 7, 30):
+        summary = json.loads((tmp_path / 'reports' / f'summary-{days}.json').read_text(encoding='utf-8'))
+        assert summary['http_requests'] == summary['geography']['countries'][0]['http_requests'] == 1
