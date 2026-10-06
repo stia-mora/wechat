@@ -55,7 +55,13 @@ with tempfile.TemporaryDirectory() as folder:
         assert status == 200
         summary = json.loads(body)
         assert summary['days'] == days and summary['engine'] == 'GoAccess 1.12'
+        geography = summary['geography']
+        assert all(level in geography for level in ('countries', 'regions', 'cities', 'located'))
+        assert sum(row['browser_pv'] for row in geography['countries']) == summary['browser_pv']
+        assert sum(row['http_requests'] for row in geography['countries']) == summary['http_requests']
+        assert summary['location_started_at']
         print(f'PASS authenticated summary days={days}: HTTP={summary["http_requests"]}, browserPV={summary["browser_pv"]}, AI={summary["types"]["AI 爬虫 / 助手"]}')
+        print(f'PASS geography days={days}: countries={len(geography["countries"])}, regions={len(geography["regions"])}, cities={len(geography["cities"])}; browser/HTTP totals match')
     assert curl('/traffic/events', 'POST', {'path': '/wechat/admin'})[0] == 422
     assert curl('/traffic/events', 'POST', {'path': '/wechat/search?q=private'})[0] == 422
     assert curl('/traffic/login', 'POST', {'username': 'admin', 'password': password}, extra=['-H', 'Origin: https://evil.example'])[0] == 403

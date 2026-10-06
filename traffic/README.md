@@ -25,6 +25,7 @@ GitHub API 核对的星数，后续会变化：
 - 搜索引擎引荐和 AI 平台引荐分别分组。AI 平台引荐是点击来源，AI 爬虫是抓取请求；搜索词和 AI 对话路径不持久化。
 - 报表每分钟生成，今天、7 天、30 天三个窗口；超过列表条数上限的引荐流量单独显示，不归为直接访问。HTTP 原生详细报表是近 30 天窗口。
 - `started.txt` 持久保存启动日期；早于上线的图表日期显示“—”，不伪造历史统计。
+- 访问地域：启用 Cloudflare 的 Add visitor location headers，网关只信任已验证代理来源的 `CF-IPCountry`、`CF-Region`、`CF-IPCity`，覆盖浏览器传来的同名监控头。国家／地区、省／州、城市分别展示浏览器 PV 和 HTTP 请求，二者不相加。位置来自 IP 网络出口估算，不读取 GPS，不记录经纬度；缺失及旧日志显示未知，`location-started.txt` 保存位置统计启用时间。位置使用同一私有日志的 JSON 附加字段，保留30天；旧 COMBINED 日志仍兼容。依据：[Cloudflare 访客位置请求头](https://developers.cloudflare.com/rules/transform/managed-transforms/reference/#add-visitor-location-headers)。
 - Cloudflare 缓存命中或被边缘拦截的请求不一定到源站。完整边缘覆盖或高置信度 bot score 需要另接 Cloudflare 对应能力与权限，当前未启用付费功能。参见 [Cloudflare 检测机制](https://developers.cloudflare.com/bots/concepts/bot-detection-engines/)。
 
 ## 登录保护

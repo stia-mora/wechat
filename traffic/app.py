@@ -31,6 +31,9 @@ async def lifespan(app):
     started = analyzer.DATA / 'started.txt'
     if not started.exists():
         started.write_text(analyzer.now().isoformat(), encoding='ascii')
+    location_started = analyzer.DATA / 'location-started.txt'
+    if not location_started.exists():
+        location_started.write_text(analyzer.now().isoformat(), encoding='ascii')
     stop = threading.Event()
     thread = threading.Thread(target=analyzer.run, args=(stop,), daemon=True)
     thread.start()
@@ -168,7 +171,10 @@ def event(data: PageEvent, request: Request):
     agent = request.headers.get('user-agent', '-')[:1024]
     agent = re.sub(r'["\\\r\n\t]', '_', agent)
     stamp = current.strftime('%d/%b/%Y:%H:%M:%S %z')
-    line = f'{address} - - [{stamp}] "GET {data.path} HTTP/1.1" 200 0 "{referrer}" "{agent}"\n'
+    location = analyzer.clean_location({key: request.headers.get('x-traffic-' + key, '').encode('latin-1').decode('utf-8', errors='replace')
+                                       for key in ('country', 'region', 'city')})
+    line = (f'{address} - - [{stamp}] "GET {data.path} HTTP/1.1" 200 0 "{referrer}" "{agent}" '
+            + json.dumps(location, ensure_ascii=False) + '\n')
     folder = analyzer.DATA / 'browser'
     folder.mkdir(parents=True, exist_ok=True)
     with log_lock, (folder / f'browser-{current.date()}.log').open('a', encoding='utf-8') as stream:

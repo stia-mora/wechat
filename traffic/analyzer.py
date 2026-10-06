@@ -1,14 +1,17 @@
 """GoAccess remains the parsing and aggregation engine; this adds site-specific views."""
 import json
+import ipaddress
 import logging
 import os
 import re
 import subprocess
 import threading
+import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlsplit
 from zoneinfo import ZoneInfo
+from collections import Counter
 
 ZONE = ZoneInfo('Asia/Shanghai')
 LOGS = Path(os.getenv('TRAFFIC_LOGS', '/logs'))
@@ -17,6 +20,8 @@ STATIC = Path(__file__).parent / 'static'
 SEARCH_DOMAINS = ('bing.com', 'baidu.com', 'sogou.com', 'so.com', 'yahoo.com', 'yandex.ru', 'duckduckgo.com')
 AI_DOMAINS = ('chatgpt.com', 'openai.com', 'perplexity.ai', 'claude.ai', 'gemini.google.com',
               'copilot.microsoft.com', 'doubao.com', 'yuanbao.tencent.com', 'kimi.com', 'moonshot.cn', 'deepseek.com')
+LOG_RECORD = re.compile(r'^(\S+) - - \[([^\]]+)\] "[A-Z]+ \S+ HTTP/[0-9.]+" [1-5][0-9]{2} [0-9]+ '
+                        r'"(?:[^"\\]|\\.)*" "(?:[^"\\]|\\.)*"(?: (\{"country":.*\}))?\r?\n$')
 
 
 def now():
@@ -103,6 +108,59 @@ def log_files(channel, days):
             if (root / f'{prefix}-{today - timedelta(days=offset)}.log').exists()]
 
 
+def clean_location(value):
+    country = value.get('country', '')
+    country = country if isinstance(country, str) and re.fullmatch(r'[A-Z]{2}|T1', country) and country != 'XX' else '-'
+    result = {'country': country}
+    for key in ('region', 'city'):
+        text = value.get(key, '')
+        result[key] = (text.strip() if country != '-' and isinstance(text, str) and 0 < len(text) <= 100
+                       and not re.search(r'[\x00-\x1f\x7f<>"\\]', text) else '-') or '-'
+    return result
+
+
+def valid_record(line):
+    match = LOG_RECORD.fullmatch(line)
+    if not match:
+        return None
+    try:
+        ipaddress.ip_address(match[1])
+        datetime.strptime(match[2], '%d/%b/%Y:%H:%M:%S %z')
+    except ValueError:
+        return None
+    return match
+
+
+def location_summary(http_files, browser_files):
+    groups = {level: {'http_requests': Counter(), 'browser_pv': Counter()}
+              for level in ('countries', 'regions', 'cities')}
+    located = {'http_requests': 0, 'browser_pv': 0}
+    for files, metric in ((http_files, 'http_requests'), (browser_files, 'browser_pv')):
+        for path in files:
+            with path.open(encoding='utf-8', errors='replace') as stream:
+                for line in stream:
+                    match = valid_record(line)
+                    if not match:
+                        continue
+                    try:
+                        location = clean_location(json.loads(match[3])) if match[3] else clean_location({})
+                    except (ValueError, TypeError, AttributeError):
+                        location = clean_location({})
+                    country, region, city = (location[key] for key in ('country', 'region', 'city'))
+                    located[metric] += country != '-'
+                    for level, key in (('countries', (country,)), ('regions', (country, region)),
+                                       ('cities', (country, region, city))):
+                        groups[level][metric][key] += 1
+    result = {'located': located}
+    for level, metrics in groups.items():
+        keys = set(metrics['http_requests']) | set(metrics['browser_pv'])
+        rows = [{**dict(zip(('country', 'region', 'city'), key)),
+                 **{metric: counts[key] for metric, counts in metrics.items()}} for key in keys]
+        result[level] = sorted(rows, key=lambda row: (-row['browser_pv'], -row['http_requests'],
+                                                     row['country'], row.get('region', ''), row.get('city', '')))
+    return result
+
+
 def analyze(files, output, html=None):
     if not files or not any(path.stat().st_size for path in files):
         output.unlink(missing_ok=True)
@@ -127,16 +185,35 @@ def analyze(files, output, html=None):
 def refresh():
     reports = DATA / 'reports'
     reports.mkdir(parents=True, exist_ok=True)
-    for days in (1, 7, 30):
-        http = analyze(log_files('http', days), reports / f'http-{days}.json', reports / 'goaccess.html' if days == 30 else None)
-        browser = analyze(log_files('browser', days), reports / f'browser-{days}.json')
-        result = summarize(http, browser)
-        result.update(updated_at=now().isoformat(), days=days, engine='GoAccess 1.12',
-                      collection_started_at=(DATA / 'started.txt').read_text(encoding='ascii').strip())
-        target = reports / f'summary-{days}.json'
-        temporary = target.with_suffix('.tmp')
-        temporary.write_text(json.dumps(result, ensure_ascii=False), encoding='utf-8')
-        temporary.replace(target)
+    # One immutable, complete-record snapshot keeps GoAccess and geographic totals consistent.
+    with tempfile.TemporaryDirectory(prefix='traffic-snapshot-') as folder:
+        snapshots = {}
+        for channel in ('http', 'browser'):
+            for source in log_files(channel, 30):
+                target = Path(folder) / source.name
+                with source.open(encoding='utf-8', errors='replace') as incoming, target.open('w', encoding='utf-8') as outgoing:
+                    for line in incoming:
+                        if valid_record(line):
+                            outgoing.write(line)
+                snapshots[source] = target
+        for days in (1, 7, 30):
+            http_files, browser_files = ([snapshots[path] for path in log_files(channel, days) if path in snapshots]
+                                         for channel in ('http', 'browser'))
+            http = analyze(http_files, reports / f'http-{days}.json', reports / 'goaccess.html' if days == 30 else None)
+            browser = analyze(browser_files, reports / f'browser-{days}.json')
+            result = summarize(http, browser)
+            geography = location_summary(http_files, browser_files)
+            for metric in ('http_requests', 'browser_pv'):
+                if sum(row[metric] for row in geography['countries']) != result[metric]:
+                    raise ValueError('Geography and GoAccess totals diverged')
+            result.update(updated_at=now().isoformat(), days=days, engine='GoAccess 1.12',
+                          collection_started_at=(DATA / 'started.txt').read_text(encoding='ascii').strip(),
+                          location_started_at=(DATA / 'location-started.txt').read_text(encoding='ascii').strip(),
+                          geography=geography)
+            target = reports / f'summary-{days}.json'
+            temporary = target.with_suffix('.tmp')
+            temporary.write_text(json.dumps(result, ensure_ascii=False), encoding='utf-8')
+            temporary.replace(target)
 
 
 def run(stop: threading.Event):
