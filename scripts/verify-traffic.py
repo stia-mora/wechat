@@ -47,6 +47,9 @@ with tempfile.TemporaryDirectory() as folder:
     assert curl('/traffic/login', 'POST', {'username': 'admin', 'password': password})[0] == 200
     status, body, _ = curl('/traffic', auth=True)
     assert status == 200 and '浏览器上报访问' in body
+    status, body, headers = curl('/traffic/report', auth=True)
+    assert status == 200 and 'unsafe-eval' in headers and 'no-store' in headers
+    print('PASS authenticated native report: 200, scoped template policy, no-store')
     for days in (1, 7, 30):
         status, body, _ = curl('/traffic/api/summary?days=' + str(days), auth=True)
         assert status == 200
