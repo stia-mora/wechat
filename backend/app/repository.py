@@ -58,6 +58,8 @@ def set_tags(conn, account_id, tags):
 ACCOUNT_SELECT = """SELECT a.*, c.name AS category, s.article_count,s.articles_last_7d,s.articles_last_30d,
  s.readable_count,s.active_score,p.data AS profile,p.model_name,p.prompt_version,p.source_article_count,p.generated_at,
  coalesce((SELECT json_agg(t.name ORDER BY t.name) FROM official_account_tags at JOIN tags t ON t.id=at.tag_id WHERE at.account_id=a.id),'[]') AS tags,
+ (SELECT ar.source_url FROM articles ar WHERE ar.account_id=a.id AND ar.status<>'hidden' AND ar.source_url<>''
+  ORDER BY ar.publish_time DESC NULLS LAST,ar.id DESC LIMIT 1) AS external_article_url,
  (SELECT count(*) FROM user_following f WHERE f.account_id=a.id)::int AS following_count,
  (SELECT count(*) FROM user_following f WHERE f.account_id=a.id AND f.created_at>now()-interval '7 days')::int AS growth,
  (SELECT count(*) FROM collections f WHERE f.account_id=a.id)::int AS collection_count

@@ -15,6 +15,11 @@ export function WechatEntry({ account, className = 'flex items-center gap-1 font
   useEffect(() => {
     if (open) dialog.current?.showModal();
   }, [open]);
+  if (account.external_article_url) {
+    return <a href={account.external_article_url} target="_blank" rel="noreferrer" className={className}>
+      在微信查看一篇文章 <ArrowUpRight size={15} />
+    </a>;
+  }
   if (!account.source_url) return null;
 
   async function copy() {
@@ -28,23 +33,17 @@ export function WechatEntry({ account, className = 'flex items-center gap-1 font
 
   return (
     <>
-      <button type="button" className={className} onClick={() => {
-        if (/MicroMessenger/i.test(navigator.userAgent)) {
-          window.location.assign(account.source_url);
-          return;
-        }
-        setOpen(true);
-      }}>
-        打开微信公众号 <ArrowUpRight size={15} />
+      <button type="button" className={className} onClick={() => setOpen(true)}>
+        在微信中查找公众号 <ArrowUpRight size={15} />
       </button>
       {open && <dialog ref={dialog} onClose={() => { setOpen(false); setFeedback(''); }}
         className="m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-stone-200 bg-white p-6 text-stone-800 backdrop:bg-stone-900/40"
         aria-label={'在微信中打开' + account.name}>
         <div className="flex items-start justify-between gap-4">
-          <h2 className="text-lg font-semibold">在微信中打开{account.name}</h2>
+          <h2 className="text-lg font-semibold">在微信中查找{account.name}</h2>
           <button type="button" onClick={() => dialog.current?.close()} className="shrink-0 text-sm text-stone-500">关闭</button>
         </div>
-        <p className="mt-3 text-sm leading-6 text-stone-500">用微信扫一扫，进入该公众号。手机上也可保存二维码后，在微信扫一扫中选择图片。</p>
+        <p className="mt-3 text-sm leading-6 text-stone-500">本站暂未收录可直接打开的文章。可用微信扫一扫，或搜索下方账号。</p>
         <img src={apiPath(`/accounts/${account.id}/wechat-qr`)}
           alt={account.name + '的微信入口二维码'} width={240} height={240} className="mx-auto my-4" />
         <p className="text-sm text-stone-500">也可复制{account.wechat_id ? '微信号' : '公众号名称'}，打开微信后搜索：</p>

@@ -54,6 +54,7 @@ export interface Account {
   similarity_reason?: string;
   difference?: string;
   source_url: string;
+  external_article_url: string | null;
   subcategories?: Category[];
 }
 export interface Article {

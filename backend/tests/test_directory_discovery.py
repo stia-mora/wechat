@@ -71,8 +71,28 @@ def test_public_directory_is_browsable_and_has_wechat_links_without_articles(cli
     assert page["items"][0]["source_url"] == wechat_profile_url(source_id)
     detail = api.get(f"/api/accounts/{account}").json()
     assert detail["source_url"] == wechat_profile_url(source_id)
+    assert detail["external_article_url"] is None
     assert detail["article_count"] == 0 and not detail["article_collection_enabled"]
     assert api.get(f"/api/accounts/{hidden}").status_code == 404
+
+
+def test_account_external_article_url_uses_latest_visible_article(client):
+    api, conn = client
+    account = fixture_account(conn)
+    old = "https://mp.weixin.qq.com/s/old-article"
+    hidden = "https://mp.weixin.qq.com/s/hidden-article"
+    latest = "https://mp.weixin.qq.com/s/latest-article"
+    for title, url, status, published in (
+        ("旧文章", old, "ready", "2026-01-01"),
+        ("隐藏文章", hidden, "hidden", "2026-02-01"),
+        ("最新文章", latest, "metadata", "2026-03-01"),
+    ):
+        conn.execute(
+            """INSERT INTO articles(account_id,source_key,title,source_url,status,publish_time)
+            VALUES (%s,%s,%s,%s,%s,%s)""",
+            (account, secrets.token_hex(16), title, url, status, published),
+        )
+    assert api.get(f"/api/accounts/{account}").json()["external_article_url"] == latest
 
 
 def test_wechat_profile_links_use_only_real_numeric_identities():

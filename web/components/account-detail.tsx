@@ -97,10 +97,10 @@ export default function AccountPage({ initialAccount, initialArticles }: {
           </div>
           <WechatEntry account={a} className="button secondary" />
         </div>
-        {a.source_url && (
+        {a.external_article_url && (
           <p className="mt-4 text-xs leading-6 text-stone-500">
-            <a href={a.source_url} target="_blank" rel="noreferrer" className="underline">公众号原始资料链接</a> ·{' '}
-            点击可查看微信入口；在微信内访问本站时可直接前往公众号。
+            <a href={a.external_article_url} target="_blank" rel="noreferrer" className="underline">查看该公众号的一篇已收录文章</a> ·{' '}
+            在微信文章页可查看作者并进入公众号。
           </p>
         )}
       </section>
