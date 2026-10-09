@@ -1,4 +1,4 @@
-"""Run in the source image: python -m unittest test_discovery."""
+"""Run in the source image with PYTHONPATH=/app: python -m unittest source_bridge.test_discovery."""
 
 import asyncio
 import unittest
@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, patch
 import httpx
 from fastapi import HTTPException
 
-import service
+from source_bridge import service
 
 
 class DiscoveryTests(unittest.TestCase):

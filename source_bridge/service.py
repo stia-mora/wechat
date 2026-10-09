@@ -18,11 +18,13 @@ from pydantic import BaseModel, Field
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "ref" / "wechat-download-api"))
+sys.path.insert(1, str(ROOT))
 
 from app import app
 from routes.article import ArticleRequest, get_article
 from utils import rss_store
 from utils.auth_manager import auth_manager
+from source_bridge.mp_login import MPLogin
 
 
 def authenticate(authorization: str = Header(default="")):
@@ -33,6 +35,26 @@ def authenticate(authorization: str = Header(default="")):
 
 router = APIRouter(prefix="/api/bridge", dependencies=[Depends(authenticate)])
 SEARCH_PAGE_SIZE = 10
+mp_login = MPLogin(auth_manager)
+
+
+class LoginSession(BaseModel):
+    session_id: str = Field(min_length=20, max_length=80, pattern=r"^[a-zA-Z0-9_-]+$")
+
+
+@router.post("/mp-login/start")
+def start_mp_login():
+    return mp_login.start()
+
+
+@router.post("/mp-login/poll")
+def poll_mp_login(data: LoginSession):
+    return mp_login.poll(data.session_id)
+
+
+@router.post("/mp-login/cancel")
+def cancel_mp_login():
+    return mp_login.cancel()
 
 
 @router.get("/accounts/search")
