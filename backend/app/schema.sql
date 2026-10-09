@@ -229,7 +229,7 @@ CREATE TABLE IF NOT EXISTS source_memberships (
  PRIMARY KEY(source_account_id,account_id)
 );
 ALTER TABLE jobs DROP CONSTRAINT IF EXISTS jobs_kind_check;
-ALTER TABLE jobs ADD CONSTRAINT jobs_kind_check CHECK(kind IN ('discover','sync','parse','account_ai','article_ai','embedding','account_embedding'));
+ALTER TABLE jobs ADD CONSTRAINT jobs_kind_check CHECK(kind IN ('discover','sync','parse','account_ai','article_ai','embedding','account_embedding','account_entry'));
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS source_account_id bigint REFERENCES source_accounts(id);
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS lease_token text;
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS heartbeat_at timestamptz;
@@ -270,6 +270,17 @@ CREATE TABLE IF NOT EXISTS discovery_requests (
 );
 CREATE INDEX IF NOT EXISTS jobs_source_lease ON jobs(source_account_id) WHERE status='running';
 ALTER TABLE jobs ADD COLUMN IF NOT EXISTS execution_token text;
+CREATE TABLE IF NOT EXISTS entry_collection (
+ id boolean PRIMARY KEY DEFAULT true CHECK(id), run_id text NOT NULL DEFAULT '',
+ phase text NOT NULL DEFAULT 'unprepared', status text NOT NULL DEFAULT 'paused',
+ blocked boolean NOT NULL DEFAULT false, reason text NOT NULL DEFAULT '',
+ token_hash text NOT NULL DEFAULT '', last_heartbeat timestamptz, next_request_at timestamptz
+);
+INSERT INTO entry_collection(id) VALUES (true) ON CONFLICT DO NOTHING;
+ALTER TABLE entry_collection ADD COLUMN IF NOT EXISTS probe_job_id bigint REFERENCES jobs(id);
+CREATE TABLE IF NOT EXISTS entry_request_budget (
+ day date PRIMARY KEY, requests integer NOT NULL DEFAULT 0 CHECK(requests>=0)
+);
 ALTER TABLE source_accounts ADD COLUMN IF NOT EXISTS maintenance_until timestamptz;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_publish_time timestamptz;
 ALTER TABLE articles ADD COLUMN IF NOT EXISTS body_error text;

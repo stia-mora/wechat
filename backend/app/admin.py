@@ -34,6 +34,9 @@ def overview():
         )
         response.raise_for_status()
         source = response.json()
+        # Stored credentials are not proof of a current upstream session.
+        source = {"loggedIn": bool(source.get("loggedIn") and not source.get("isExpired")),
+                  "status": source.get("status", "登录状态未知")}
     except (httpx.HTTPError, ValueError):
         source = {"loggedIn": False, "status": "采集服务不可连接"}
     return {
@@ -167,6 +170,8 @@ def retry(job_id: int):
         ).fetchone()
         if not job:
             raise HTTPException(409, "只能重试失败或阻塞的任务")
+        if job["kind"] == "account_entry":
+            raise HTTPException(409, "补入口任务请在独立补入口页重试")
         payload = dict(job["payload"])
         if job["kind"] == "sync":
             payload["_progress"] = job["result"] or payload.get("_progress")

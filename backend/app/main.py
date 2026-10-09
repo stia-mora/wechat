@@ -18,6 +18,7 @@ from .db import db, initialize
 from .embeddings import embed_query
 from .repository import ACCOUNT_SELECT, rank_account, wechat_profile_url
 from .source_admin import router as source_admin_router
+from .entry_collection import router as entry_collector_router, admin_router as entry_admin_router
 
 
 @asynccontextmanager
@@ -30,6 +31,8 @@ app = FastAPI(title="WeChat Source", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(source_admin_router)
 app.include_router(api_access_router)
+app.include_router(entry_collector_router)
+app.include_router(entry_admin_router)
 
 
 class DiscoveryRequest(BaseModel):

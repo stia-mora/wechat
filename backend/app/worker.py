@@ -83,7 +83,7 @@ def run(once=False, mode="all"):
         with db() as conn:
             recover(conn)
             conn.execute(
-                "UPDATE jobs SET status='queued',execution_token=NULL,error='Worker 中断，重新排队' WHERE status='running' AND lease_token IS NULL AND started_at<now()-interval '3 hours'"
+                "UPDATE jobs SET status='queued',execution_token=NULL,error='Worker 中断，重新排队' WHERE kind<>'account_entry' AND status='running' AND lease_token IS NULL AND started_at<now()-interval '3 hours'"
             )
             types = (
                 ["article_ai", "account_ai", "embedding", "account_embedding"]
