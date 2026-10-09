@@ -7,6 +7,7 @@ import { ErrorState, Loading } from '@/components/ui';
 import { SourcePipeline } from '@/components/source-pipeline';
 import { SourceAccounts } from '@/components/source-accounts';
 import { ApiUserAdmin } from '@/components/api-user-admin';
+import { EntryCollectionAdmin, MPLogin } from '@/components/entry-collection-admin';
 
 type Overview = {
   accounts: { status: string; count: number }[];
@@ -36,6 +37,7 @@ const kindNames: Record<string, string> = {
   account_ai: '账号画像',
   article_ai: '文章摘要',
   embedding: '文章向量',
+  account_entry: '独立补入口',
 };
 
 export default function Admin() {
@@ -181,6 +183,7 @@ export default function Admin() {
           ['overview', '概览'],
           ['accounts', '公众号审核'],
           ['sources', '微信读书账号池'],
+          ['entry-collection', '独立补入口'],
           ['articles', '文章管理'],
           ['jobs', '采集 / AI 任务'],
           ['categories', '分类'],
@@ -240,14 +243,7 @@ export default function Admin() {
               <p className="mt-3 text-xs text-stone-500">
                 最近采集 {date(overview.source_counts.last_crawled_at)}
               </p>
-              <a
-                href="http://localhost:5500/login.html"
-                target="_blank"
-                rel="noreferrer"
-                className="button secondary mt-5 small"
-              >
-                打开本机扫码入口
-              </a>
+              <div className="mt-5"><MPLogin token={token} /></div>
             </section>
             <section className="rounded-xl border border-stone-200 bg-white p-7">
               <h2 className="mb-4 text-lg font-semibold">任务与分析</h2>
@@ -789,6 +785,7 @@ export default function Admin() {
         </form>
       )}
       {tab === 'api-users' && <ApiUserAdmin token={token} />}
+      {tab === 'entry-collection' && <EntryCollectionAdmin token={token} />}
       {['accounts', 'jobs', 'articles'].includes(tab) && (
         <div className="mt-7 flex items-center justify-center gap-5">
           <button
