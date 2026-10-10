@@ -1,0 +1,15 @@
+port: 2025
+download_dir: downloads
+cert_file: '@CERT_PATH@'
+secret_token: '@LOCAL_TOKEN@'
+web_console_token: '@LOCAL_TOKEN@'
+cloud_enabled: false
+radar_enabled: false
+auto_open_channels: false
+show_log_button: false
+log_file: logs/wx_channel.log
+max_log_size_mb: 5
+allowed_origins:
+  - 'http://127.0.0.1:2025'
+  - 'http://127.0.0.1:2026'
+  - 'https://mp.weixin.qq.com'
