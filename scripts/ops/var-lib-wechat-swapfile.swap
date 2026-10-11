@@ -1,0 +1,9 @@
+[Unit]
+Description=WeChat runtime OOM emergency swap buffer
+
+[Swap]
+What=/var/lib/wechat/swapfile
+Priority=10
+
+[Install]
+WantedBy=swap.target
