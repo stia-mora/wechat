@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: source_bridge/Dockerfile
     restart: unless-stopped
+    mem_limit: 192m
+    memswap_limit: 256m
     environment:
       TZ: Asia/Shanghai
     volumes:
@@ -21,8 +23,14 @@ services:
 
   api:
     restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--limit-concurrency", "32", "--backlog", "64", "--timeout-keep-alive", "2"]
+    mem_limit: 256m
+    memswap_limit: 384m
     environment:
       SOURCE_API_URL: http://source:5500
+      DB_MAX_CONNECTIONS: 6
+      DB_ACQUIRE_TIMEOUT_SECONDS: 2
+      DB_STATEMENT_TIMEOUT_MS: 15000
     depends_on:
       source:
         condition: service_healthy
@@ -30,6 +38,8 @@ services:
   worker:
     restart: unless-stopped
     profiles: [articles]
+    mem_limit: 192m
+    memswap_limit: 256m
     environment:
       SOURCE_API_URL: http://source:5500
 
@@ -37,6 +47,8 @@ services:
     build: ./backend
     profiles: [directory]
     restart: on-failure
+    mem_limit: 128m
+    memswap_limit: 192m
     command: python -u -m app.bulk_discover --target 10000 --wait-login
     env_file: .env
     environment:
@@ -53,6 +65,8 @@ services:
 
   ai-worker:
     restart: unless-stopped
+    mem_limit: 128m
+    memswap_limit: 192m
     environment:
       SOURCE_API_URL: http://source:5500
       AI_JOB_START_INTERVAL_SECONDS: 12
@@ -61,6 +75,11 @@ services:
 
   web:
     restart: unless-stopped
+    command: ["node", "node_modules/next/dist/bin/next", "start", "--hostname", "0.0.0.0", "--port", "3000"]
+    environment:
+      NODE_OPTIONS: --max-old-space-size=192
+    mem_limit: 384m
+    memswap_limit: 512m
 
   traffic:
     image: wechat-traffic
@@ -89,3 +108,6 @@ services:
 
   db:
     restart: unless-stopped
+    command: ["postgres", "-c", "max_connections=32", "-c", "work_mem=2MB", "-c", "shared_buffers=128MB", "-c", "maintenance_work_mem=32MB", "-c", "max_parallel_workers_per_gather=0", "-c", "statement_timeout=30s", "-c", "lock_timeout=5s", "-c", "idle_in_transaction_session_timeout=60s", "-c", "jit=off"]
+    mem_limit: 384m
+    memswap_limit: 512m
