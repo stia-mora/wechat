@@ -1,18 +1,33 @@
 import os
 from contextlib import contextmanager
 from pathlib import Path
+from threading import BoundedSemaphore
 
 import psycopg
 from dotenv import load_dotenv
 from psycopg.rows import dict_row
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+connection_slots = BoundedSemaphore(max(1, int(os.getenv("DB_MAX_CONNECTIONS", "6"))))
+
+
+class DatabaseBusy(Exception):
+    """No connection slot is available; callers may retry, without a raw DSN."""
 
 
 @contextmanager
 def db():
-    with psycopg.connect(os.environ["DATABASE_URL"], row_factory=dict_row) as conn:
-        yield conn
+    if not connection_slots.acquire(timeout=float(os.getenv("DB_ACQUIRE_TIMEOUT_SECONDS", "2"))):
+        raise DatabaseBusy()
+    try:
+        statement_ms = max(1, int(os.getenv("DB_STATEMENT_TIMEOUT_MS", "30000")))
+        with psycopg.connect(
+            os.environ["DATABASE_URL"], row_factory=dict_row, connect_timeout=5,
+            options=f"-c statement_timeout={statement_ms} -c lock_timeout=5000 -c idle_in_transaction_session_timeout=60000",
+        ) as conn:
+            yield conn
+    finally:
+        connection_slots.release()
 
 
 def initialize():

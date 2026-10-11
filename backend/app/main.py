@@ -9,12 +9,14 @@ import qrcode
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field
+from psycopg import OperationalError
+from psycopg.errors import LockNotAvailable, QueryCanceled
 
 from .admin import router as admin_router
 from .api_access import router as api_access_router
 from .auth import current_user
 from .auth import router as auth_router
-from .db import db, initialize
+from .db import DatabaseBusy, db, initialize
 from .embeddings import embed_query
 from .repository import ACCOUNT_SELECT, rank_account, wechat_profile_url
 from .source_admin import router as source_admin_router
@@ -29,6 +31,17 @@ async def lifespan(app):
 
 
 app = FastAPI(title="WeChat Source", lifespan=lifespan)
+
+
+@app.exception_handler(DatabaseBusy)
+@app.exception_handler(OperationalError)
+@app.exception_handler(QueryCanceled)
+@app.exception_handler(LockNotAvailable)
+async def database_unavailable(request: Request, exc: Exception):
+    return JSONResponse({"detail": "服务繁忙或数据库暂不可用，请稍后重试"}, status_code=503,
+                        headers={"Retry-After": "2", "Cache-Control": "no-store"})
+
+
 app.include_router(auth_router)
 app.include_router(source_admin_router)
 app.include_router(api_access_router)
