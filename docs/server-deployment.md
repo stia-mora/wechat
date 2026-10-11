@@ -1,11 +1,17 @@
 # ECS deployment
 
-The production ECS has 2 vCPU, 2 GiB RAM and no swap. Never run image builds
+The production ECS has 2 vCPU and 2 GiB RAM. Since 2026-10-11 it has a 2 GiB
+emergency Swap buffer; this does not make it a build machine. Never run image builds
 there: previous builds have repeatedly coincided with loss of SSH and public
 reachability. Build and test images locally, transfer them, then use
 `--no-build --no-deps` to replace only the changed application services.
 Before replacement, check container status, available memory/disk and
 `systemctl is-active cloudflared`. Preserve backups and runtime data.
+
+Keep the runtime memory, database and request-concurrency limits. See the
+[2026-10-11 OOM recovery record](runtime-oom-recovery-2026-10-11.md) for evidence,
+Swap setup, acceptance results and rollback. Do not increase AI replicas to
+consume the emergency Swap buffer.
 
 The server deployment uses the committed application code plus a private migration
 archive. The archive contains PostgreSQL, environment settings, credential keys,
@@ -20,8 +26,13 @@ directory.
 .\scripts\create-server-migration.ps1 -OutputPath "$env:TEMP\wechat-migration.tgz"
 ```
 
-From the repository root on the server, after copying the archive to
-`/root/wechat-migration.tgz`:
+The following migration is only for a first deployment to a new, empty instance
+and database, after the runtime Swap setup above. It extracts private files and
+uses `pg_restore --clean`; never run it against an existing production instance
+for an upgrade or code-only recovery. Use the targeted image update below instead.
+
+For that initial deployment only, from the server repository root after copying
+the archive to `/root/wechat-migration.tgz`:
 
 ```sh
 mkdir -p data/private data/source-bridge/upstream-data
@@ -66,12 +77,12 @@ docker image save -o "$env:TEMP\wechat-images.tar" `
 scp "$env:TEMP\wechat-images.tar" root@SERVER:/root/wechat-images.tar
 ```
 
-Then, on the server:
+Then, on the server, replace only the services actually changed (API/Web example):
 
 ```sh
 docker load -i /root/wechat-images.tar
 cd /opt/wechat
-docker compose -f compose.yaml -f compose.server.yaml up -d --no-build
+docker compose -f compose.yaml -f compose.server.yaml up -d --no-build --no-deps api web
 ```
 
 For a code-only update when `git pull` also times out, transfer an incremental Git
